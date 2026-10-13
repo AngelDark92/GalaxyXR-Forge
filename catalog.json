@@ -152,9 +152,9 @@
         {
           "repo": "Terminal-ennui/Galaxy_XR_ALVR_USB",
           "url": "https://github.com/Terminal-ennui/Galaxy_XR_ALVR_USB",
-          "about": "Streams SteamVR to the headset over USB 3 with ALVR.",
+          "about": "Streams SteamVR over USB 3 using stock ALVR 20.14.1 with a patched headset client.",
           "license": "MIT",
-          "release": null,
+          "release": "v0.2.0-beta",
           "tags": ["alvr", "usb", "streaming"]
         },
         {
@@ -437,7 +437,7 @@
         {
           "repo": "Terminal-ennui/pyrowave",
           "url": "https://github.com/Terminal-ennui/pyrowave",
-          "about": "Vulkan compute wavelet codec used by the headset's ALVR streaming builds.",
+          "about": "PyroWave wavelet codec fork used by the headset's ALVR 4:4:4 streaming builds.",
           "license": "MIT",
           "release": null,
           "tags": ["codec", "vulkan", "streaming"]

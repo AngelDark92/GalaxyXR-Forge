@@ -25,14 +25,6 @@
           "license": null,
           "release": "v4.1",
           "tags": ["root", "loader", "module"]
-        },
-        {
-          "repo": "diabl0w/KernelSU",
-          "url": "https://github.com/diabl0w/KernelSU",
-          "about": "KernelSU fork with the samsung-v1.0 branch that KernelSU-GXR builds on.",
-          "license": "GPL-3.0",
-          "release": "samsung-v1.0",
-          "tags": ["root", "kernelsu", "source"]
         }
       ]
     },
@@ -377,6 +369,14 @@
           "license": "GPL-2.0",
           "release": "1.3.0",
           "tags": ["steamvr", "framework", "driver"]
+        },
+        {
+          "repo": "diabl0w/KernelSU",
+          "url": "https://github.com/diabl0w/KernelSU",
+          "about": "KernelSU fork with the samsung-v1.0 branch that KernelSU-GXR builds on.",
+          "license": "GPL-3.0",
+          "release": "samsung-v1.0",
+          "tags": ["root", "kernelsu", "source"]
         },
         {
           "repo": "ovrport/app",

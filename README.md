@@ -28,7 +28,6 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | --- | --- |
 | **[4uva4ek/KernelSU-GXR](https://github.com/4uva4ek/KernelSU-GXR)**<br>![stars](https://img.shields.io/github/stars/4uva4ek/KernelSU-GXR?style=flat-square) ![release](https://img.shields.io/github/v/release/4uva4ek/KernelSU-GXR?style=flat-square&label=release) | KernelSU manager and daemon built for the Galaxy XR: module installer and signed self-update. |
 | **[diabl0w/DFRoot](https://github.com/diabl0w/DFRoot)**<br>![stars](https://img.shields.io/github/stars/diabl0w/DFRoot?style=flat-square) ![release](https://img.shields.io/github/v/release/diabl0w/DFRoot?style=flat-square&label=release) | Kernel-module loader that loads KernelSU-GXR without flashing a boot image. |
-| **[diabl0w/KernelSU](https://github.com/diabl0w/KernelSU)**<br>![stars](https://img.shields.io/github/stars/diabl0w/KernelSU?style=flat-square) ![release](https://img.shields.io/github/v/release/diabl0w/KernelSU?style=flat-square&label=release) | KernelSU fork with the samsung-v1.0 branch that KernelSU-GXR builds on. |
 
 <a id="kernelsu-modules"></a>
 
@@ -135,6 +134,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | Repository | What it does |
 | --- | --- |
 | **[sboys3/CustomHeadsetOpenVR](https://github.com/sboys3/CustomHeadsetOpenVR)**<br>![stars](https://img.shields.io/github/stars/sboys3/CustomHeadsetOpenVR?style=flat-square) ![release](https://img.shields.io/github/v/release/sboys3/CustomHeadsetOpenVR?style=flat-square&label=release) | Base custom-headset SteamVR driver framework; both Galaxy XR drivers fork from it. |
+| **[diabl0w/KernelSU](https://github.com/diabl0w/KernelSU)**<br>![stars](https://img.shields.io/github/stars/diabl0w/KernelSU?style=flat-square) ![release](https://img.shields.io/github/v/release/diabl0w/KernelSU?style=flat-square&label=release) | KernelSU fork with the samsung-v1.0 branch that KernelSU-GXR builds on. |
 | **[ovrport/app](https://github.com/ovrport/app)**<br>![stars](https://img.shields.io/github/stars/ovrport/app?style=flat-square) ![release](https://img.shields.io/github/v/release/ovrport/app?style=flat-square&label=release) | Upstream Overport: patches Quest-targeting Android games; base of the Galaxy XR fork. |
 | **[MorpheApp/morphe-manager](https://github.com/MorpheApp/morphe-manager)**<br>![stars](https://img.shields.io/github/stars/MorpheApp/morphe-manager?style=flat-square) ![release](https://img.shields.io/github/v/release/MorpheApp/morphe-manager?style=flat-square&label=release) | The on-device Morphe patcher that applies .mpp patch bundles. |
 | **[MorpheApp/morphe-patches](https://github.com/MorpheApp/morphe-patches)**<br>![stars](https://img.shields.io/github/stars/MorpheApp/morphe-patches?style=flat-square) ![release](https://img.shields.io/github/v/release/MorpheApp/morphe-patches?style=flat-square&label=release) | Morphe's base patch library; the groundwork for Galaxy XR patch bundles. |

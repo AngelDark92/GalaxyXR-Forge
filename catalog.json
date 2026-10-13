@@ -115,7 +115,7 @@
       "title": "PC VR & Streaming",
       "icon": "🖥️",
       "hue": "#38bdf8",
-      "blurb": "SteamVR drivers and streaming tooling that make PC VR behave on the XR.",
+      "blurb": "SteamVR drivers, streaming stacks and PC-side VR tooling for the XR.",
       "repos": [
         {
           "repo": "AngelDark92/GalaxyXR-Driver",
@@ -172,6 +172,30 @@
           "license": "AGPL-3.0",
           "release": null,
           "tags": ["lighthouse", "steamvr", "controllers"]
+        },
+        {
+          "repo": "mbucchia/PimaxMagic4All",
+          "url": "https://github.com/mbucchia/PimaxMagic4All",
+          "about": "Brings Pimax dynamic foveated rendering to non-Pimax headsets in SteamVR apps.",
+          "license": "MIT",
+          "release": "1.0",
+          "tags": ["foveated rendering", "eye tracking", "steamvr", "performance"]
+        },
+        {
+          "repo": "Mr-Nlce/PCVR-Mods-Installer-Hub",
+          "url": "https://github.com/Mr-Nlce/PCVR-Mods-Installer-Hub",
+          "about": "Portable installer and launcher for publicly available PC VR game mods.",
+          "license": "MIT",
+          "release": "v0.8.7.9",
+          "tags": ["pcvr mods", "installer", "flat2vr", "launcher"]
+        },
+        {
+          "repo": "Gilleece/moonlight-android-xr",
+          "url": "https://github.com/Gilleece/moonlight-android-xr",
+          "about": "Moonlight fork: native OpenXR client with on-headset 2D-to-3D conversion.",
+          "license": "GPL-3.0",
+          "release": "v0.4",
+          "tags": ["moonlight", "streaming", "openxr", "3d"]
         }
       ]
     },

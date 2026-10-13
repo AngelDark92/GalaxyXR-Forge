@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-45-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-48-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-13` — 45 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-13` — 48 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -59,7 +59,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 
 ## 🖥️ PC VR & Streaming
 
-> SteamVR drivers and streaming tooling that make PC VR behave on the XR.
+> SteamVR drivers, streaming stacks and PC-side VR tooling for the XR.
 
 | Repository | What it does |
 | --- | --- |
@@ -70,6 +70,9 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[Terminal-ennui/Galaxy_XR_ALVR_USB](https://github.com/Terminal-ennui/Galaxy_XR_ALVR_USB)**<br>![stars](https://img.shields.io/github/stars/Terminal-ennui/Galaxy_XR_ALVR_USB?style=flat-square) ![release](https://img.shields.io/github/v/release/Terminal-ennui/Galaxy_XR_ALVR_USB?style=flat-square&label=release) | Streams SteamVR over USB 3 using stock ALVR 20.14.1 with a patched headset client. |
 | **[shinyflvre/OpenVR-SpaceSync](https://github.com/shinyflvre/OpenVR-SpaceSync)**<br>![stars](https://img.shields.io/github/stars/shinyflvre/OpenVR-SpaceSync?style=flat-square) | Syncs Lighthouse devices to an SLAM headset's pose in SteamVR (Follow SLAM HMD mode). |
 | **[Nyabsi/OpenVR-SpaceOverride](https://github.com/Nyabsi/OpenVR-SpaceOverride)**<br>![stars](https://img.shields.io/github/stars/Nyabsi/OpenVR-SpaceOverride?style=flat-square) | Uses Lighthouse devices on non-Lighthouse headsets like the Galaxy XR. |
+| **[mbucchia/PimaxMagic4All](https://github.com/mbucchia/PimaxMagic4All)**<br>![stars](https://img.shields.io/github/stars/mbucchia/PimaxMagic4All?style=flat-square) ![release](https://img.shields.io/github/v/release/mbucchia/PimaxMagic4All?style=flat-square&label=release) | Brings Pimax dynamic foveated rendering to non-Pimax headsets in SteamVR apps. |
+| **[Mr-Nlce/PCVR-Mods-Installer-Hub](https://github.com/Mr-Nlce/PCVR-Mods-Installer-Hub)**<br>![stars](https://img.shields.io/github/stars/Mr-Nlce/PCVR-Mods-Installer-Hub?style=flat-square) ![release](https://img.shields.io/github/v/release/Mr-Nlce/PCVR-Mods-Installer-Hub?style=flat-square&label=release) | Portable installer and launcher for publicly available PC VR game mods. |
+| **[Gilleece/moonlight-android-xr](https://github.com/Gilleece/moonlight-android-xr)**<br>![stars](https://img.shields.io/github/stars/Gilleece/moonlight-android-xr?style=flat-square) ![release](https://img.shields.io/github/v/release/Gilleece/moonlight-android-xr?style=flat-square&label=release) | Moonlight fork: native OpenXR client with on-headset 2D-to-3D conversion. |
 
 <a id="app-patches"></a>
 
@@ -164,4 +167,4 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-13 · 45 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-13 · 48 repos</sub></div>

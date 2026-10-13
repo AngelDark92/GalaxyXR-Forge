@@ -1,0 +1,279 @@
+{
+  "title": "Galaxy XR Forge",
+  "device": "Samsung Galaxy XR (SM-I610)",
+  "updated": "2026-10-13",
+  "groups": [
+    {
+      "id": "root-kernel",
+      "title": "Root & Kernel",
+      "icon": "🛡️",
+      "hue": "#f59e0b",
+      "blurb": "Root the headset and keep it: managers, loaders and kernel research.",
+      "repos": [
+        {
+          "repo": "4uva4ek/KernelSU-GXR",
+          "url": "https://github.com/4uva4ek/KernelSU-GXR",
+          "about": "KernelSU manager and daemon built for the Galaxy XR: module installer and signed self-update.",
+          "license": "GPL-3.0",
+          "release": "gxr-v1.0.9",
+          "tags": ["root", "kernelsu", "manager", "daemon"]
+        },
+        {
+          "repo": "diabl0w/DFRoot",
+          "url": "https://github.com/diabl0w/DFRoot",
+          "about": "Kernel-module loader that loads KernelSU-GXR without flashing a boot image.",
+          "license": null,
+          "release": "v4.1",
+          "tags": ["root", "loader", "module"]
+        },
+        {
+          "repo": "diabl0w/KernelSU",
+          "url": "https://github.com/diabl0w/KernelSU",
+          "about": "KernelSU fork with the samsung-v1.0 branch that KernelSU-GXR builds on.",
+          "license": "GPL-3.0",
+          "release": "samsung-v1.0",
+          "tags": ["root", "kernelsu", "source"]
+        }
+      ]
+    },
+    {
+      "id": "kernelsu-modules",
+      "title": "KernelSU Modules",
+      "icon": "🧩",
+      "hue": "#34d399",
+      "blurb": "Runtime device patches for tracking, haptics and thermals; every package installs disabled.",
+      "repos": [
+        {
+          "repo": "4uva4ek/galaxyxr-modules",
+          "url": "https://github.com/4uva4ek/galaxyxr-modules",
+          "about": "Tracking and haptic fixes: whitening, timestamp precision, OpenXR velocity, OTA control.",
+          "license": null,
+          "release": null,
+          "tags": ["modules", "tracking", "haptics", "ota"]
+        },
+        {
+          "repo": "BreadDoesStuff/galaxy-xr-modules",
+          "url": "https://github.com/BreadDoesStuff/galaxy-xr-modules",
+          "about": "Fan control, passthrough anywhere, camera debug stream and mic gain modules.",
+          "license": "MIT",
+          "release": null,
+          "tags": ["modules", "fan", "passthrough", "camera", "mic"]
+        },
+        {
+          "repo": "BlueScorpioVR/galaxyxr-modules",
+          "url": "https://github.com/BlueScorpioVR/galaxyxr-modules",
+          "about": "Experimental personal KernelSU modules for the Galaxy XR.",
+          "license": null,
+          "release": null,
+          "tags": ["modules", "experimental"]
+        }
+      ]
+    },
+    {
+      "id": "face-eye",
+      "title": "Face & Eye Tracking",
+      "icon": "👁️",
+      "hue": "#c084fc",
+      "blurb": "Face and eye tracking for PC VR: relays, bridges and fixes.",
+      "repos": [
+        {
+          "repo": "compdoge/gxr-alvr-ft",
+          "url": "https://github.com/compdoge/gxr-alvr-ft",
+          "about": "Headset-side face and eye relay plus a KernelSU module for PC VR face tracking.",
+          "license": "MIT",
+          "release": "v1.2.9",
+          "tags": ["face tracking", "eye tracking", "modules", "vrchat"]
+        },
+        {
+          "repo": "compdoge/gxr-face-bridge",
+          "url": "https://github.com/compdoge/gxr-face-bridge",
+          "about": "OpenXR face-tracking bridge for Steam Link VR on the Galaxy XR.",
+          "license": "GPL-3.0",
+          "release": "v1.0.0",
+          "tags": ["face tracking", "openxr", "steam link"]
+        },
+        {
+          "repo": "SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop",
+          "url": "https://github.com/SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop",
+          "about": "Fixes eye-gaze drift on head tilt in Virtual Desktop's VRCFaceTracking module.",
+          "license": "MIT",
+          "release": "v1.0.0",
+          "tags": ["eye tracking", "virtual desktop", "fix"]
+        }
+      ]
+    },
+    {
+      "id": "pcvr-drivers",
+      "title": "PC VR & Streaming",
+      "icon": "🖥️",
+      "hue": "#38bdf8",
+      "blurb": "SteamVR drivers and streaming tooling that make PC VR behave on the XR.",
+      "repos": [
+        {
+          "repo": "AngelDark92/GalaxyXR-Driver",
+          "url": "https://github.com/AngelDark92/GalaxyXR-Driver",
+          "about": "SteamVR driver: native headset identity, controller and throw fixes, image processing; Companion GUI.",
+          "license": "GPL-3.0",
+          "release": "v1.8.0",
+          "tags": ["steamvr", "driver", "steam link", "colour", "distortion"]
+        },
+        {
+          "repo": "timkhronos/CustomHeadsetOpenVrGxR",
+          "url": "https://github.com/timkhronos/CustomHeadsetOpenVrGxR",
+          "about": "Original Galaxy XR SteamVR driver fork: pose fixes, colour pipeline, distortion tuner.",
+          "license": "GPL-2.0",
+          "release": "1.1.5",
+          "tags": ["steamvr", "driver", "distortion"]
+        },
+        {
+          "repo": "4uva4ek/galaxy-xr-game-link",
+          "url": "https://github.com/4uva4ek/galaxy-xr-game-link",
+          "about": "Patches and tooling for Samsung Game Link (XR Link) PC streaming on the Galaxy XR.",
+          "license": null,
+          "release": "v0.1.0",
+          "tags": ["streaming", "game link", "xr link"]
+        }
+      ]
+    },
+    {
+      "id": "app-patches",
+      "title": "App Patches & Ports",
+      "icon": "📱",
+      "hue": "#fb7185",
+      "blurb": "Quest and PICO apps patched or converted to run natively on Android XR.",
+      "repos": [
+        {
+          "repo": "AngelDark92/xr-porting-hub",
+          "url": "https://github.com/AngelDark92/xr-porting-hub",
+          "about": "Morphe patches for Steam Link VR on Galaxy XR: resolution, colour, mic, tracking, face bridge.",
+          "license": "GPL-3.0",
+          "release": "v1.27.0",
+          "tags": ["morphe", "steam link", "patches", "android xr"]
+        },
+        {
+          "repo": "4uva4ek/overport-galaxyxr",
+          "url": "https://github.com/4uva4ek/overport-galaxyxr",
+          "about": "APK converter with a Galaxy XR preset: 3552x3840 per eye, BOOST, 90 Hz, Unity EGL fix.",
+          "license": "GPL-3.0",
+          "release": "galaxyxr-v0.1.1",
+          "tags": ["overport", "apk", "converter", "graphics"]
+        },
+        {
+          "repo": "logkim1/4XVR-GalaxyXR",
+          "url": "https://github.com/logkim1/4XVR-GalaxyXR",
+          "about": "4XVR video player patched for GXR: HDR tone mapping, memory fix, subtitle controls.",
+          "license": null,
+          "release": "v1.0",
+          "tags": ["4xvr", "video", "hdr", "patch"]
+        }
+      ]
+    },
+    {
+      "id": "games",
+      "title": "Games & Emulation",
+      "icon": "🎮",
+      "hue": "#fbbf24",
+      "blurb": "Games running on the headset or beside it.",
+      "repos": [
+        {
+          "repo": "evertec82/AstroQuest",
+          "url": "https://github.com/evertec82/AstroQuest",
+          "about": "ASTRO BOT Rescue Mission via shadPS4 on standalone headsets and PC VR.",
+          "license": "GPL-2.0",
+          "release": "v0.8.5",
+          "tags": ["ps4", "emulator", "astro bot", "shadps4"]
+        },
+        {
+          "repo": "WinlatorXR/WinlatorXR",
+          "url": "https://github.com/WinlatorXR/WinlatorXR",
+          "about": "Windows x86 games and apps emulator for standalone Android XR headsets.",
+          "license": null,
+          "release": null,
+          "tags": ["windows", "emulator", "x86"]
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "title": "Tools & Diagnostics",
+      "icon": "🔧",
+      "hue": "#22d3ee",
+      "blurb": "Measure and diagnose what is on the panel.",
+      "repos": [
+        {
+          "repo": "AngelDark92/SteamVRColourLab",
+          "url": "https://github.com/AngelDark92/SteamVRColourLab",
+          "about": "In-headset colour test suite: gradients, dark scenes, 8-bit vs 10-bit comparison.",
+          "license": "MIT",
+          "release": "v0.4.0",
+          "tags": ["colour", "10-bit", "banding", "test"]
+        }
+      ]
+    },
+    {
+      "id": "foundations",
+      "title": "Foundations & Upstreams",
+      "icon": "🏗️",
+      "hue": "#94a3b8",
+      "blurb": "The base projects everything above builds on.",
+      "repos": [
+        {
+          "repo": "sboys3/CustomHeadsetOpenVR",
+          "url": "https://github.com/sboys3/CustomHeadsetOpenVR",
+          "about": "Base custom-headset SteamVR driver framework; both Galaxy XR drivers fork from it.",
+          "license": "GPL-2.0",
+          "release": "1.3.0",
+          "tags": ["steamvr", "framework", "driver"]
+        },
+        {
+          "repo": "ovrport/app",
+          "url": "https://github.com/ovrport/app",
+          "about": "Upstream Overport: patches Quest-targeting Android games; base of the Galaxy XR fork.",
+          "license": "GPL-3.0",
+          "release": "1.2.3",
+          "tags": ["overport", "quest", "apk"]
+        },
+        {
+          "repo": "MorpheApp/morphe-manager",
+          "url": "https://github.com/MorpheApp/morphe-manager",
+          "about": "The on-device Morphe patcher that applies .mpp patch bundles.",
+          "license": "GPL-3.0",
+          "release": "v1.35.0",
+          "tags": ["morphe", "patcher", "apk"]
+        },
+        {
+          "repo": "MorpheApp/morphe-patches",
+          "url": "https://github.com/MorpheApp/morphe-patches",
+          "about": "Morphe's base patch library; the groundwork for Galaxy XR patch bundles.",
+          "license": "GPL-3.0",
+          "release": "v1.47.0",
+          "tags": ["morphe", "patches", "library"]
+        },
+        {
+          "repo": "shadps4-emu/shadPS4",
+          "url": "https://github.com/shadps4-emu/shadPS4",
+          "about": "PlayStation 4 emulator; the base the headset PS4 porting projects build on.",
+          "license": "GPL-2.0",
+          "release": "v.0.19.0",
+          "tags": ["ps4", "emulator"]
+        },
+        {
+          "repo": "zenithblue-oss/shadps4-arm64",
+          "url": "https://github.com/zenithblue-oss/shadps4-arm64",
+          "about": "ARM64 shadPS4 build with FEX integration that runs on the headset itself.",
+          "license": null,
+          "release": null,
+          "tags": ["ps4", "arm64", "fex"]
+        },
+        {
+          "repo": "Vauzi-17/mesa-tu8",
+          "url": "https://github.com/Vauzi-17/mesa-tu8",
+          "about": "Turnip (Mesa) Vulkan driver build used by the headset emulation stack.",
+          "license": null,
+          "release": null,
+          "tags": ["mesa", "turnip", "vulkan", "driver"]
+        }
+      ]
+    }
+  ]
+}

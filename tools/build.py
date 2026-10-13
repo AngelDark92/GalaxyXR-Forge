@@ -295,14 +295,15 @@ main{padding:34px 0 6px}
 .card{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 12px;transition:border-color .15s ease,transform .15s ease,box-shadow .15s ease}
 .card:hover{border-color:var(--hue);transform:translateY(-2px);box-shadow:0 14px 34px -22px #000}
 .card-top{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
-.card h3{font:600 16px/1.3 var(--font-disp);margin:0}
-.card h3 .owner{font:400 13px var(--font-mono);color:var(--dim)}
+.card h3{font:600 16px/1.3 var(--font-disp);margin:0;flex:1 1 auto;min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.card h3 .owner{font:400 13px var(--font-mono);color:var(--dim);overflow-wrap:anywhere}
 .card h3 a:hover{color:var(--accent-2)}
 .badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
 .badges img{height:20px;display:block}
-.card .about{color:var(--muted);font-size:13.5px;margin:0;flex:1}
-.card-foot{display:flex;align-items:center;gap:10px;font:11.5px var(--font-mono);color:var(--dim);padding-top:9px;border-top:1px solid var(--line)}
-.card-foot .links{margin-left:auto;display:flex;gap:12px}
+.card .about{color:var(--muted);font-size:13.5px;margin:0;flex:1;overflow-wrap:anywhere;word-break:break-word}
+.card-foot{display:flex;align-items:center;gap:10px;font:11.5px var(--font-mono);color:var(--dim);padding-top:9px;border-top:1px solid var(--line);min-width:0}
+.card-foot .license{min-width:0;overflow-wrap:anywhere}
+.card-foot .links{margin-left:auto;display:flex;gap:12px;flex:none}
 .card-foot a{color:var(--muted);font:500 12px var(--font-mono)}
 .card-foot a:hover{color:var(--accent)}
 .empty{max-width:1120px;margin:0 auto;padding:0 22px 30px;color:var(--muted);font-style:italic}

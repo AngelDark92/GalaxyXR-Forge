@@ -16,7 +16,7 @@ Where everything Galaxy XR lives. `catalog.json` in the GalaxyXR-Forge repo is t
 
 ## Read first
 
-- `catalog.json` — every catalogued repo, grouped by id: `root-kernel`, `kernelsu-modules`, `face-eye`, `pcvr-drivers`, `app-patches`, `games`, `tools`, `foundations`.
+- `catalog.json` — every catalogued repo, grouped by id: `root-kernel`, `kernelsu-modules`, `face-eye`, `pcvr-drivers`, `app-patches`, `games`, `tools`, `apps-samples`, `foundations`.
 - `AGENTS.md` — rules for working in the Forge repo.
 
 ## Local checkouts (owner machine)

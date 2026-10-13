@@ -1,0 +1,222 @@
+[
+  {
+    "full_name": "stearnsbq/questlhsync-galaxy-xr",
+    "url": "https://github.com/stearnsbq/questlhsync-galaxy-xr",
+    "description": "",
+    "short_description": "KernelSU module aligning Lighthouse trackers with Galaxy XR tracking cameras",
+    "group": "kernelsu-modules",
+    "stars": 0,
+    "license": "MIT",
+    "pushed_at": "2026-10-12T21:46:22Z",
+    "public": true
+  },
+  {
+    "full_name": "stearnsbq/QuestLHSync",
+    "url": "https://github.com/stearnsbq/QuestLHSync",
+    "description": "Lighthouse trackers and controllers aligned to a rooted Quest's or Steam Frame's own tracking, from its cameras seeing SteamVR base stations",
+    "short_description": "Lighthouse alignment base project paired with the Galaxy XR module",
+    "group": "upstream",
+    "stars": 0,
+    "license": "MIT",
+    "pushed_at": "2026-10-12T21:43:51Z",
+    "public": true
+  },
+  {
+    "full_name": "Terminal-ennui/galaxy-xr-alvr-pyrowave-444",
+    "url": "https://github.com/Terminal-ennui/galaxy-xr-alvr-pyrowave-444",
+    "description": "Full-chroma (4:4:4) experimental wireless PC VR streaming for the Samsung Galaxy XR: patched ALVR 20.13 with the PyroWave wavelet codec (beta research release)",
+    "short_description": "4:4:4 wireless PC VR streaming for Galaxy XR via patched ALVR",
+    "group": "pcvr-drivers",
+    "stars": 4,
+    "license": "MIT",
+    "pushed_at": "2026-09-27T14:23:04Z",
+    "public": true
+  },
+  {
+    "full_name": "Terminal-ennui/Galaxy_XR_ALVR_USB",
+    "url": "https://github.com/Terminal-ennui/Galaxy_XR_ALVR_USB",
+    "description": "",
+    "short_description": "Stream SteamVR to Galaxy XR over USB 3 with ALVR",
+    "group": "pcvr-drivers",
+    "stars": 0,
+    "license": "MIT",
+    "pushed_at": "2026-09-27T15:51:23Z",
+    "public": true
+  },
+  {
+    "full_name": "Terminal-ennui/pyrowave",
+    "url": "https://github.com/Terminal-ennui/pyrowave",
+    "description": "",
+    "short_description": "Ultra-fast Vulkan compute codec used by Galaxy XR ALVR streaming",
+    "group": "upstream",
+    "stars": 0,
+    "license": "MIT",
+    "pushed_at": "2026-09-27T15:19:22Z",
+    "public": true
+  },
+  {
+    "full_name": "shinyflvre/OpenVR-SpaceSync",
+    "url": "https://github.com/shinyflvre/OpenVR-SpaceSync",
+    "description": "Synchronizes Lighthouse devices with SLAM headsets using a Follow SLAM HMD mode that keeps the headset pose authoritative and continuously aligns Lighthouse tracking to it.",
+    "short_description": "Lighthouse and SLAM headset pose sync for SteamVR (Galaxy XR)",
+    "group": "pcvr-drivers",
+    "stars": 159,
+    "license": "AGPL-3.0",
+    "pushed_at": "2026-10-05T03:28:58Z",
+    "public": true
+  },
+  {
+    "full_name": "tw0b33rs/xr-native-sensor-access",
+    "url": "https://github.com/tw0b33rs/xr-native-sensor-access",
+    "description": "Raw, low-latency sensor data access on Android XR devices via NDK/C++. Built for developers building sensor fusion, computer vision, or custom XR applications on Samsung Galaxy XR.",
+    "short_description": "Raw low-latency IMU sensor access for Samsung Galaxy XR apps",
+    "group": "tools",
+    "stars": 15,
+    "license": "Apache-2.0",
+    "pushed_at": "2026-01-03T21:42:27Z",
+    "public": true
+  },
+  {
+    "full_name": "CurvSurf/PointCloudRecorder-GalaxyXR",
+    "url": "https://github.com/CurvSurf/PointCloudRecorder-GalaxyXR",
+    "description": "An experimental sample project for Galaxy XR that records and filters point clouds reconstructed from ARCore depth maps (Android XR).",
+    "short_description": "Records point clouds from Galaxy XR ARCore depth maps",
+    "group": "tools",
+    "stars": 6,
+    "license": "MIT",
+    "pushed_at": "2025-12-24T06:10:17Z",
+    "public": true
+  },
+  {
+    "full_name": "Molier/openxr-dispatcher-open",
+    "url": "https://github.com/Molier/openxr-dispatcher-open",
+    "description": "Open-source drop-in replacement for OVRPort's closed OpenXR dispatcher (libopenxr_loader.so) in converted Quest apps; tested on the Steam Frame",
+    "short_description": "Open-source OpenXR dispatcher replacing OVRPort's closed loader in ported APKs",
+    "group": "tools",
+    "stars": 3,
+    "license": "NOASSERTION",
+    "pushed_at": "2026-10-06T16:15:06Z",
+    "public": true
+  },
+  {
+    "full_name": "Shift-Foundry/project-hazard",
+    "url": "https://github.com/Shift-Foundry/project-hazard",
+    "description": "Room-scale mixed-reality roguelite for Android XR glasses (XREAL Project Aura · Samsung Galaxy XR) — Unreal Engine 5.8, C++. Technical preview.",
+    "short_description": "Room-scale MR roguelite game for Galaxy XR glasses",
+    "group": "games",
+    "stars": 3,
+    "license": "NOASSERTION",
+    "pushed_at": "2026-06-30T20:29:15Z",
+    "public": true
+  },
+  {
+    "full_name": "hyunaseo/OpenAI-for-Galaxy-XR",
+    "url": "https://github.com/hyunaseo/OpenAI-for-Galaxy-XR",
+    "description": "Galaxy XR (Project Moohan - Android XR) project showcasing passthrough capture, OpenAI multimodal queries, and speech-to-speech interaction.",
+    "short_description": "Galaxy XR showcase: passthrough capture with OpenAI multimodal voice queries",
+    "group": "tools",
+    "stars": 2,
+    "license": null,
+    "pushed_at": "2025-12-03T03:56:57Z",
+    "public": true
+  },
+  {
+    "full_name": "mathewvarghesemanu/android-xr-immersive-video-player",
+    "url": "https://github.com/mathewvarghesemanu/android-xr-immersive-video-player",
+    "description": "180° SBS 3D VR video player for Samsung Galaxy XR with independent pitch reposition.",
+    "short_description": "180° SBS 3D video player for Samsung Galaxy XR",
+    "group": "tools",
+    "stars": 1,
+    "license": "MIT",
+    "pushed_at": "2026-05-22T18:59:32Z",
+    "public": true
+  },
+  {
+    "full_name": "andreylukin/mind-castle",
+    "url": "https://github.com/andreylukin/mind-castle",
+    "description": "Personal VR workspace: Mac windows streamed to Galaxy XR",
+    "short_description": "Streams Mac windows into Galaxy XR via USB",
+    "group": "tools",
+    "stars": 0,
+    "license": null,
+    "pushed_at": "2026-10-07T18:53:07Z",
+    "public": true
+  },
+  {
+    "full_name": "Tony-Klink/GabbleXR-server",
+    "url": "https://github.com/Tony-Klink/GabbleXR-server",
+    "description": "OpenXR client that reads GalaxyXR face and eye tracking data and sends it to Resonite in UnifiedExpressions format",
+    "short_description": "Galaxy XR face/eye tracking bridge to Resonite via OSC",
+    "group": "tools",
+    "stars": 0,
+    "license": "NOASSERTION",
+    "pushed_at": "2026-04-23T19:16:34Z",
+    "public": true
+  },
+  {
+    "full_name": "HyunsooleePG/GalaxyXR_Passthrough_WebCamTexture",
+    "url": "https://github.com/HyunsooleePG/GalaxyXR_Passthrough_WebCamTexture",
+    "description": "Access passthrough image on GalaxyXR",
+    "short_description": "Unity sample accessing Galaxy XR passthrough camera image",
+    "group": "tools",
+    "stars": 0,
+    "license": null,
+    "pushed_at": "2026-04-23T03:25:39Z",
+    "public": true
+  },
+  {
+    "full_name": "AmeChanRain/MicDotDisabler",
+    "url": "https://github.com/AmeChanRain/MicDotDisabler",
+    "description": "Primarily used for Android XR devices like Galaxy XR",
+    "short_description": "Hides Android privacy indicator dot, used on Galaxy XR",
+    "group": "tools",
+    "stars": 1,
+    "license": "GPL-2.0",
+    "pushed_at": "2026-06-20T06:52:13Z",
+    "public": true
+  },
+  {
+    "full_name": "dli7319/galaxy-xr-rx-qr-code-generator",
+    "url": "https://github.com/dli7319/galaxy-xr-rx-qr-code-generator",
+    "description": "QR Code generator for Galaxy XR RX Lenses",
+    "short_description": "QR generator for Galaxy XR prescription lens inserts",
+    "group": "tools",
+    "stars": 2,
+    "license": "MIT",
+    "pushed_at": "2025-12-22T07:35:02Z",
+    "public": true
+  },
+  {
+    "full_name": "perillamint/galaxy-xr-lenscal",
+    "url": "https://github.com/perillamint/galaxy-xr-lenscal",
+    "description": "Galaxy XR Lens Calibration QR builder",
+    "short_description": "Lens calibration QR builder for Galaxy XR",
+    "group": "tools",
+    "stars": 0,
+    "license": null,
+    "pushed_at": "2025-11-20T12:59:20Z",
+    "public": true
+  },
+  {
+    "full_name": "ngocthanhgl/morphe-audit-bot",
+    "url": "https://github.com/ngocthanhgl/morphe-audit-bot",
+    "description": "Diff-only security audit bot for Morphe patch repos, 4h cron",
+    "short_description": "Security audit bot scanning Morphe patch repos for malicious diffs",
+    "group": "tools",
+    "stars": 0,
+    "license": null,
+    "pushed_at": "2026-10-13T13:28:57Z",
+    "public": true
+  },
+  {
+    "full_name": "Nyabsi/OpenVR-SpaceOverride",
+    "url": "https://github.com/Nyabsi/OpenVR-SpaceOverride",
+    "description": "Use your lighthouse devices on other headsets.",
+    "short_description": "Use Lighthouse devices on non-Lighthouse headsets like Galaxy XR",
+    "group": "pcvr-drivers",
+    "stars": 179,
+    "license": "AGPL-3.0",
+    "pushed_at": "2026-08-26T18:07:20Z",
+    "public": true
+  }
+]

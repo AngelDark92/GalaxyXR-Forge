@@ -179,12 +179,33 @@ def render_chips(cat):
     return "\n        ".join(chips)
 
 
+def render_status_chips(cat):
+    total = sum(len(g["repos"]) for g in cat["groups"])
+    spec = [
+        ("fav", "#fbbf24", "\u2605 Favourites", "cnt-fav", 0,
+         "Show only favourites (marks kept in this browser)"),
+        ("done", "#34d399", "\u2713 Checked", "cnt-done", 0,
+         "Show only repositories already checked / installed (marks kept in this browser)"),
+        ("todo", "#64748b", "\u2610 To check", "cnt-todo", total,
+         "Show only repositories not checked yet (marks kept in this browser)"),
+    ]
+    chips = []
+    for key, hue, label, chip_id, start, title in spec:
+        chips.append(
+            f'<button type="button" class="chip" data-status="{key}" aria-pressed="false" '
+            f'title="{html.escape(title, quote=True)}" style="--hue:{hue}">'
+            f'{label} <b id="{chip_id}">{start}</b></button>'
+        )
+    return "\n        ".join(chips)
+
+
 def render_sections(cat):
     out = []
     for g in cat["groups"]:
         cards = []
         for r in g["repos"]:
-            owner, name = r["repo"].split("/")
+            repo = r["repo"]
+            owner, name = repo.split("/")
             badges = [
                 f'<img src="https://img.shields.io/github/stars/{r["repo"]}?style=flat-square" '
                 f'alt="GitHub stars" loading="lazy">'
@@ -194,6 +215,16 @@ def render_sections(cat):
                     f'<img src="https://img.shields.io/github/v/release/{r["repo"]}?style=flat-square&label=release" '
                     f'alt="latest release" loading="lazy">'
                 )
+            flags = (
+                f'<span class="flags">'
+                f'<button type="button" class="flag fav" data-flag="fav" aria-pressed="false" '
+                f'aria-label="Favourite {repo}" title="Favourite \u2014 saved in this browser">'
+                f'<span aria-hidden="true">\u2605</span></button>'
+                f'<button type="button" class="flag done" data-flag="done" aria-pressed="false" '
+                f'aria-label="Mark {repo} as checked" title="Mark as checked / installed \u2014 saved in this browser">'
+                f'<span aria-hidden="true">\u2713</span></button>'
+                f'</span>'
+            )
             links = [f'<a href="{r["url"]}" target="_blank" rel="noopener">GitHub</a>']
             if r.get("release"):
                 links.append(f'<a href="{r["url"]}/releases" target="_blank" rel="noopener">Releases</a>')
@@ -201,12 +232,14 @@ def render_sections(cat):
                 [r["repo"], r.get("about", ""), r.get("license") or ""] + list(r.get("tags", []))
             ).lower()
             cards.append(
-                f'<article class="card" data-group="{g["id"]}" data-text="{html.escape(hay, quote=True)}">'
+                f'<article class="card" data-group="{g["id"]}" data-repo="{html.escape(r["repo"], quote=True)}"'
+                f' data-text="{html.escape(hay, quote=True)}">'
                 f'<div class="card-top"><h3><a href="{r["url"]}" target="_blank" rel="noopener">'
                 f'<span class="owner">{owner}/</span>{name}</a></h3>'
                 f'<div class="badges">{"".join(badges)}</div></div>'
                 f'<p class="about">{html.escape(r["about"])}</p>'
                 f'<div class="card-foot"><span class="license">{html.escape(r.get("license") or "")}</span>'
+                f'{flags}'
                 f'<span class="links">{"".join(links)}</span></div>'
                 f"</article>"
             )
@@ -286,6 +319,9 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .chip b{font-weight:500;color:var(--dim)}
 .chip:hover{border-color:var(--muted);color:var(--ink)}
 .chip.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
+.chip[data-status="fav"].is-active{border-color:rgba(251,191,36,.6);background:rgba(251,191,36,.12)}
+.chip[data-status="done"].is-active{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
+.chip[data-status="todo"].is-active{border-color:var(--muted);background:rgba(148,163,184,.10)}
 main{padding:34px 0 6px}
 .group{max-width:1120px;margin:0 auto 42px;padding:0 22px}
 .group-head h2{display:flex;align-items:center;gap:10px;font:600 1.35rem var(--font-disp);margin:0 0 6px}
@@ -294,6 +330,16 @@ main{padding:34px 0 6px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .card{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 12px;transition:border-color .15s ease,transform .15s ease,box-shadow .15s ease}
 .card:hover{border-color:var(--hue);transform:translateY(-2px);box-shadow:0 14px 34px -22px #000}
+.card.is-fav{border-color:rgba(251,191,36,.42)}
+.card.is-done{background:#0c1119;border-color:#182230}
+.card.is-done h3 a{color:var(--muted)}
+.card.is-done h3 .owner{color:#516074}
+.card.is-done .about{color:#5d6b7e}
+.card.is-done .badges{opacity:.45;filter:grayscale(1)}
+.card.is-done .card-foot{color:#4b596b;border-top-color:#161f2b}
+.card.is-done .card-foot .license{color:#4b596b}
+.card.is-done .card-foot a{color:#5d6b7e}
+.card.is-done:hover{transform:none;box-shadow:none;border-color:var(--line-2)}
 .card-top{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
 .card h3{font:600 16px/1.3 var(--font-disp);margin:0;flex:1 1 auto;min-width:0;overflow-wrap:anywhere;word-break:break-word}
 .card h3 .owner{font:400 13px var(--font-mono);color:var(--dim);overflow-wrap:anywhere}
@@ -303,7 +349,13 @@ main{padding:34px 0 6px}
 .card .about{color:var(--muted);font-size:13.5px;margin:0;flex:1;overflow-wrap:anywhere;word-break:break-word}
 .card-foot{display:flex;align-items:center;gap:10px;font:11.5px var(--font-mono);color:var(--dim);padding-top:9px;border-top:1px solid var(--line);min-width:0}
 .card-foot .license{min-width:0;overflow-wrap:anywhere}
-.card-foot .links{margin-left:auto;display:flex;gap:12px;flex:none}
+.flags{display:flex;gap:6px;margin-left:auto;flex:none}
+.flag{display:inline-flex;align-items:center;justify-content:center;width:30px;height:26px;padding:0;border:1px solid var(--line-2);background:transparent;color:var(--dim);border-radius:8px;cursor:pointer;font:13px/1 var(--font-mono)}
+.flag:hover{border-color:var(--muted);color:var(--ink)}
+.flag:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.flag.fav.is-on{color:var(--accent-2);border-color:rgba(251,191,36,.55);background:rgba(251,191,36,.14)}
+.flag.done.is-on{color:#34d399;border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.14)}
+.card-foot .links{display:flex;gap:12px;flex:none}
 .card-foot a{color:var(--muted);font:500 12px var(--font-mono)}
 .card-foot a:hover{color:var(--accent)}
 .empty{max-width:1120px;margin:0 auto;padding:0 22px 30px;color:var(--muted);font-style:italic}
@@ -316,6 +368,10 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   .hero .wrap{padding-top:44px;padding-bottom:30px}
   .stat{padding:0 14px}
   .stat b{font-size:18px}
+  .filters-inner{padding:10px 14px;gap:8px}
+  .chips{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none}
 }
 </style>
 </head>
@@ -339,11 +395,14 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     <div class="chips" role="group" aria-label="Repository groups">
         __CHIPS__
     </div>
+    <div class="chips" role="group" aria-label="Checked and favourite repositories">
+        __STATUS__
+    </div>
   </div>
 </nav>
 <main id="catalog">
   __SECTIONS__
-  <p class="empty" id="empty" style="display:none">No repository matches that filter.</p>
+  <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
 </main>
 <footer>
   <div class="wrap">
@@ -353,20 +412,87 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 </footer>
 <script>
 (function () {
+  var STORE_KEY = 'gxrforge.marks';
+  var COOKIE_KEY = 'gxrforge_marks';
   var q = document.getElementById('q');
-  var chips = [].slice.call(document.querySelectorAll('.chip'));
+  var groupChips = [].slice.call(document.querySelectorAll('.chip[data-group]'));
+  var statusChips = [].slice.call(document.querySelectorAll('.chip[data-status]'));
   var cards = [].slice.call(document.querySelectorAll('.card'));
   var sections = [].slice.call(document.querySelectorAll('.group'));
   var count = document.getElementById('count');
   var empty = document.getElementById('empty');
-  var state = { q: '', group: 'all' };
+  var main = document.getElementById('catalog');
+  var state = { q: '', group: 'all', status: {}, fav: {}, done: {} };
+
+  // Star and check marks live in localStorage, with a cookie kept in sync as a
+  // fallback, so they survive reloads and a browser restart. Nothing is sent anywhere.
+  function readRaw() {
+    try {
+      var stored = window.localStorage.getItem(STORE_KEY);
+      if (stored) return stored;
+    } catch (e) {}
+    var hit = document.cookie.match(new RegExp('(?:^|;\\s*)' + COOKIE_KEY + '=([^;]*)'));
+    return hit ? decodeURIComponent(hit[1]) : '';
+  }
+  function writeRaw(raw) {
+    try { window.localStorage.setItem(STORE_KEY, raw); } catch (e) {}
+    document.cookie = COOKIE_KEY + '=' + encodeURIComponent(raw) +
+      '; path=/; max-age=31536000; samesite=lax';
+  }
+  function listOf(marks) {
+    var out = [];
+    for (var k in marks) { if (Object.prototype.hasOwnProperty.call(marks, k)) out.push(k); }
+    return out.sort();
+  }
+  function loadMarks() {
+    var raw = readRaw();
+    if (!raw) return;
+    var data = null;
+    try { data = JSON.parse(raw); } catch (e) { return; }
+    if (!data) return;
+    ['fav', 'done'].forEach(function (key) {
+      (data[key] || []).forEach(function (repo) { state[key][repo] = true; });
+    });
+  }
+  function saveMarks() {
+    writeRaw(JSON.stringify({ fav: listOf(state.fav), done: listOf(state.done) }));
+  }
+  function setCount(id, n) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = n;
+  }
+
   function apply() {
     var query = state.q.trim().toLowerCase();
-    var shown = 0;
+    var active = [];
+    ['fav', 'done', 'todo'].forEach(function (s) { if (state.status[s]) active.push(s); });
+    var shown = 0, favN = 0, doneN = 0;
     cards.forEach(function (c) {
-      var okG = state.group === 'all' || c.dataset.group === state.group;
-      var okQ = !query || c.dataset.text.indexOf(query) > -1;
-      var show = okG && okQ;
+      var repo = c.dataset.repo;
+      var fav = !!state.fav[repo];
+      var done = !!state.done[repo];
+      if (fav) favN++;
+      if (done) doneN++;
+      c.classList.toggle('is-fav', fav);
+      c.classList.toggle('is-done', done);
+      var favBtn = c.querySelector('.flag.fav');
+      var doneBtn = c.querySelector('.flag.done');
+      if (favBtn) {
+        favBtn.classList.toggle('is-on', fav);
+        favBtn.setAttribute('aria-pressed', fav ? 'true' : 'false');
+      }
+      if (doneBtn) {
+        doneBtn.classList.toggle('is-on', done);
+        doneBtn.setAttribute('aria-pressed', done ? 'true' : 'false');
+      }
+      var okGroup = state.group === 'all' || c.dataset.group === state.group;
+      var okText = !query || c.dataset.text.indexOf(query) > -1;
+      var okMark = !active.length || active.some(function (s) {
+        if (s === 'fav') return fav;
+        if (s === 'done') return done;
+        return !done;
+      });
+      var show = okGroup && okText && okMark;
       c.style.display = show ? '' : 'none';
       if (show) shown++;
     });
@@ -376,18 +502,47 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       });
       s.style.display = any ? '' : 'none';
     });
+    setCount('cnt-fav', favN);
+    setCount('cnt-done', doneN);
+    setCount('cnt-todo', cards.length - doneN);
     if (count) count.textContent = shown;
     if (empty) empty.style.display = shown ? 'none' : '';
   }
+
   if (q) q.addEventListener('input', function () { state.q = q.value; apply(); });
-  chips.forEach(function (ch) {
+  groupChips.forEach(function (ch) {
     ch.addEventListener('click', function () {
-      chips.forEach(function (c) { c.classList.remove('is-active'); });
+      groupChips.forEach(function (c) { c.classList.remove('is-active'); });
       ch.classList.add('is-active');
       state.group = ch.dataset.group;
       apply();
     });
   });
+  statusChips.forEach(function (ch) {
+    ch.setAttribute('aria-pressed', 'false');
+    ch.addEventListener('click', function () {
+      var key = ch.dataset.status;
+      state.status[key] = !state.status[key];
+      ch.classList.toggle('is-active', !!state.status[key]);
+      ch.setAttribute('aria-pressed', state.status[key] ? 'true' : 'false');
+      apply();
+    });
+  });
+  if (main) {
+    main.addEventListener('click', function (ev) {
+      var btn = ev.target && ev.target.closest ? ev.target.closest('.flag') : null;
+      if (!btn) return;
+      var card = btn.closest('.card');
+      if (!card) return;
+      var store = state[btn.dataset.flag];
+      var repo = card.dataset.repo;
+      if (!store || !repo) return;
+      if (store[repo]) { delete store[repo]; } else { store[repo] = true; }
+      saveMarks();
+      apply();
+    });
+  }
+  loadMarks();
   apply();
 })();
 </script>
@@ -405,6 +560,7 @@ def render_site(cat):
     page = page.replace("__GROUPS__", str(len(cat["groups"])))
     page = page.replace("__DATE__", updated)
     page = page.replace("__CHIPS__", render_chips(cat))
+    page = page.replace("__STATUS__", render_status_chips(cat))
     page = page.replace("__SECTIONS__", render_sections(cat))
     page = page.replace("__REPO_URL__", REPO_URL)
     return page

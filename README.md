@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-52-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-53-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-13` — 52 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-14` — 53 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -41,6 +41,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[BreadDoesStuff/galaxy-xr-modules](https://github.com/BreadDoesStuff/galaxy-xr-modules)**<br>![stars](https://img.shields.io/github/stars/BreadDoesStuff/galaxy-xr-modules?style=flat-square) | Fan control, passthrough anywhere, camera debug stream and mic gain modules. |
 | **[BlueScorpioVR/galaxyxr-modules](https://github.com/BlueScorpioVR/galaxyxr-modules)**<br>![stars](https://img.shields.io/github/stars/BlueScorpioVR/galaxyxr-modules?style=flat-square) | Experimental personal KernelSU modules for the Galaxy XR. |
 | **[stearnsbq/questlhsync-galaxy-xr](https://github.com/stearnsbq/questlhsync-galaxy-xr)**<br>![stars](https://img.shields.io/github/stars/stearnsbq/questlhsync-galaxy-xr?style=flat-square) ![release](https://img.shields.io/github/v/release/stearnsbq/questlhsync-galaxy-xr?style=flat-square&label=release) | KernelSU module aligning Lighthouse trackers with the XR's camera tracking (QuestLHSync PC side required). |
+| **[compdoge/gxr-ksu-modules](https://github.com/compdoge/gxr-ksu-modules)**<br>![stars](https://img.shields.io/github/stars/compdoge/gxr-ksu-modules?style=flat-square) | KernelSU module source for the Galaxy XR: add it in the manager's Sources screen. |
 
 <a id="face-eye"></a>
 
@@ -50,7 +51,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 
 | Repository | What it does |
 | --- | --- |
-| **[compdoge/gxr-alvr-ft](https://github.com/compdoge/gxr-alvr-ft)**<br>![stars](https://img.shields.io/github/stars/compdoge/gxr-alvr-ft?style=flat-square) ![release](https://img.shields.io/github/v/release/compdoge/gxr-alvr-ft?style=flat-square&label=release) | Headset-side face and eye relay plus a KernelSU module for PC VR face tracking. |
+| **[compdoge/gxr-root-ft](https://github.com/compdoge/gxr-root-ft)**<br>![stars](https://img.shields.io/github/stars/compdoge/gxr-root-ft?style=flat-square) ![release](https://img.shields.io/github/v/release/compdoge/gxr-root-ft?style=flat-square&label=release) | Headset-side face and eye relay plus a KernelSU module for PC VR face tracking. |
 | **[compdoge/gxr-face-bridge](https://github.com/compdoge/gxr-face-bridge)**<br>![stars](https://img.shields.io/github/stars/compdoge/gxr-face-bridge?style=flat-square) ![release](https://img.shields.io/github/v/release/compdoge/gxr-face-bridge?style=flat-square&label=release) | OpenXR face-tracking bridge for Steam Link VR on the Galaxy XR. |
 | **[SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop](https://github.com/SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop)**<br>![stars](https://img.shields.io/github/stars/SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop?style=flat-square) ![release](https://img.shields.io/github/v/release/SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop?style=flat-square&label=release) | Fixes eye-gaze drift on head tilt in Virtual Desktop's VRCFaceTracking module. |
 | **[Tony-Klink/GabbleXR-server](https://github.com/Tony-Klink/GabbleXR-server)**<br>![stars](https://img.shields.io/github/stars/Tony-Klink/GabbleXR-server?style=flat-square) | Bridges Galaxy XR face and eye tracking into Resonite via OSC. |
@@ -167,12 +168,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-14` — KernelSU module source, and a renamed relay repo
 - `2026-10-14` — Aurora Store and a changelog tab
 - `2026-10-14` — Obtainium and the emulation pack
 - `2026-10-14` — VectorXR
 - `2026-10-13` — PimaxMagic4All, PCVR Mods Hub and Moonlight XR
 - `2026-10-13` — ALVR USB badge and pyrowave note
-- `2026-10-13` — Game Link and QuestLHSync entries enriched
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -182,4 +183,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-13 · 52 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-14 · 53 repos</sub></div>

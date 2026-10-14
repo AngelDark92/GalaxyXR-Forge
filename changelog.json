@@ -2,6 +2,14 @@
   "entries": [
     {
       "date": "2026-10-14",
+      "title": "KernelSU module source, and a renamed relay repo",
+      "items": [
+        "Added compdoge/gxr-ksu-modules to KernelSU Modules: a module source the GXR manager browses under Sources.",
+        "compdoge/gxr-alvr-ft follows its rename to compdoge/gxr-root-ft, with its release badge brought up to date."
+      ]
+    },
+    {
+      "date": "2026-10-14",
       "title": "Aurora Store and a changelog tab",
       "items": [
         "Added whyorean/AuroraStore to Tools & Diagnostics.",

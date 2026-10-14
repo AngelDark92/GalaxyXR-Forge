@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-14 — KernelSU module source, and a renamed relay repo
+
+- Added compdoge/gxr-ksu-modules to KernelSU Modules: a module source the GXR manager browses under Sources.
+- compdoge/gxr-alvr-ft follows its rename to compdoge/gxr-root-ft, with its release badge brought up to date.
+
 ## 2026-10-14 — Aurora Store and a changelog tab
 
 - Added whyorean/AuroraStore to Tools & Diagnostics.

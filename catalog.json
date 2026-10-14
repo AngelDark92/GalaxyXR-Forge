@@ -196,6 +196,14 @@
           "license": "GPL-3.0",
           "release": "v0.4",
           "tags": ["moonlight", "streaming", "openxr", "3d"]
+        },
+        {
+          "repo": "DienerTech/vectorxr",
+          "url": "https://github.com/DienerTech/vectorxr",
+          "about": "Windows OpenXR layer and app for stereo depth, pivot and foveated-rendering tuning.",
+          "license": null,
+          "release": "v0.19.1",
+          "tags": ["openxr", "foveated rendering", "depth", "layers"]
         }
       ]
     },

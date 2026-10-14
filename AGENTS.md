@@ -13,9 +13,9 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 3. Keep descriptions to one factual line (build enforces ≤160 chars; target ~14 words). No marketing.
 4. Every catalog change needs an entry in `changelog.json` (date, title, one item per repo added, moved or removed). `build.py` renders `CHANGELOG.md` and the site's Changelog tab from it — a catalog edit without a changelog entry is an incomplete change.
 5. Do not rename group `id` values — README anchors, site filters and chips depend on them.
-6. Commit and push only when the user asked. Editing files and running `build.py` / `check-links.py` are always fine; pushing to GitHub or changing Pages settings requires explicit authorization.
+6. Commit and push only when the user asked. Editing files and running `build.py` / `check-links.py` / `check-repos.py` are always fine; pushing to GitHub or changing Pages settings requires explicit authorization.
 7. Links only: never copy code, binaries or proprietary blobs from catalogued repos into this one.
-8. Keep `tools/build.py` and `tools/check-links.py` dependency-free (Python 3.10+, stdlib only) so any host can run them.
+8. Keep `tools/build.py`, `tools/check-links.py` and `tools/check-repos.py` dependency-free (Python 3.10+, stdlib only) so any host can run them.
 
 ## Layout
 
@@ -26,6 +26,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | `tools/build.py` | Regenerates `README.md`, `CHANGELOG.md` and `docs/index.html` from the two JSON inputs |
 | `CHANGELOG.md` | Generated changelog (the GitHub view of `changelog.json`) |
 | `tools/check-links.py` | Checks that every catalog URL answers |
+| `tools/check-repos.py` | Checks each catalogued repo against GitHub: renamed, transferred, archived or gone |
 | `README.md` | Generated GitHub landing page |
 | `docs/` | Generated GitHub Pages site (Pages: branch `main`, folder `/docs`) |
 | `docs/.nojekyll` | Disables Jekyll on Pages; keep it |
@@ -56,6 +57,7 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 | Add / update / remove a catalog entry (plus its changelog entry) | Follow `.agents/skills/galaxyxr-forge-catalog/SKILL.md` |
 | Find where a repo or project lives; which repo to touch | `.agents/skills/galaxyxr-forge-map/SKILL.md` |
 | Adjust README or site layout | Edit the templates inside `tools/build.py`, rerun it |
+| Confirm catalogued repos still exist and are not renamed, transferred or archived | `python tools/check-repos.py` |
 | Bug in a driver, module, patch or app itself | Go to that project's checkout — do not fix it here |
 
 ## Agent hosts
@@ -72,4 +74,5 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 - `python tools/build.py` exits 0 and prints repo, group and changelog counts; `python tools/build.py --check` validates without writing.
 - Every catalog edit carries a matching `changelog.json` entry, appended newest first.
 - `python tools/check-links.py` reports no failures.
+- `python tools/check-repos.py` reports no renames, transfers, archived or missing repos. A renamed repo still answers, so link checks alone will not catch it.
 - Never claim the Pages site updated without fetching the live URL.

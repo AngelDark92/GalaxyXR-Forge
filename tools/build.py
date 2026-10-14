@@ -183,11 +183,11 @@ def render_status_chips(cat):
     total = sum(len(g["repos"]) for g in cat["groups"])
     spec = [
         ("fav", "#fbbf24", "\u2605 Favourites", "cnt-fav", 0,
-         "Show only favourites (marks kept in this browser)"),
+         "Show only favourites \u2014 combines with the other mark filters (AND)"),
         ("done", "#34d399", "\u2713 Checked", "cnt-done", 0,
-         "Show only repositories already checked / installed (marks kept in this browser)"),
+         "Show only repositories already checked / installed \u2014 combines with the other mark filters (AND)"),
         ("todo", "#64748b", "\u2610 To check", "cnt-todo", total,
-         "Show only repositories not checked yet (marks kept in this browser)"),
+         "Show only repositories not checked yet \u2014 combines with the other mark filters (AND)"),
     ]
     chips = []
     for key, hue, label, chip_id, start, title in spec:
@@ -487,7 +487,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       }
       var okGroup = state.group === 'all' || c.dataset.group === state.group;
       var okText = !query || c.dataset.text.indexOf(query) > -1;
-      var okMark = !active.length || active.some(function (s) {
+      var okMark = active.every(function (s) {
         if (s === 'fav') return fav;
         if (s === 'done') return done;
         return !done;

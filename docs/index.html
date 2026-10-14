@@ -150,9 +150,9 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
         <button type="button" class="chip" data-group="foundations" style="--hue:#94a3b8"><span class="dot"></span>🏗️ Foundations &amp; Upstreams <b>10</b></button>
     </div>
     <div class="chips" role="group" aria-label="Checked and favourite repositories">
-        <button type="button" class="chip" data-status="fav" aria-pressed="false" title="Show only favourites (marks kept in this browser)" style="--hue:#fbbf24">★ Favourites <b id="cnt-fav">0</b></button>
-        <button type="button" class="chip" data-status="done" aria-pressed="false" title="Show only repositories already checked / installed (marks kept in this browser)" style="--hue:#34d399">✓ Checked <b id="cnt-done">0</b></button>
-        <button type="button" class="chip" data-status="todo" aria-pressed="false" title="Show only repositories not checked yet (marks kept in this browser)" style="--hue:#64748b">☐ To check <b id="cnt-todo">49</b></button>
+        <button type="button" class="chip" data-status="fav" aria-pressed="false" title="Show only favourites — combines with the other mark filters (AND)" style="--hue:#fbbf24">★ Favourites <b id="cnt-fav">0</b></button>
+        <button type="button" class="chip" data-status="done" aria-pressed="false" title="Show only repositories already checked / installed — combines with the other mark filters (AND)" style="--hue:#34d399">✓ Checked <b id="cnt-done">0</b></button>
+        <button type="button" class="chip" data-status="todo" aria-pressed="false" title="Show only repositories not checked yet — combines with the other mark filters (AND)" style="--hue:#64748b">☐ To check <b id="cnt-todo">49</b></button>
     </div>
   </div>
 </nav>
@@ -251,7 +251,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       }
       var okGroup = state.group === 'all' || c.dataset.group === state.group;
       var okText = !query || c.dataset.text.indexOf(query) > -1;
-      var okMark = !active.length || active.some(function (s) {
+      var okMark = active.every(function (s) {
         if (s === 'fav') return fav;
         if (s === 'done') return done;
         return !done;

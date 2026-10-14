@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-51-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-52-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-13` — 51 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-14` — 52 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -126,6 +126,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 
 | Repository | What it does |
 | --- | --- |
+| **[BlueScorpioVR/ScreenStreamerXR](https://github.com/BlueScorpioVR/ScreenStreamerXR)**<br>![stars](https://img.shields.io/github/stars/BlueScorpioVR/ScreenStreamerXR?style=flat-square) ![release](https://img.shields.io/github/v/release/BlueScorpioVR/ScreenStreamerXR?style=flat-square&label=release) | Android XR screen-streaming app for Twitch, YouTube, custom RTMP and OmniStream, with chat, alerts and recording. |
 | **[mathewvarghesemanu/android-xr-immersive-video-player](https://github.com/mathewvarghesemanu/android-xr-immersive-video-player)**<br>![stars](https://img.shields.io/github/stars/mathewvarghesemanu/android-xr-immersive-video-player?style=flat-square) | 180° SBS 3D VR video player for Galaxy XR with pitch reposition. |
 | **[andreylukin/mind-castle](https://github.com/andreylukin/mind-castle)**<br>![stars](https://img.shields.io/github/stars/andreylukin/mind-castle?style=flat-square) | Streams Mac windows into the Galaxy XR over USB. |
 | **[hyunaseo/OpenAI-for-Galaxy-XR](https://github.com/hyunaseo/OpenAI-for-Galaxy-XR)**<br>![stars](https://img.shields.io/github/stars/hyunaseo/OpenAI-for-Galaxy-XR?style=flat-square) | Showcase: passthrough capture with OpenAI multimodal voice queries on Galaxy XR. |
@@ -170,4 +171,4 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-13 · 51 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-14 · 52 repos</sub></div>

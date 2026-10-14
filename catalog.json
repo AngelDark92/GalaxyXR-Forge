@@ -1,7 +1,7 @@
 {
   "title": "Galaxy XR Forge",
   "device": "Samsung Galaxy XR (SM-I610)",
-  "updated": "2026-10-13",
+  "updated": "2026-10-14",
   "groups": [
     {
       "id": "root-kernel",
@@ -369,6 +369,14 @@
       "hue": "#a3e635",
       "blurb": "Small apps, players and dev samples built for the XR.",
       "repos": [
+        {
+          "repo": "BlueScorpioVR/ScreenStreamerXR",
+          "url": "https://github.com/BlueScorpioVR/ScreenStreamerXR",
+          "about": "Android XR screen-streaming app for Twitch, YouTube, custom RTMP and OmniStream, with chat, alerts and recording.",
+          "license": "Apache-2.0",
+          "release": "v0.1.0",
+          "tags": ["streaming", "twitch", "youtube", "rtmp", "omnistream"]
+        },
         {
           "repo": "mathewvarghesemanu/android-xr-immersive-video-player",
           "url": "https://github.com/mathewvarghesemanu/android-xr-immersive-video-player",

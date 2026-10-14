@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 """Build the Galaxy XR Forge index.
 
-    catalog.json  ->  README.md  +  docs/index.html
+    catalog.json + changelog.json  ->  README.md + CHANGELOG.md + docs/index.html
 
 Usage:
     python tools/build.py           validate, then write the generated files
-    python tools/build.py --check   validate catalog.json only
+    python tools/build.py --check   validate the inputs only
 
 Rules:
-    - catalog.json is the single source of truth. Never hand-edit README.md
-      or docs/index.html; edit the catalog and rerun this script.
+    - catalog.json is the single source of truth for the repo list; changelog.json
+      holds the change history. Never hand-edit README.md, CHANGELOG.md or
+      docs/index.html: edit the inputs and rerun this script.
     - Dependency-free: Python 3.10+, stdlib only, runs on any host.
 """
 
@@ -21,10 +22,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG_PATH = ROOT / "catalog.json"
+CHANGELOG_PATH = ROOT / "changelog.json"
 README_PATH = ROOT / "README.md"
+CHANGELOG_MD_PATH = ROOT / "CHANGELOG.md"
 SITE_PATH = ROOT / "docs" / "index.html"
 
 REPO_URL = "https://github.com/AngelDark92/GalaxyXR-Forge"
+SITE_URL = "https://angeldark92.github.io/GalaxyXR-Forge"
 TAGLINE = (
     "Every community repo for the Samsung Galaxy XR (SM-I610) in one place: "
     "root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics."
@@ -77,11 +81,59 @@ def validate(cat):
 
 
 # ---------------------------------------------------------------------------
+# changelog loading and validation
+# ---------------------------------------------------------------------------
+
+
+def load_changelog():
+    with CHANGELOG_PATH.open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+def validate_changelog(changelog):
+    """Every catalog change needs an entry: date, title and at least one item."""
+    errors = []
+    entries = changelog.get("entries") or []
+    if not entries:
+        errors.append("changelog has no entries")
+    for i, e in enumerate(entries):
+        label = f"changelog entry {i + 1}"
+        when = str(e.get("date", ""))
+        if len(when) != 10 or when[4] != "-" or when[7] != "-":
+            errors.append(f"{label}: bad date {when!r} (want YYYY-MM-DD)")
+        if not e.get("title"):
+            errors.append(f"{label}: missing title")
+        if not (e.get("items") or []):
+            errors.append(f"{label}: no items")
+        for item in e.get("items") or []:
+            if not str(item).strip():
+                errors.append(f"{label}: empty item")
+    return errors
+
+
+def render_changelog_md(changelog):
+    L = [
+        "# Changelog",
+        "",
+        "Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) "
+        "by `tools/build.py` — never edit this file by hand.",
+        "",
+    ]
+    for e in changelog["entries"]:
+        L.append(f'## {e["date"]} — {e["title"]}')
+        L.append("")
+        for item in e["items"]:
+            L.append(f"- {item}")
+        L.append("")
+    return "\n".join(L)
+
+
+# ---------------------------------------------------------------------------
 # README
 # ---------------------------------------------------------------------------
 
 
-def render_readme(cat):
+def render_readme(cat, changelog):
     groups = cat["groups"]
     total = sum(len(g["repos"]) for g in groups)
     updated = cat.get("updated", date.today().isoformat())
@@ -148,6 +200,13 @@ def render_readme(cat):
         "[`catalog.json`](catalog.json) is the machine-readable index; "
         "[`.agents/skills/`](.agents/skills/) maps every Galaxy XR repo and its local checkout."
     )
+    A("")
+    A("## Changelog")
+    A("")
+    for e in changelog.get("entries", [])[:6]:
+        A(f'- `{e["date"]}` — {e["title"]}')
+    A("")
+    A(f'Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab]({SITE_URL}/#changelog).')
     A("")
     A("## Notes")
     A("")
@@ -322,6 +381,25 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .chip[data-status="fav"].is-active{border-color:rgba(251,191,36,.6);background:rgba(251,191,36,.12)}
 .chip[data-status="done"].is-active{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
 .chip[data-status="todo"].is-active{border-color:var(--muted);background:rgba(148,163,184,.10)}
+.tabs{display:flex;gap:6px;flex:none}
+.tab{border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:7px 14px;font:500 13px var(--font-mono);cursor:pointer;min-height:34px}
+.tab b{font-weight:500;color:var(--dim)}
+.tab:hover{border-color:var(--muted);color:var(--ink)}
+.tab.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.12)}
+.tab.is-active b{color:var(--accent-2)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.catalog-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex:1 1 320px;min-width:0}
+.catalog-controls[hidden]{display:none}
+.changelog{max-width:1120px;margin:0 auto;padding:0 22px}
+.changelog h2{font:600 1.35rem var(--font-disp);margin:0 0 6px}
+.entries{list-style:none;margin:0;padding:0}
+.entry{border-top:1px solid var(--line);padding:18px 0}
+.entry:first-child{border-top:0}
+.entry-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.entry-head time{font:500 12.5px var(--font-mono);color:var(--accent);letter-spacing:.06em}
+.entry-head h3{font:600 16px var(--font-disp);margin:0}
+.entry ul{margin:8px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
+.entry li{margin:4px 0}
 main{padding:34px 0 6px}
 .group{max-width:1120px;margin:0 auto 42px;padding:0 22px}
 .group-head h2{display:flex;align-items:center;gap:10px;font:600 1.35rem var(--font-disp);margin:0 0 6px}
@@ -389,14 +467,20 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     </div>
   </div>
 </header>
-<nav class="filters" aria-label="Filter repositories">
+<nav class="filters" aria-label="Views and filters">
   <div class="filters-inner">
-    <input id="q" type="search" placeholder="Filter repos: name, tag, description…" aria-label="Filter repositories">
-    <div class="chips" role="group" aria-label="Repository groups">
-        __CHIPS__
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button type="button" class="tab is-active" data-view="catalog" role="tab" aria-selected="true">Catalog <b>__TOTAL__</b></button>
+      <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>__CHANGELOG_COUNT__</b></button>
     </div>
-    <div class="chips" role="group" aria-label="Checked and favourite repositories">
+    <div class="catalog-controls" id="catalog-controls">
+      <input id="q" type="search" placeholder="Filter repos: name, tag, description…" aria-label="Filter repositories">
+      <div class="chips" role="group" aria-label="Repository groups">
+        __CHIPS__
+      </div>
+      <div class="chips" role="group" aria-label="Checked and favourite repositories">
         __STATUS__
+      </div>
     </div>
   </div>
 </nav>
@@ -404,10 +488,13 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   __SECTIONS__
   <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
 </main>
+<div id="changelog" hidden>
+  __CHANGELOG__
+</div>
 <footer>
   <div class="wrap">
     <span>Unofficial community hub — not affiliated with Samsung. Each project keeps its own license.</span>
-    <span>Add a repo: edit <code>catalog.json</code>, run <code>python tools/build.py</code>, open a PR · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
+    <span>Add a repo: edit <code>catalog.json</code> and <code>changelog.json</code>, run <code>python tools/build.py</code>, open a PR · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
   </div>
 </footer>
 <script>
@@ -545,13 +632,53 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   loadMarks();
   apply();
 })();
+
+// Catalog / Changelog views. The active view is mirrored in the URL hash, so a
+// link like #changelog opens the history directly.
+(function () {
+  var tabs = [].slice.call(document.querySelectorAll('.tab'));
+  var views = { catalog: document.getElementById('catalog'), changelog: document.getElementById('changelog') };
+  var controls = document.getElementById('catalog-controls');
+  function show(view) {
+    tabs.forEach(function (t) {
+      var on = t.dataset.view === view;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    Object.keys(views).forEach(function (k) {
+      if (views[k]) views[k].hidden = k !== view;
+    });
+    if (controls) controls.hidden = view !== 'catalog';
+    if (window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + view);
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { show(t.dataset.view); });
+  });
+  if (window.location.hash === '#changelog') show('changelog');
+})();
 </script>
 </body>
 </html>
 """
 
 
-def render_site(cat):
+def render_changelog_view(changelog):
+    entries = []
+    for e in changelog["entries"]:
+        items = "".join(f"<li>{html.escape(str(i))}</li>" for i in e["items"])
+        entries.append(
+            f'<li class="entry"><div class="entry-head">'
+            f'<time datetime="{e["date"]}">{e["date"]}</time>'
+            f'<h3>{html.escape(str(e["title"]))}</h3></div><ul>{items}</ul></li>'
+        )
+    return (
+        '<section class="changelog"><h2>Changelog</h2>'
+        '<p class="blurb">Every catalog change — repos added, moved or removed. Newest first.</p>'
+        f'<ol class="entries">{"".join(entries)}</ol></section>'
+    )
+
+
+def render_site(cat, changelog):
     total = sum(len(g["repos"]) for g in cat["groups"])
     updated = cat.get("updated", date.today().isoformat())
     page = SITE_TEMPLATE
@@ -562,6 +689,8 @@ def render_site(cat):
     page = page.replace("__CHIPS__", render_chips(cat))
     page = page.replace("__STATUS__", render_status_chips(cat))
     page = page.replace("__SECTIONS__", render_sections(cat))
+    page = page.replace("__CHANGELOG_COUNT__", str(len(changelog.get("entries", []))))
+    page = page.replace("__CHANGELOG__", render_changelog_view(changelog))
     page = page.replace("__REPO_URL__", REPO_URL)
     return page
 
@@ -573,23 +702,34 @@ def main():
     args = sys.argv[1:]
     check_only = "--check" in args
     cat = load_catalog()
+    changelog = load_changelog()
     errors, repos = validate(cat)
+    errors += validate_changelog(changelog)
     if errors:
-        print("catalog.json INVALID:")
+        print("input INVALID:")
         for e in errors:
             print("  -", e)
         return 1
     if check_only:
-        print(f"catalog OK: {len(repos)} repos in {len(cat['groups'])} groups")
+        print(
+            f"OK: {len(repos)} repos in {len(cat['groups'])} groups; "
+            f"changelog: {len(changelog['entries'])} entries"
+        )
         return 0
-    readme = render_readme(cat)
-    site = render_site(cat)
+    readme = render_readme(cat, changelog)
+    changelog_md = render_changelog_md(changelog)
+    site = render_site(cat, changelog)
     README_PATH.write_text(readme, encoding="utf-8", newline="\n")
+    CHANGELOG_MD_PATH.write_text(changelog_md, encoding="utf-8", newline="\n")
     SITE_PATH.parent.mkdir(parents=True, exist_ok=True)
     SITE_PATH.write_text(site, encoding="utf-8", newline="\n")
     print(f"wrote README.md ({len(readme)} bytes)")
+    print(f"wrote CHANGELOG.md ({len(changelog_md)} bytes)")
     print(f"wrote docs/index.html ({len(site)} bytes)")
-    print(f"catalog: {len(repos)} repos in {len(cat['groups'])} groups")
+    print(
+        f"catalog: {len(repos)} repos in {len(cat['groups'])} groups; "
+        f"changelog: {len(changelog['entries'])} entries"
+    )
     return 0
 
 

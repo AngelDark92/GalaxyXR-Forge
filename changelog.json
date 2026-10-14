@@ -1,0 +1,74 @@
+{
+  "entries": [
+    {
+      "date": "2026-10-14",
+      "title": "Aurora Store and a changelog tab",
+      "items": [
+        "Added whyorean/AuroraStore to Tools & Diagnostics.",
+        "The site gained a Changelog tab, rendered from this file like everything else; CHANGELOG.md mirrors it for GitHub."
+      ]
+    },
+    {
+      "date": "2026-10-14",
+      "title": "Obtainium and the emulation pack",
+      "items": [
+        "Added ImranR98/Obtainium to Tools & Diagnostics.",
+        "Added RJNY/Obtainium-Emulation-Pack to Games & Emulation."
+      ]
+    },
+    {
+      "date": "2026-10-14",
+      "title": "VectorXR",
+      "items": [
+        "Added DienerTech/vectorxr to PC VR & Streaming."
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "title": "PimaxMagic4All, PCVR Mods Hub and Moonlight XR",
+      "items": [
+        "Added mbucchia/PimaxMagic4All, Mr-Nlce/PCVR-Mods-Installer-Hub and Gilleece/moonlight-android-xr to PC VR & Streaming.",
+        "Widened that group's blurb to cover PC-side VR tooling."
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "title": "ALVR USB badge and pyrowave note",
+      "items": [
+        "Terminal-ennui/Galaxy_XR_ALVR_USB gained its v0.2.0-beta release badge and a sharper line.",
+        "Terminal-ennui/pyrowave is now marked as the codec fork behind the ALVR 4:4:4 builds."
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "title": "Game Link and QuestLHSync entries enriched",
+      "items": [
+        "4uva4ek/galaxy-xr-game-link line corrected after reading its README.",
+        "stearnsbq/questlhsync-galaxy-xr gained its v0.4.1 release badge and a PC-side requirement note."
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "title": "diabl0w/KernelSU moved to Foundations",
+      "items": [
+        "Moved diabl0w/KernelSU out of Root & Kernel: it is the source base both root stacks build on, not an XR deliverable."
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "title": "20 more repos and a new Apps & Samples group",
+      "items": [
+        "Added 20 community repos found by a GitHub sweep: Lighthouse sync modules, ALVR streaming variants, face-tracking relays, lens QR tools and more.",
+        "New Apps & Samples group for players, samples and small apps."
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "title": "Catalog opens with 25 repos",
+      "items": [
+        "Added the first 25 repos across 8 groups: root and kernel tooling, KernelSU modules, PC VR drivers, app patches, emulation and diagnostics.",
+        "README, Pages site and agent docs published, all generated from catalog.json."
+      ]
+    }
+  ]
+}

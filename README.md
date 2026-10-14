@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-51-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-52-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-13` — 51 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-13` — 52 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -117,6 +117,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[perillamint/galaxy-xr-lenscal](https://github.com/perillamint/galaxy-xr-lenscal)**<br>![stars](https://img.shields.io/github/stars/perillamint/galaxy-xr-lenscal?style=flat-square) | Lens calibration QR builder for Galaxy XR. |
 | **[AmeChanRain/MicDotDisabler](https://github.com/AmeChanRain/MicDotDisabler)**<br>![stars](https://img.shields.io/github/stars/AmeChanRain/MicDotDisabler?style=flat-square) | Hides the Android privacy indicator dot, built for Android XR devices. |
 | **[ImranR98/Obtainium](https://github.com/ImranR98/Obtainium)**<br>![stars](https://img.shields.io/github/stars/ImranR98/Obtainium?style=flat-square) ![release](https://img.shields.io/github/v/release/ImranR98/Obtainium?style=flat-square&label=release) | Android app updater that installs and tracks APKs straight from their sources. |
+| **[whyorean/AuroraStore](https://github.com/whyorean/AuroraStore)**<br>![stars](https://img.shields.io/github/stars/whyorean/AuroraStore?style=flat-square) | Google Play client: search, download and update Play apps and APKs on device. |
 
 <a id="apps-samples"></a>
 
@@ -164,10 +165,21 @@ Keep descriptions to one factual line. See [`.agents/skills/`](.agents/skills/) 
 
 This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](catalog.json) is the machine-readable index; [`.agents/skills/`](.agents/skills/) maps every Galaxy XR repo and its local checkout.
 
+## Changelog
+
+- `2026-10-14` — Aurora Store and a changelog tab
+- `2026-10-14` — Obtainium and the emulation pack
+- `2026-10-14` — VectorXR
+- `2026-10-13` — PimaxMagic4All, PCVR Mods Hub and Moonlight XR
+- `2026-10-13` — ALVR USB badge and pyrowave note
+- `2026-10-13` — Game Link and QuestLHSync entries enriched
+
+Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
+
 ## Notes
 
 - Unofficial community hub — not affiliated with Samsung. Each catalogued project keeps its own license.
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-13 · 51 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-13 · 52 repos</sub></div>

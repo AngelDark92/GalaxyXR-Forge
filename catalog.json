@@ -278,6 +278,14 @@
           "license": null,
           "release": null,
           "tags": ["game", "mixed reality", "unreal"]
+        },
+        {
+          "repo": "RJNY/Obtainium-Emulation-Pack",
+          "url": "https://github.com/RJNY/Obtainium-Emulation-Pack",
+          "about": "Obtainium import list bundling Android emulator apps for one-shot install.",
+          "license": "Unlicense",
+          "release": "v7.19.0",
+          "tags": ["emulation", "obtainium", "android", "pack"]
         }
       ]
     },
@@ -343,6 +351,14 @@
           "license": "GPL-2.0",
           "release": null,
           "tags": ["privacy dot", "android xr", "utility"]
+        },
+        {
+          "repo": "ImranR98/Obtainium",
+          "url": "https://github.com/ImranR98/Obtainium",
+          "about": "Android app updater that installs and tracks APKs straight from their sources.",
+          "license": "GPL-3.0",
+          "release": "v1.6.17",
+          "tags": ["apk", "updater", "obtainium", "utility"]
         }
       ]
     },

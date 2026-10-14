@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-49-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-51-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-13` — 49 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-13` — 51 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -99,6 +99,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[evertec82/AstroQuest](https://github.com/evertec82/AstroQuest)**<br>![stars](https://img.shields.io/github/stars/evertec82/AstroQuest?style=flat-square) ![release](https://img.shields.io/github/v/release/evertec82/AstroQuest?style=flat-square&label=release) | ASTRO BOT Rescue Mission via shadPS4 on standalone headsets and PC VR. |
 | **[WinlatorXR/WinlatorXR](https://github.com/WinlatorXR/WinlatorXR)**<br>![stars](https://img.shields.io/github/stars/WinlatorXR/WinlatorXR?style=flat-square) | Windows x86 games and apps emulator for standalone Android XR headsets. |
 | **[Shift-Foundry/project-hazard](https://github.com/Shift-Foundry/project-hazard)**<br>![stars](https://img.shields.io/github/stars/Shift-Foundry/project-hazard?style=flat-square) | Room-scale mixed-reality roguelite for Android XR glasses, including Galaxy XR. |
+| **[RJNY/Obtainium-Emulation-Pack](https://github.com/RJNY/Obtainium-Emulation-Pack)**<br>![stars](https://img.shields.io/github/stars/RJNY/Obtainium-Emulation-Pack?style=flat-square) ![release](https://img.shields.io/github/v/release/RJNY/Obtainium-Emulation-Pack?style=flat-square&label=release) | Obtainium import list bundling Android emulator apps for one-shot install. |
 
 <a id="tools"></a>
 
@@ -115,6 +116,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[dli7319/galaxy-xr-rx-qr-code-generator](https://github.com/dli7319/galaxy-xr-rx-qr-code-generator)**<br>![stars](https://img.shields.io/github/stars/dli7319/galaxy-xr-rx-qr-code-generator?style=flat-square) | Generates the QR code for Galaxy XR prescription (RX) lens inserts. |
 | **[perillamint/galaxy-xr-lenscal](https://github.com/perillamint/galaxy-xr-lenscal)**<br>![stars](https://img.shields.io/github/stars/perillamint/galaxy-xr-lenscal?style=flat-square) | Lens calibration QR builder for Galaxy XR. |
 | **[AmeChanRain/MicDotDisabler](https://github.com/AmeChanRain/MicDotDisabler)**<br>![stars](https://img.shields.io/github/stars/AmeChanRain/MicDotDisabler?style=flat-square) | Hides the Android privacy indicator dot, built for Android XR devices. |
+| **[ImranR98/Obtainium](https://github.com/ImranR98/Obtainium)**<br>![stars](https://img.shields.io/github/stars/ImranR98/Obtainium?style=flat-square) ![release](https://img.shields.io/github/v/release/ImranR98/Obtainium?style=flat-square&label=release) | Android app updater that installs and tracks APKs straight from their sources. |
 
 <a id="apps-samples"></a>
 
@@ -168,4 +170,4 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-13 · 49 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-13 · 51 repos</sub></div>

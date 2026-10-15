@@ -2,6 +2,14 @@
   "entries": [
     {
       "date": "2026-10-14",
+      "title": "NEW badge tuned to real additions",
+      "items": [
+        "The badge now starts from the catalog's new_badge_since baseline, so the initial bulk seeding is not flagged as new.",
+        "Only entries added on or after 2026-10-14, within the last 5 days, carry NEW."
+      ]
+    },
+    {
+      "date": "2026-10-14",
       "title": "NEW badges for freshly added repos",
       "items": [
         "Every catalog entry now records the date it was added.",

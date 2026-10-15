@@ -46,6 +46,11 @@ def load_catalog():
 
 def validate(cat):
     errors = []
+    since = cat.get("new_badge_since")
+    if since is not None and (
+        len(str(since)) != 10 or str(since)[4] != "-" or str(since)[7] != "-"
+    ):
+        errors.append(f"new_badge_since: bad date {since!r} (want YYYY-MM-DD)")
     seen_ids = set()
     seen_repos = set()
     groups = cat.get("groups") or []
@@ -250,11 +255,12 @@ def count_new(cat, days=5):
     this build-time number is only the starting value before scripts run.
     """
     today = date.today()
+    since = str(cat.get("new_badge_since") or "0000-01-01")
     n = 0
     for g in cat["groups"]:
         for r in g["repos"]:
             added = r.get("added")
-            if not added:
+            if not added or str(added) < since:
                 continue
             try:
                 when = date(int(str(added)[0:4]), int(str(added)[5:7]), int(str(added)[8:10]))
@@ -551,9 +557,10 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   // date-only string is parsed as local midnight, so no timezone or server clock
   // enters into it. Cards age out of NEW on their own, without a rebuild.
   var NEW_MS = 5 * 24 * 60 * 60 * 1000;
+  var NEW_SINCE = '__NEW_SINCE__';
   function isNewCard(card) {
     var raw = card.dataset.added;
-    if (!raw) return false;
+    if (!raw || raw < NEW_SINCE) return false;
     var p = raw.split('-');
     if (p.length !== 3) return false;
     var t = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])).getTime();
@@ -746,6 +753,7 @@ def render_site(cat, changelog):
     page = page.replace("__STATUS__", render_status_chips(cat))
     page = page.replace("__SECTIONS__", render_sections(cat))
     page = page.replace("__CHANGELOG_COUNT__", str(len(changelog.get("entries", []))))
+    page = page.replace("__NEW_SINCE__", str(cat.get("new_badge_since") or "0000-01-01"))
     page = page.replace("__CHANGELOG__", render_changelog_view(changelog))
     page = page.replace("__REPO_URL__", REPO_URL)
     return page

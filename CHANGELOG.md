@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-14 — NEW badge tuned to real additions
+
+- The badge now starts from the catalog's new_badge_since baseline, so the initial bulk seeding is not flagged as new.
+- Only entries added on or after 2026-10-14, within the last 5 days, carry NEW.
+
 ## 2026-10-14 — NEW badges for freshly added repos
 
 - Every catalog entry now records the date it was added.

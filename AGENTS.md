@@ -11,7 +11,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 1. `catalog.json` and `changelog.json` are the single sources of truth. Never hand-edit `README.md`, `CHANGELOG.md` or `docs/index.html` — they are generated.
 2. After every catalog change run `python tools/build.py` (regenerates README, changelog and site) and review the git diff before committing.
 3. Keep descriptions to one factual line (build enforces ≤160 chars; target ~14 words). No marketing.
-4. Every catalog change needs an entry in `changelog.json` (date, title, one item per repo added, moved or removed). `build.py` renders `CHANGELOG.md` and the site's Changelog tab from it — a catalog edit without a changelog entry is an incomplete change.
+4. Every catalog change needs an entry in `changelog.json` (date, title, one item per repo added, moved or removed). `build.py` renders `CHANGELOG.md` and the site's Changelog tab from it — a catalog edit without a changelog entry is an incomplete change. Set `"added": "YYYY-MM-DD"` on every new entry: the site's NEW badge and New filter derive from it, computed client-side because Pages is static.
 5. Do not rename group `id` values — README anchors, site filters and chips depend on them.
 6. Commit and push only when the user asked. Editing files and running `build.py` / `check-links.py` / `check-repos.py` are always fine; pushing to GitHub or changing Pages settings requires explicit authorization.
 7. Links only: never copy code, binaries or proprietary blobs from catalogued repos into this one.
@@ -72,7 +72,8 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 ## Verification
 
 - `python tools/build.py` exits 0 and prints repo, group and changelog counts; `python tools/build.py --check` validates without writing.
-- Every catalog edit carries a matching `changelog.json` entry, appended newest first.
+- Every catalog edit carries a matching `changelog.json` entry, appended newest first, and a new entry carries its `added` date.
+- The NEW badge is browser-side logic over `data-added`; it expires on its own after 5 days with no rebuild. Do not freeze "new" into the generated README or the site HTML.
 - `python tools/check-links.py` reports no failures.
 - `python tools/check-repos.py` reports no renames, transfers, archived or missing repos. A renamed repo still answers, so link checks alone will not catch it.
 - Never claim the Pages site updated without fetching the live URL.

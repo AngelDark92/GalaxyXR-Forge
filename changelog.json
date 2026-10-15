@@ -2,6 +2,14 @@
   "entries": [
     {
       "date": "2026-10-14",
+      "title": "NEW badges for freshly added repos",
+      "items": [
+        "Every catalog entry now records the date it was added.",
+        "The site marks entries from the last 5 days with a NEW badge and a New filter, computed in the visitor's browser so they expire on their own."
+      ]
+    },
+    {
+      "date": "2026-10-14",
       "title": "KernelSU module source, and a renamed relay repo",
       "items": [
         "Added compdoge/gxr-ksu-modules to KernelSU Modules: a module source the GXR manager browses under Sources.",

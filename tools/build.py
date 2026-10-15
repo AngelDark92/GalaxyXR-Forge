@@ -77,6 +77,11 @@ def validate(cat):
                 errors.append(f"{repo}: missing about")
             elif len(about) > 160:
                 errors.append(f"{repo}: about too long ({len(about)} chars)")
+            added = r.get("added")
+            if added is not None and (
+                len(str(added)) != 10 or str(added)[4] != "-" or str(added)[7] != "-"
+            ):
+                errors.append(f"{repo}: bad added date {added!r} (want YYYY-MM-DD)")
     return errors, seen_repos
 
 
@@ -238,9 +243,33 @@ def render_chips(cat):
     return "\n        ".join(chips)
 
 
+def count_new(cat, days=5):
+    """How many repos were added within the last `days` days, by the build date.
+
+    The site recomputes this in the browser on every load (see the NEW badge JS);
+    this build-time number is only the starting value before scripts run.
+    """
+    today = date.today()
+    n = 0
+    for g in cat["groups"]:
+        for r in g["repos"]:
+            added = r.get("added")
+            if not added:
+                continue
+            try:
+                when = date(int(str(added)[0:4]), int(str(added)[5:7]), int(str(added)[8:10]))
+            except (TypeError, ValueError):
+                continue
+            if 0 <= (today - when).days < days:
+                n += 1
+    return n
+
+
 def render_status_chips(cat):
     total = sum(len(g["repos"]) for g in cat["groups"])
     spec = [
+        ("new", "#f97316", "\u2726 New", "cnt-new", count_new(cat),
+         "Show only repositories added in the last 5 days \u2014 combines with the other mark filters (AND)"),
         ("fav", "#fbbf24", "\u2605 Favourites", "cnt-fav", 0,
          "Show only favourites \u2014 combines with the other mark filters (AND)"),
         ("done", "#34d399", "\u2713 Checked", "cnt-done", 0,
@@ -290,11 +319,13 @@ def render_sections(cat):
             hay = " ".join(
                 [r["repo"], r.get("about", ""), r.get("license") or ""] + list(r.get("tags", []))
             ).lower()
+            added = r.get("added")
+            added_attr = f' data-added="{html.escape(str(added), quote=True)}"' if added else ""
             cards.append(
                 f'<article class="card" data-group="{g["id"]}" data-repo="{html.escape(r["repo"], quote=True)}"'
-                f' data-text="{html.escape(hay, quote=True)}">'
+                f' data-text="{html.escape(hay, quote=True)}"{added_attr}>'
                 f'<div class="card-top"><h3><a href="{r["url"]}" target="_blank" rel="noopener">'
-                f'<span class="owner">{owner}/</span>{name}</a></h3>'
+                f'<span class="owner">{owner}/</span>{name}</a><span class="tag-new" hidden>NEW</span></h3>'
                 f'<div class="badges">{"".join(badges)}</div></div>'
                 f'<p class="about">{html.escape(r["about"])}</p>'
                 f'<div class="card-foot"><span class="license">{html.escape(r.get("license") or "")}</span>'
@@ -378,6 +409,7 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .chip b{font-weight:500;color:var(--dim)}
 .chip:hover{border-color:var(--muted);color:var(--ink)}
 .chip.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
+.chip[data-status="new"].is-active{border-color:rgba(249,115,22,.6);background:rgba(249,115,22,.12)}
 .chip[data-status="fav"].is-active{border-color:rgba(251,191,36,.6);background:rgba(251,191,36,.12)}
 .chip[data-status="done"].is-active{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
 .chip[data-status="todo"].is-active{border-color:var(--muted);background:rgba(148,163,184,.10)}
@@ -418,6 +450,8 @@ main{padding:34px 0 6px}
 .card.is-done .card-foot .license{color:#4b596b}
 .card.is-done .card-foot a{color:#5d6b7e}
 .card.is-done:hover{transform:none;box-shadow:none;border-color:var(--line-2)}
+.card.is-new{border-color:rgba(249,115,22,.38)}
+.tag-new{display:inline-flex;align-items:center;margin-left:8px;padding:2px 8px;border-radius:999px;font:600 10px/1.7 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:#180b02;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 6px 18px -12px rgba(249,115,22,.9);vertical-align:middle;white-space:nowrap}
 .card-top{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
 .card h3{font:600 16px/1.3 var(--font-disp);margin:0;flex:1 1 auto;min-width:0;overflow-wrap:anywhere;word-break:break-word}
 .card h3 .owner{font:400 13px var(--font-mono);color:var(--dim);overflow-wrap:anywhere}
@@ -512,6 +546,20 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   var main = document.getElementById('catalog');
   var state = { q: '', group: 'all', status: {}, fav: {}, done: {} };
 
+  // "New" is computed here, in the visitor's browser, from the date the entry was
+  // added to the catalog. GitHub Pages is static with no per-request logic, and the
+  // date-only string is parsed as local midnight, so no timezone or server clock
+  // enters into it. Cards age out of NEW on their own, without a rebuild.
+  var NEW_MS = 5 * 24 * 60 * 60 * 1000;
+  function isNewCard(card) {
+    var raw = card.dataset.added;
+    if (!raw) return false;
+    var p = raw.split('-');
+    if (p.length !== 3) return false;
+    var t = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])).getTime();
+    return Date.now() - t < NEW_MS;
+  }
+
   // Star and check marks live in localStorage, with a cookie kept in sync as a
   // fallback, so they survive reloads and a browser restart. Nothing is sent anywhere.
   function readRaw() {
@@ -553,14 +601,19 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   function apply() {
     var query = state.q.trim().toLowerCase();
     var active = [];
-    ['fav', 'done', 'todo'].forEach(function (s) { if (state.status[s]) active.push(s); });
-    var shown = 0, favN = 0, doneN = 0;
+    ['new', 'fav', 'done', 'todo'].forEach(function (s) { if (state.status[s]) active.push(s); });
+    var shown = 0, favN = 0, doneN = 0, newN = 0;
     cards.forEach(function (c) {
       var repo = c.dataset.repo;
       var fav = !!state.fav[repo];
       var done = !!state.done[repo];
+      var isNew = isNewCard(c);
       if (fav) favN++;
       if (done) doneN++;
+      if (isNew) newN++;
+      var pill = c.querySelector('.tag-new');
+      if (pill) pill.hidden = !isNew;
+      c.classList.toggle('is-new', isNew);
       c.classList.toggle('is-fav', fav);
       c.classList.toggle('is-done', done);
       var favBtn = c.querySelector('.flag.fav');
@@ -576,6 +629,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       var okGroup = state.group === 'all' || c.dataset.group === state.group;
       var okText = !query || c.dataset.text.indexOf(query) > -1;
       var okMark = active.every(function (s) {
+        if (s === 'new') return isNew;
         if (s === 'fav') return fav;
         if (s === 'done') return done;
         return !done;
@@ -590,6 +644,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       });
       s.style.display = any ? '' : 'none';
     });
+    setCount('cnt-new', newN);
     setCount('cnt-fav', favN);
     setCount('cnt-done', doneN);
     setCount('cnt-todo', cards.length - doneN);

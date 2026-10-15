@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-14 — NEW badges for freshly added repos
+
+- Every catalog entry now records the date it was added.
+- The site marks entries from the last 5 days with a NEW badge and a New filter, computed in the visitor's browser so they expire on their own.
+
 ## 2026-10-14 — KernelSU module source, and a renamed relay repo
 
 - Added compdoge/gxr-ksu-modules to KernelSU Modules: a module source the GXR manager browses under Sources.

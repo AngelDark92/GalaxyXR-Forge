@@ -168,12 +168,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-14` — NEW badge and New filter brought back into sync
 - `2026-10-14` — NEW badge tuned to real additions
 - `2026-10-14` — NEW badges for freshly added repos
 - `2026-10-14` — KernelSU module source, and a renamed relay repo
 - `2026-10-14` — Aurora Store and a changelog tab
 - `2026-10-14` — Obtainium and the emulation pack
-- `2026-10-14` — VectorXR
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

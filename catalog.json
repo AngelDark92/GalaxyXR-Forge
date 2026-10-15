@@ -2,7 +2,6 @@
   "title": "Galaxy XR Forge",
   "device": "Samsung Galaxy XR (SM-I610)",
   "updated": "2026-10-14",
-  "new_badge_since": "2026-10-14",
   "groups": [
     {
       "id": "root-kernel",

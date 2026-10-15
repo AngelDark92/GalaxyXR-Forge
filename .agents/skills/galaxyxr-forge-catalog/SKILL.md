@@ -32,7 +32,7 @@ metadata:
 
    - `license`: SPDX id or `null` when the repo has none.
    - `release`: only when the repo has releases AND a single version stream. Per-module tags (e.g. `module-name/v0.1.0`) → use `null`; the badge would be misleading.
-   - `added`: the date the repo entered this catalog, `YYYY-MM-DD`. Always set it on a new entry — the site's NEW badge and New filter read it (browser-side, 5-day window; entries before the catalog's `new_badge_since` baseline never badge).
+   - `added`: the date the repo entered this catalog, `YYYY-MM-DD`. Always set it on a new entry — the site's NEW badge and New filter read it (browser-side, 5-day window; badge and filter share the one predicate).
    - Bump the top-level `"updated"` date.
 3. Add a `changelog.json` entry covering the same change, newest first:
 

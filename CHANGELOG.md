@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-14 — NEW badge and New filter brought back into sync
+
+- Fixed: the badge's own CSS overrode the hidden attribute, so every card wore NEW while the filter matched only the window set.
+- The 5-day window is now the only rule — no baseline — and the badge, the chip count and the New filter share one predicate.
+
 ## 2026-10-14 — NEW badge tuned to real additions
 
 - The badge now starts from the catalog's new_badge_since baseline, so the initial bulk seeding is not flagged as new.

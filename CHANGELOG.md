@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-16 — ALVR face-tracking module, and a badge bump
+
+- Added compdoge/VRCFT-ALVR-UE to Face & Eye Tracking: the PC-side VRCFaceTracking receiver that pairs with gxr-root-ft.
+- compdoge/gxr-root-ft release badge brought up to v1.3.8.
+
 ## 2026-10-14 — NEW badge and New filter brought back into sync
 
 - Fixed: the badge's own CSS overrode the hidden attribute, so every card wore NEW while the filter matched only the window set.

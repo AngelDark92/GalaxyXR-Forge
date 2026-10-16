@@ -1,7 +1,7 @@
 {
   "title": "Galaxy XR Forge",
   "device": "Samsung Galaxy XR (SM-I610)",
-  "updated": "2026-10-14",
+  "updated": "2026-10-16",
   "groups": [
     {
       "id": "root-kernel",
@@ -96,9 +96,18 @@
           "url": "https://github.com/compdoge/gxr-root-ft",
           "about": "Headset-side face and eye relay plus a KernelSU module for PC VR face tracking.",
           "license": "MIT",
-          "release": "v1.3.6",
+          "release": "v1.3.8",
           "added": "2026-10-13",
           "tags": ["face tracking", "eye tracking", "modules", "vrchat"]
+        },
+        {
+          "repo": "compdoge/VRCFT-ALVR-UE",
+          "url": "https://github.com/compdoge/VRCFT-ALVR-UE",
+          "about": "VRCFaceTracking module that receives ALVR eye and face tracking on the PC.",
+          "license": "Apache-2.0",
+          "release": "v1.4.0",
+          "added": "2026-10-16",
+          "tags": ["face tracking", "eye tracking", "vrcft", "alvr"]
         },
         {
           "repo": "compdoge/gxr-face-bridge",

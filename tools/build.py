@@ -183,7 +183,7 @@ def render_readme(cat, changelog):
             badges = [f'![stars](https://img.shields.io/github/stars/{r["repo"]}?style=flat-square)']
             if r.get("release"):
                 badges.append(
-                    f'![release](https://img.shields.io/github/v/release/{r["repo"]}?style=flat-square&label=release)'
+                    f'![release](https://img.shields.io/github/v/release/{r["repo"]}?include_prereleases&style=flat-square&label=release)'
                 )
             name = f'**[{r["repo"]}]({r["url"]})**<br>{" ".join(badges)}'
             A(f'| {name} | {r["about"]} |')
@@ -295,12 +295,12 @@ def render_sections(cat):
             repo = r["repo"]
             owner, name = repo.split("/")
             badges = [
-                f'<img src="https://img.shields.io/github/stars/{r["repo"]}?style=flat-square" '
+                f'<img data-badge="stars" src="https://img.shields.io/github/stars/{r["repo"]}?style=flat-square" '
                 f'alt="GitHub stars" loading="lazy">'
             ]
             if r.get("release"):
                 badges.append(
-                    f'<img src="https://img.shields.io/github/v/release/{r["repo"]}?style=flat-square&label=release" '
+                    f'<img data-badge="release" src="https://img.shields.io/github/v/release/{r["repo"]}?include_prereleases&style=flat-square&label=release" '
                     f'alt="latest release" loading="lazy">'
                 )
             flags = (
@@ -459,6 +459,10 @@ main{padding:34px 0 6px}
 .card h3 a:hover{color:var(--accent-2)}
 .badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
 .badges img{height:20px;display:block}
+.pill{display:inline-flex;align-items:center;gap:5px;max-width:170px;height:20px;padding:0 8px;border:1px solid var(--line-2);border-radius:999px;font:500 10.5px var(--font-mono);color:var(--muted);white-space:nowrap}
+.pill:hover{border-color:var(--accent);color:var(--ink)}
+.pill .sym{color:var(--accent-2)}
+.pill .v{overflow:hidden;text-overflow:ellipsis}
 .card .about{color:var(--muted);font-size:13.5px;margin:0;flex:1;overflow-wrap:anywhere;word-break:break-word}
 .card-foot{display:flex;align-items:center;gap:10px;font:11.5px var(--font-mono);color:var(--dim);padding-top:9px;border-top:1px solid var(--line);min-width:0}
 .card-foot .license{min-width:0;overflow-wrap:anywhere}
@@ -712,6 +716,147 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     t.addEventListener('click', function () { show(t.dataset.view); });
   });
   if (window.location.hash === '#changelog') show('changelog');
+})();
+
+// Live stars and latest release, fetched in the visitor's browser so both stay
+// current with no rebuild: shields.io JSON endpoints (CORS-open, edge-cached),
+// ungh.cc as fallback, results cached in localStorage for 30 minutes and
+// refreshed in the background. The badge images stay until a value arrives, so
+// nothing breaks without JS or when a fetch fails.
+(function () {
+  var STORE = 'gxrforge.live.v1';
+  var TTL = 30 * 60 * 1000;
+  var MAX_PARALLEL = 6;
+  var cards = [].slice.call(document.querySelectorAll('.card[data-repo]'));
+  if (!cards.length || !window.fetch) return;
+  var cache = {};
+  try { cache = JSON.parse(window.localStorage.getItem(STORE) || '{}') || {}; } catch (e) { cache = {}; }
+  var queue = [];
+  var active = 0;
+
+  function save() {
+    try { window.localStorage.setItem(STORE, JSON.stringify(cache)); } catch (e) {}
+  }
+  function getJSON(url) {
+    return window.fetch(url, { credentials: 'omit' }).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    });
+  }
+  function compact(n) {
+    n = Number(n);
+    if (!isFinite(n)) return '';
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/[.]0$/, '') + 'k';
+    return String(n);
+  }
+  // Each helper resolves {ok, value}; ok false means "could not determine,
+  // leave the badge image in place and retry on the next visit".
+  function fetchStars(repo) {
+    return getJSON('https://img.shields.io/github/stars/' + repo + '.json')
+      .then(function (d) { var v = String(d.value || ''); return { ok: !!v, value: v }; })
+      .catch(function () {
+        return getJSON('https://ungh.cc/repos/' + repo)
+          .then(function (d) { return { ok: true, value: compact((d.repo || {}).stars) }; })
+          .catch(function () { return { ok: false, value: null }; });
+      });
+  }
+  function fetchRelease(repo) {
+    return getJSON('https://img.shields.io/github/v/release/' + repo + '.json?include_prereleases')
+      .then(function (d) {
+        var v = String(d.value || '');
+        if (!v || /no releases|not found/i.test(v)) return { ok: true, value: null };
+        return { ok: true, value: v };
+      })
+      .catch(function () {
+        return getJSON('https://ungh.cc/repos/' + repo + '/releases/latest')
+          .then(function (d) {
+            var tag = d.release && d.release.tag ? String(d.release.tag) : null;
+            return { ok: true, value: tag };
+          })
+          .catch(function () { return { ok: false, value: null }; });
+      });
+  }
+  function dropImg(badges, which) {
+    var img = badges.querySelector('img[data-badge="' + which + '"]');
+    if (img && img.parentNode) img.parentNode.removeChild(img);
+  }
+  function pill(badges, cls, href, sym) {
+    var el = badges.querySelector('a.pill.' + cls);
+    if (el) return el;
+    el = document.createElement('a');
+    el.className = 'pill ' + cls;
+    el.href = href;
+    el.target = '_blank';
+    el.rel = 'noopener';
+    if (sym) {
+      var s = document.createElement('span');
+      s.className = 'sym';
+      s.setAttribute('aria-hidden', 'true');
+      s.textContent = sym;
+      el.appendChild(s);
+    }
+    var v = document.createElement('span');
+    v.className = 'v';
+    el.appendChild(v);
+    return el;
+  }
+  function render(card, repo, data) {
+    var badges = card.querySelector('.badges');
+    if (!badges) return;
+    if (data.s) {
+      var sp = pill(badges, 'stars', 'https://github.com/' + repo + '/stargazers', '\u2605');
+      sp.querySelector('.v').textContent = data.s;
+      sp.title = data.s + ' stars on GitHub';
+      if (sp.parentNode !== badges) badges.insertBefore(sp, badges.firstChild);
+      dropImg(badges, 'stars');
+    }
+    if (data.rn) {
+      dropImg(badges, 'release');
+      var old = badges.querySelector('a.pill.rel');
+      if (data.r) {
+        var rp = pill(badges, 'rel', 'https://github.com/' + repo + '/releases', null);
+        rp.querySelector('.v').textContent = data.r;
+        rp.title = 'Latest release: ' + data.r;
+        if (rp.parentNode !== badges) {
+          var sp2 = badges.querySelector('a.pill.stars');
+          if (sp2 && sp2.parentNode === badges) badges.insertBefore(rp, sp2.nextSibling);
+          else badges.insertBefore(rp, badges.firstChild);
+        }
+      } else if (old && old.parentNode) {
+        old.parentNode.removeChild(old);
+      }
+    }
+  }
+  function pump() {
+    while (active < MAX_PARALLEL && queue.length) {
+      active++;
+      (queue.shift())().then(function () { active--; pump(); }, function () { active--; pump(); });
+    }
+  }
+  function schedule(fn) { queue.push(fn); pump(); }
+
+  cards.forEach(function (card) {
+    var repo = card.dataset.repo;
+    if (!repo || repo.indexOf('/') < 0) return;
+    var hit = cache[repo] || null;
+    if (hit) render(card, repo, { s: hit.s, r: hit.r, rn: hit.rn });
+    if (hit && Date.now() - (hit.t || 0) < TTL) return;
+    schedule(function () {
+      return Promise.all([fetchStars(repo), fetchRelease(repo)]).then(function (res) {
+        var stars = res[0], rel = res[1];
+        if (!stars.ok && !rel.ok) return; // keep the badges; retry on the next visit
+        var entry = {
+          s: stars.ok ? stars.value : (hit && hit.s) || null,
+          r: rel.ok ? rel.value : (hit && hit.r) || null,
+          rn: rel.ok ? true : !!(hit && hit.rn),
+          t: Date.now()
+        };
+        cache[repo] = entry;
+        save();
+        render(card, repo, entry);
+      });
+    });
+  });
 })();
 </script>
 </body>

@@ -31,7 +31,7 @@ metadata:
    ```
 
    - `license`: SPDX id or `null` when the repo has none.
-   - `release`: only when the repo has releases AND a single version stream. Per-module tags (e.g. `module-name/v0.1.0`) → use `null`; the badge would be misleading.
+   - `release`: only when the repo has releases AND a single version stream. Per-module tags (e.g. `module-name/v0.1.0`) → use `null`; the badge would be misleading. It only gates the README badge: the site loads star counts and the latest release live in the browser (prereleases included) for every repo, so the value never needs bumping.
    - `added`: the date the repo entered this catalog, `YYYY-MM-DD`. Always set it on a new entry — the site's NEW badge and New filter read it (browser-side, 5-day window; badge and filter share the one predicate).
    - Bump the top-level `"updated"` date.
 3. Add a `changelog.json` entry covering the same change, newest first:
@@ -58,5 +58,5 @@ metadata:
 - Append changelog entries newest first; never rewrite or delete history.
 - Duplicate `repo` values or a bad URL fail the build on purpose — fix the catalog, not the build.
 - Group `id` values are README anchors and site filter keys. Renaming breaks links; don't.
-- Release badges are live (shields.io) — never hardcode versions in `about`.
+- Release badges are live (shields.io images; keep `?include_prereleases` in the URL or beta-only repos show a red "no releases" badge), and the site loads star counts and latest tags in the visitor's browser (shields.io JSON → `localStorage`, 30-min TTL, badge image as fallback) — never hardcode versions in `about`, and never bake star counts, release tags or other live values into generated files.
 - Keep `about` factual and stable; it appears in three places (README, site, search index).

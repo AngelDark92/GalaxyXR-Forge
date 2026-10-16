@@ -74,6 +74,7 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 - `python tools/build.py` exits 0 and prints repo, group and changelog counts; `python tools/build.py --check` validates without writing.
 - Every catalog edit carries a matching `changelog.json` entry, appended newest first, and a new entry carries its `added` date.
 - The NEW badge is browser-side logic over `data-added`; it expires on its own after 5 days with no rebuild. Do not freeze "new" into the generated README or the site HTML.
+- Star counts and latest releases on the site cards are fetched in the visitor's browser (shields.io JSON + `localStorage` cache; the badge image is the no-JS/failure fallback). Live values are never baked into the README, the site HTML or the changelog.
 - `python tools/check-links.py` reports no failures.
 - `python tools/check-repos.py` reports no renames, transfers, archived or missing repos. A renamed repo still answers, so link checks alone will not catch it.
 - Never claim the Pages site updated without fetching the live URL.

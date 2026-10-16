@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-16 — Stars and releases load live on the site cards
+
+- Site cards now fetch each repo's star count and latest release in the visitor's browser (shields.io JSON, cached 30 minutes, refreshed in the background), so both stay current with no catalog edits or rebuilds.
+- Release badges include prereleases now, so beta-only repos no longer show a red "no releases or repo not found" badge.
+
 ## 2026-10-16 — ALVR face-tracking module, and a badge bump
 
 - Added compdoge/VRCFT-ALVR-UE to Face & Eye Tracking: the PC-side VRCFaceTracking receiver that pairs with gxr-root-ft.

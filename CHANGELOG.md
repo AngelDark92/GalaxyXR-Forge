@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-16 — Input Forwarder for Apollo streaming
+
+- Added BlueScorpioVR/androidInputForwarder to PC VR & Streaming: a root-only app that forwards a Bluetooth controller, keyboard and mouse to an Apollo PC while another app owns the screen.
+
 ## 2026-10-16 — Stars and releases load live on the site cards
 
 - Site cards now fetch each repo's star count and latest release in the visitor's browser (shields.io JSON, cached 30 minutes, refreshed in the background), so both stay current with no catalog edits or rebuilds.

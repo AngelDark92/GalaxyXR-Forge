@@ -2,6 +2,13 @@
   "entries": [
     {
       "date": "2026-10-16",
+      "title": "Input Forwarder for Apollo streaming",
+      "items": [
+        "Added BlueScorpioVR/androidInputForwarder to PC VR & Streaming: a root-only app that forwards a Bluetooth controller, keyboard and mouse to an Apollo PC while another app owns the screen."
+      ]
+    },
+    {
+      "date": "2026-10-16",
       "title": "Stars and releases load live on the site cards",
       "items": [
         "Site cards now fetch each repo's star count and latest release in the visitor's browser (shields.io JSON, cached 30 minutes, refreshed in the background), so both stay current with no catalog edits or rebuilds.",

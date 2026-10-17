@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-54-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-55-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-16` — 54 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-16` — 55 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -76,6 +76,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[Mr-Nlce/PCVR-Mods-Installer-Hub](https://github.com/Mr-Nlce/PCVR-Mods-Installer-Hub)**<br>![stars](https://img.shields.io/github/stars/Mr-Nlce/PCVR-Mods-Installer-Hub?style=flat-square) ![release](https://img.shields.io/github/v/release/Mr-Nlce/PCVR-Mods-Installer-Hub?include_prereleases&style=flat-square&label=release) | Portable installer and launcher for publicly available PC VR game mods. |
 | **[Gilleece/moonlight-android-xr](https://github.com/Gilleece/moonlight-android-xr)**<br>![stars](https://img.shields.io/github/stars/Gilleece/moonlight-android-xr?style=flat-square) ![release](https://img.shields.io/github/v/release/Gilleece/moonlight-android-xr?include_prereleases&style=flat-square&label=release) | Moonlight fork: native OpenXR client with on-headset 2D-to-3D conversion. |
 | **[DienerTech/vectorxr](https://github.com/DienerTech/vectorxr)**<br>![stars](https://img.shields.io/github/stars/DienerTech/vectorxr?style=flat-square) ![release](https://img.shields.io/github/v/release/DienerTech/vectorxr?include_prereleases&style=flat-square&label=release) | Windows OpenXR layer and app for stereo depth, pivot and foveated-rendering tuning. |
+| **[BlueScorpioVR/androidInputForwarder](https://github.com/BlueScorpioVR/androidInputForwarder)**<br>![stars](https://img.shields.io/github/stars/BlueScorpioVR/androidInputForwarder?style=flat-square) ![release](https://img.shields.io/github/v/release/BlueScorpioVR/androidInputForwarder?include_prereleases&style=flat-square&label=release) | Root-only app forwarding a Bluetooth controller, keyboard and mouse to an Apollo PC. |
 
 <a id="app-patches"></a>
 
@@ -169,12 +170,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-16` — Input Forwarder for Apollo streaming
 - `2026-10-16` — Stars and releases load live on the site cards
 - `2026-10-16` — ALVR face-tracking module, and a badge bump
 - `2026-10-14` — NEW badge and New filter brought back into sync
 - `2026-10-14` — NEW badge tuned to real additions
 - `2026-10-14` — NEW badges for freshly added repos
-- `2026-10-14` — KernelSU module source, and a renamed relay repo
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -184,4 +185,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-16 · 54 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-16 · 55 repos</sub></div>

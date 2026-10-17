@@ -2,6 +2,16 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-17 — Filters rail moves out to the left on wide screens
+
+- Site layout: from 1840px up the filter rail leaves the centered column and sits to its left with a fixed 26px gap — closer to the window edge, but never flush against it.
+- The width the rail frees goes to the repository grid, which shows three cards per row there; narrower screens keep the previous layout.
+
+## 2026-10-17 — Orange cursor glow
+
+- The site now carries a soft orange glow that eases toward the pointer: one fixed radial-gradient layer moved with a composited transform in a single requestAnimationFrame loop.
+- The glow is skipped on touch devices and for reduced-motion visitors, and its loop stops when the pointer settles or the tab is hidden.
+
 ## 2026-10-17 — Filters move into a left side rail
 
 - Site layout: search, group and status filters now sit in a rail on the left of the catalog — sticky on desktop and collapsed or expanded with the Filters button.

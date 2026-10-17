@@ -29,6 +29,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-sa
 a{color:inherit;text-decoration:none}
 .skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:#0a0e14;padding:8px 12px;border-radius:0 0 8px 0;z-index:60}
 .skip:focus{left:0}
+.glow{position:fixed;left:0;top:0;width:620px;height:620px;margin:-310px 0 0 -310px;z-index:-1;pointer-events:none;border-radius:50%;
+  background:radial-gradient(closest-side, rgba(249,115,22,.22), rgba(249,115,22,.07) 55%, transparent 100%);
+  transform:translate3d(var(--gx,50vw),var(--gy,28vh),0);opacity:0;transition:opacity .5s ease;will-change:transform}
+body.glow-on .glow{opacity:1}
+@media (prefers-reduced-motion:reduce){.glow{display:none}}
 .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
   background:
@@ -108,6 +113,16 @@ body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
 @media (min-width:1001px){
   body.side-closed .shell{grid-template-columns:minmax(0,1fr)}
   body.side-closed .side{display:none}
+}
+@media (min-width:1840px){
+  /* The rail leaves the centered column: its grid track collapses to zero and a
+     negative margin pulls the panel out to the left, a constant 26px from the repo
+     grid, which keeps the freed width (three cards per row). Sticky stays, so the
+     rail still starts below the hero and pins under the top bar on scroll.
+     1840px is where 308px rail + gap + 1120px column fit without crowding the
+     window edge. */
+  .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
+  .side{width:308px;margin-left:-334px}
 }
 @media (max-width:1000px){
   .shell{grid-template-columns:minmax(0,1fr);padding-top:20px}
@@ -199,6 +214,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 </head>
 <body>
 <a class="skip" href="#catalog">Skip to catalog</a>
+<div class="glow" aria-hidden="true"></div>
 <header class="hero">
   <div class="wrap">
     <p class="kicker">Samsung Galaxy XR · SM-I610 · Android XR</p>
@@ -219,7 +235,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     </button>
     <div class="tabs" role="tablist" aria-label="Views">
       <button type="button" class="tab is-active" data-view="catalog" role="tab" aria-selected="true">Catalog <b>55</b></button>
-      <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>17</b></button>
+      <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>19</b></button>
     </div>
   </div>
 </nav>
@@ -275,7 +291,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
     </main>
     <div id="changelog" hidden>
-      <section class="changelog"><h2>Changelog</h2><p class="blurb">Every catalog change — repos added, moved or removed. Newest first.</p><ol class="entries"><li class="entry"><div class="entry-head"><time datetime="2026-10-17">2026-10-17</time><h3>Filters move into a left side rail</h3></div><ul><li>Site layout: search, group and status filters now sit in a rail on the left of the catalog — sticky on desktop and collapsed or expanded with the Filters button.</li><li>On narrow screens the rail becomes an off-canvas drawer with a backdrop, closed by the X, the backdrop, Escape or the Show-N button; the Changelog tab hides the rail.</li><li>The rail shows live counts per group and per status chip; the desktop show / hide choice is remembered in the browser.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-16">2026-10-16</time><h3>Input Forwarder for Apollo streaming</h3></div><ul><li>Added BlueScorpioVR/androidInputForwarder to PC VR &amp; Streaming: a root-only app that forwards a Bluetooth controller, keyboard and mouse to an Apollo PC while another app owns the screen.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-16">2026-10-16</time><h3>Stars and releases load live on the site cards</h3></div><ul><li>Site cards now fetch each repo&#x27;s star count and latest release in the visitor&#x27;s browser (shields.io JSON, cached 30 minutes, refreshed in the background), so both stay current with no catalog edits or rebuilds.</li><li>Release badges include prereleases now, so beta-only repos no longer show a red &quot;no releases or repo not found&quot; badge.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-16">2026-10-16</time><h3>ALVR face-tracking module, and a badge bump</h3></div><ul><li>Added compdoge/VRCFT-ALVR-UE to Face &amp; Eye Tracking: the PC-side VRCFaceTracking receiver that pairs with gxr-root-ft.</li><li>compdoge/gxr-root-ft release badge brought up to v1.3.8.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>NEW badge and New filter brought back into sync</h3></div><ul><li>Fixed: the badge&#x27;s own CSS overrode the hidden attribute, so every card wore NEW while the filter matched only the window set.</li><li>The 5-day window is now the only rule — no baseline — and the badge, the chip count and the New filter share one predicate.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>NEW badge tuned to real additions</h3></div><ul><li>The badge now starts from the catalog&#x27;s new_badge_since baseline, so the initial bulk seeding is not flagged as new.</li><li>Only entries added on or after 2026-10-14, within the last 5 days, carry NEW.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>NEW badges for freshly added repos</h3></div><ul><li>Every catalog entry now records the date it was added.</li><li>The site marks entries from the last 5 days with a NEW badge and a New filter, computed in the visitor&#x27;s browser so they expire on their own.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>KernelSU module source, and a renamed relay repo</h3></div><ul><li>Added compdoge/gxr-ksu-modules to KernelSU Modules: a module source the GXR manager browses under Sources.</li><li>compdoge/gxr-alvr-ft follows its rename to compdoge/gxr-root-ft, with its release badge brought up to date.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>Aurora Store and a changelog tab</h3></div><ul><li>Added whyorean/AuroraStore to Tools &amp; Diagnostics.</li><li>The site gained a Changelog tab, rendered from this file like everything else; CHANGELOG.md mirrors it for GitHub.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>Obtainium and the emulation pack</h3></div><ul><li>Added ImranR98/Obtainium to Tools &amp; Diagnostics.</li><li>Added RJNY/Obtainium-Emulation-Pack to Games &amp; Emulation.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>VectorXR</h3></div><ul><li>Added DienerTech/vectorxr to PC VR &amp; Streaming.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>PimaxMagic4All, PCVR Mods Hub and Moonlight XR</h3></div><ul><li>Added mbucchia/PimaxMagic4All, Mr-Nlce/PCVR-Mods-Installer-Hub and Gilleece/moonlight-android-xr to PC VR &amp; Streaming.</li><li>Widened that group&#x27;s blurb to cover PC-side VR tooling.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>ALVR USB badge and pyrowave note</h3></div><ul><li>Terminal-ennui/Galaxy_XR_ALVR_USB gained its v0.2.0-beta release badge and a sharper line.</li><li>Terminal-ennui/pyrowave is now marked as the codec fork behind the ALVR 4:4:4 builds.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>Game Link and QuestLHSync entries enriched</h3></div><ul><li>4uva4ek/galaxy-xr-game-link line corrected after reading its README.</li><li>stearnsbq/questlhsync-galaxy-xr gained its v0.4.1 release badge and a PC-side requirement note.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>diabl0w/KernelSU moved to Foundations</h3></div><ul><li>Moved diabl0w/KernelSU out of Root &amp; Kernel: it is the source base both root stacks build on, not an XR deliverable.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>20 more repos and a new Apps &amp; Samples group</h3></div><ul><li>Added 20 community repos found by a GitHub sweep: Lighthouse sync modules, ALVR streaming variants, face-tracking relays, lens QR tools and more.</li><li>New Apps &amp; Samples group for players, samples and small apps.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>Catalog opens with 25 repos</h3></div><ul><li>Added the first 25 repos across 8 groups: root and kernel tooling, KernelSU modules, PC VR drivers, app patches, emulation and diagnostics.</li><li>README, Pages site and agent docs published, all generated from catalog.json.</li></ul></li></ol></section>
+      <section class="changelog"><h2>Changelog</h2><p class="blurb">Every catalog change — repos added, moved or removed. Newest first.</p><ol class="entries"><li class="entry"><div class="entry-head"><time datetime="2026-10-17">2026-10-17</time><h3>Filters rail moves out to the left on wide screens</h3></div><ul><li>Site layout: from 1840px up the filter rail leaves the centered column and sits to its left with a fixed 26px gap — closer to the window edge, but never flush against it.</li><li>The width the rail frees goes to the repository grid, which shows three cards per row there; narrower screens keep the previous layout.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-17">2026-10-17</time><h3>Orange cursor glow</h3></div><ul><li>The site now carries a soft orange glow that eases toward the pointer: one fixed radial-gradient layer moved with a composited transform in a single requestAnimationFrame loop.</li><li>The glow is skipped on touch devices and for reduced-motion visitors, and its loop stops when the pointer settles or the tab is hidden.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-17">2026-10-17</time><h3>Filters move into a left side rail</h3></div><ul><li>Site layout: search, group and status filters now sit in a rail on the left of the catalog — sticky on desktop and collapsed or expanded with the Filters button.</li><li>On narrow screens the rail becomes an off-canvas drawer with a backdrop, closed by the X, the backdrop, Escape or the Show-N button; the Changelog tab hides the rail.</li><li>The rail shows live counts per group and per status chip; the desktop show / hide choice is remembered in the browser.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-16">2026-10-16</time><h3>Input Forwarder for Apollo streaming</h3></div><ul><li>Added BlueScorpioVR/androidInputForwarder to PC VR &amp; Streaming: a root-only app that forwards a Bluetooth controller, keyboard and mouse to an Apollo PC while another app owns the screen.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-16">2026-10-16</time><h3>Stars and releases load live on the site cards</h3></div><ul><li>Site cards now fetch each repo&#x27;s star count and latest release in the visitor&#x27;s browser (shields.io JSON, cached 30 minutes, refreshed in the background), so both stay current with no catalog edits or rebuilds.</li><li>Release badges include prereleases now, so beta-only repos no longer show a red &quot;no releases or repo not found&quot; badge.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-16">2026-10-16</time><h3>ALVR face-tracking module, and a badge bump</h3></div><ul><li>Added compdoge/VRCFT-ALVR-UE to Face &amp; Eye Tracking: the PC-side VRCFaceTracking receiver that pairs with gxr-root-ft.</li><li>compdoge/gxr-root-ft release badge brought up to v1.3.8.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>NEW badge and New filter brought back into sync</h3></div><ul><li>Fixed: the badge&#x27;s own CSS overrode the hidden attribute, so every card wore NEW while the filter matched only the window set.</li><li>The 5-day window is now the only rule — no baseline — and the badge, the chip count and the New filter share one predicate.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>NEW badge tuned to real additions</h3></div><ul><li>The badge now starts from the catalog&#x27;s new_badge_since baseline, so the initial bulk seeding is not flagged as new.</li><li>Only entries added on or after 2026-10-14, within the last 5 days, carry NEW.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>NEW badges for freshly added repos</h3></div><ul><li>Every catalog entry now records the date it was added.</li><li>The site marks entries from the last 5 days with a NEW badge and a New filter, computed in the visitor&#x27;s browser so they expire on their own.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>KernelSU module source, and a renamed relay repo</h3></div><ul><li>Added compdoge/gxr-ksu-modules to KernelSU Modules: a module source the GXR manager browses under Sources.</li><li>compdoge/gxr-alvr-ft follows its rename to compdoge/gxr-root-ft, with its release badge brought up to date.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>Aurora Store and a changelog tab</h3></div><ul><li>Added whyorean/AuroraStore to Tools &amp; Diagnostics.</li><li>The site gained a Changelog tab, rendered from this file like everything else; CHANGELOG.md mirrors it for GitHub.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>Obtainium and the emulation pack</h3></div><ul><li>Added ImranR98/Obtainium to Tools &amp; Diagnostics.</li><li>Added RJNY/Obtainium-Emulation-Pack to Games &amp; Emulation.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-14">2026-10-14</time><h3>VectorXR</h3></div><ul><li>Added DienerTech/vectorxr to PC VR &amp; Streaming.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>PimaxMagic4All, PCVR Mods Hub and Moonlight XR</h3></div><ul><li>Added mbucchia/PimaxMagic4All, Mr-Nlce/PCVR-Mods-Installer-Hub and Gilleece/moonlight-android-xr to PC VR &amp; Streaming.</li><li>Widened that group&#x27;s blurb to cover PC-side VR tooling.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>ALVR USB badge and pyrowave note</h3></div><ul><li>Terminal-ennui/Galaxy_XR_ALVR_USB gained its v0.2.0-beta release badge and a sharper line.</li><li>Terminal-ennui/pyrowave is now marked as the codec fork behind the ALVR 4:4:4 builds.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>Game Link and QuestLHSync entries enriched</h3></div><ul><li>4uva4ek/galaxy-xr-game-link line corrected after reading its README.</li><li>stearnsbq/questlhsync-galaxy-xr gained its v0.4.1 release badge and a PC-side requirement note.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>diabl0w/KernelSU moved to Foundations</h3></div><ul><li>Moved diabl0w/KernelSU out of Root &amp; Kernel: it is the source base both root stacks build on, not an XR deliverable.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>20 more repos and a new Apps &amp; Samples group</h3></div><ul><li>Added 20 community repos found by a GitHub sweep: Lighthouse sync modules, ALVR streaming variants, face-tracking relays, lens QR tools and more.</li><li>New Apps &amp; Samples group for players, samples and small apps.</li></ul></li><li class="entry"><div class="entry-head"><time datetime="2026-10-13">2026-10-13</time><h3>Catalog opens with 25 repos</h3></div><ul><li>Added the first 25 repos across 8 groups: root and kernel tooling, KernelSU modules, PC VR drivers, app patches, emulation and diagnostics.</li><li>README, Pages site and agent docs published, all generated from catalog.json.</li></ul></li></ol></section>
     </div>
   </div>
 </div>
@@ -659,6 +675,38 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       });
     });
   });
+})();
+
+// Cursor glow: one fixed radial-gradient layer, eased toward the pointer in a
+// single rAF loop and moved with a composited transform. Pointer devices only;
+// reduced-motion users keep the static page and the loop stops when the pointer
+// settles or the tab is hidden.
+(function () {
+  var glow = document.querySelector('.glow');
+  if (!glow || !window.matchMedia) return;
+  if (window.matchMedia('(pointer:coarse)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  var x = window.innerWidth / 2, y = window.innerHeight * 0.3, tx = x, ty = y, raf = 0, on = false;
+  glow.style.setProperty('--gx', x + 'px');
+  glow.style.setProperty('--gy', y + 'px');
+  function frame() {
+    raf = 0;
+    x += (tx - x) * 0.16;
+    y += (ty - y) * 0.16;
+    if (Math.abs(tx - x) < 0.4 && Math.abs(ty - y) < 0.4) { x = tx; y = ty; }
+    glow.style.setProperty('--gx', x.toFixed(1) + 'px');
+    glow.style.setProperty('--gy', y.toFixed(1) + 'px');
+    if (x !== tx || y !== ty) raf = window.requestAnimationFrame(frame);
+  }
+  window.addEventListener('pointermove', function (ev) {
+    if (ev.pointerType === 'touch') return;
+    tx = ev.clientX; ty = ev.clientY;
+    if (!on) { on = true; document.body.classList.add('glow-on'); }
+    if (!raf) raf = window.requestAnimationFrame(frame);
+  }, { passive: true });
+  function fade() { on = false; document.body.classList.remove('glow-on'); }
+  document.documentElement.addEventListener('mouseleave', fade);
+  window.addEventListener('blur', fade);
 })();
 </script>
 </body>

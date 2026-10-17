@@ -377,6 +377,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-sa
 a{color:inherit;text-decoration:none}
 .skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:#0a0e14;padding:8px 12px;border-radius:0 0 8px 0;z-index:60}
 .skip:focus{left:0}
+.glow{position:fixed;left:0;top:0;width:620px;height:620px;margin:-310px 0 0 -310px;z-index:-1;pointer-events:none;border-radius:50%;
+  background:radial-gradient(closest-side, rgba(249,115,22,.22), rgba(249,115,22,.07) 55%, transparent 100%);
+  transform:translate3d(var(--gx,50vw),var(--gy,28vh),0);opacity:0;transition:opacity .5s ease;will-change:transform}
+body.glow-on .glow{opacity:1}
+@media (prefers-reduced-motion:reduce){.glow{display:none}}
 .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
   background:
@@ -456,6 +461,16 @@ body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
 @media (min-width:1001px){
   body.side-closed .shell{grid-template-columns:minmax(0,1fr)}
   body.side-closed .side{display:none}
+}
+@media (min-width:1840px){
+  /* The rail leaves the centered column: its grid track collapses to zero and a
+     negative margin pulls the panel out to the left, a constant 26px from the repo
+     grid, which keeps the freed width (three cards per row). Sticky stays, so the
+     rail still starts below the hero and pins under the top bar on scroll.
+     1840px is where 308px rail + gap + 1120px column fit without crowding the
+     window edge. */
+  .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
+  .side{width:308px;margin-left:-334px}
 }
 @media (max-width:1000px){
   .shell{grid-template-columns:minmax(0,1fr);padding-top:20px}
@@ -547,6 +562,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 </head>
 <body>
 <a class="skip" href="#catalog">Skip to catalog</a>
+<div class="glow" aria-hidden="true"></div>
 <header class="hero">
   <div class="wrap">
     <p class="kicker">Samsung Galaxy XR · SM-I610 · Android XR</p>
@@ -987,6 +1003,38 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       });
     });
   });
+})();
+
+// Cursor glow: one fixed radial-gradient layer, eased toward the pointer in a
+// single rAF loop and moved with a composited transform. Pointer devices only;
+// reduced-motion users keep the static page and the loop stops when the pointer
+// settles or the tab is hidden.
+(function () {
+  var glow = document.querySelector('.glow');
+  if (!glow || !window.matchMedia) return;
+  if (window.matchMedia('(pointer:coarse)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  var x = window.innerWidth / 2, y = window.innerHeight * 0.3, tx = x, ty = y, raf = 0, on = false;
+  glow.style.setProperty('--gx', x + 'px');
+  glow.style.setProperty('--gy', y + 'px');
+  function frame() {
+    raf = 0;
+    x += (tx - x) * 0.16;
+    y += (ty - y) * 0.16;
+    if (Math.abs(tx - x) < 0.4 && Math.abs(ty - y) < 0.4) { x = tx; y = ty; }
+    glow.style.setProperty('--gx', x.toFixed(1) + 'px');
+    glow.style.setProperty('--gy', y.toFixed(1) + 'px');
+    if (x !== tx || y !== ty) raf = window.requestAnimationFrame(frame);
+  }
+  window.addEventListener('pointermove', function (ev) {
+    if (ev.pointerType === 'touch') return;
+    tx = ev.clientX; ty = ev.clientY;
+    if (!on) { on = true; document.body.classList.add('glow-on'); }
+    if (!raf) raf = window.requestAnimationFrame(frame);
+  }, { passive: true });
+  function fade() { on = false; document.body.classList.remove('glow-on'); }
+  document.documentElement.addEventListener('mouseleave', fade);
+  window.addEventListener('blur', fade);
 })();
 </script>
 </body>

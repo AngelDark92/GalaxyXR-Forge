@@ -2,6 +2,12 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-17 — Filter figures now count what each filter would show
+
+- Every number in the filters panel is computed from the current selection: group counts follow the search box and the active status filters, status counts also follow the chosen group, and each status chip counts the repositories it would leave on screen.
+- Fixed: collapsing the panel wrapped the repo grid into a second grid row and pushed the whole catalog down the page — the collapsed track now shrinks to zero instead of dropping out of the grid.
+- Fixed: on desktop the panel no longer closes when a card is clicked; the Filters button and Escape close it, and the phone drawer keeps its backdrop click.
+
 ## 2026-10-17 — AstroQuest removed; badge errors no longer print
 
 - Removed evertec82/AstroQuest from Games & Emulation: the repository is gone now (GitHub answers 404), so its card linked nowhere.

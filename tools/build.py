@@ -468,7 +468,10 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 body.view-changelog .side,body.view-changelog .menu-btn{display:none}
 body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
 @media (min-width:1001px){
-  body.side-closed .shell{grid-template-columns:minmax(0,1fr)}
+  /* Collapsed: keep two tracks and shrink the first to zero. A single-column
+     template would wrap .content into a second row below the (invisible) rail
+     and shove the whole catalog down the page. */
+  body.side-closed .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
   body.side-closed .side{opacity:0;transform:translateY(-10px) scale(.97);visibility:hidden;pointer-events:none;
     transition:opacity .16s ease,transform .2s ease,visibility 0s linear .2s}
 }
@@ -713,15 +716,26 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     var query = state.q.trim().toLowerCase();
     var active = [];
     ['new', 'fav', 'done', 'todo'].forEach(function (s) { if (state.status[s]) active.push(s); });
-    var shown = 0, favN = 0, doneN = 0, newN = 0;
+    var shown = 0;
+    var groupN = {};
+    var statusN = { 'new': 0, fav: 0, done: 0, todo: 0 };
     cards.forEach(function (c) {
       var repo = c.dataset.repo;
       var fav = !!state.fav[repo];
       var done = !!state.done[repo];
       var isNew = isNewCard(c);
-      if (fav) favN++;
-      if (done) doneN++;
-      if (isNew) newN++;
+      var mark = { 'new': isNew, fav: fav, done: done, todo: !done };
+      // Facet numbers: every figure in the rail counts the cards that would be
+      // listed if that filter were picked, given the other active filters and the
+      // search box. Group numbers ignore the group selection because those chips
+      // are alternatives, not toggles; a status chip's own predicate is always
+      // part of its count, so "Checked 0" means checking would show nothing.
+      function pass() {
+        for (var i = 0; i < active.length; i++) {
+          if (!mark[active[i]]) return false;
+        }
+        return true;
+      }
       var pill = c.querySelector('.tag-new');
       if (pill) pill.hidden = !isNew;
       c.classList.toggle('is-new', isNew);
@@ -739,12 +753,17 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       }
       var okGroup = state.group === 'all' || c.dataset.group === state.group;
       var okText = !query || c.dataset.text.indexOf(query) > -1;
-      var okMark = active.every(function (s) {
-        if (s === 'new') return isNew;
-        if (s === 'fav') return fav;
-        if (s === 'done') return done;
-        return !done;
-      });
+      var okMark = pass();
+      if (okText && okMark) {
+        groupN[c.dataset.group] = (groupN[c.dataset.group] || 0) + 1;
+      }
+      if (okText && okMark && okGroup) {
+        // Status chips read as "what this filter shows right now", so they follow
+        // the search box, the other status filters and the selected group.
+        ['new', 'fav', 'done', 'todo'].forEach(function (s) {
+          if (mark[s]) statusN[s]++;
+        });
+      }
       var show = okGroup && okText && okMark;
       c.style.display = show ? '' : 'none';
       if (show) shown++;
@@ -755,10 +774,18 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       });
       s.style.display = any ? '' : 'none';
     });
-    setCount('cnt-new', newN);
-    setCount('cnt-fav', favN);
-    setCount('cnt-done', doneN);
-    setCount('cnt-todo', cards.length - doneN);
+    groupChips.forEach(function (ch) {
+      var id = ch.dataset.group;
+      var n = id === 'all'
+        ? Object.keys(groupN).reduce(function (a, k) { return a + groupN[k]; }, 0)
+        : (groupN[id] || 0);
+      var b = ch.querySelector('b');
+      if (b) b.textContent = n;
+    });
+    setCount('cnt-new', statusN['new']);
+    setCount('cnt-fav', statusN.fav);
+    setCount('cnt-done', statusN.done);
+    setCount('cnt-todo', statusN.todo);
     if (count) count.textContent = shown;
     setCount('side-count', shown);
     if (empty) empty.style.display = shown ? 'none' : '';
@@ -844,17 +871,13 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   if (closeBtn) closeBtn.addEventListener('click', function () { drawer(false); });
   if (doneBtn) doneBtn.addEventListener('click', function () { drawer(false); });
   if (backdrop) backdrop.addEventListener('click', function () { drawer(false); });
-  // Dropdown manners: Escape and a click anywhere outside the panel close it.
+  // Escape closes the panel; on phones the backdrop does the same. No click-away
+  // on desktop: the rail is a filter panel you keep open while flagging cards, and
+  // closing it on every card click made the catalog jump.
   document.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Escape') return;
     if (drawerOpen()) drawer(false);
     else if (!mq.matches) rail(false);
-  });
-  document.addEventListener('click', function (ev) {
-    if (mq.matches || document.body.classList.contains('side-closed')) return;
-    var t = ev.target;
-    if (t && t.closest && (t.closest('.side') || t.closest('.menu-btn'))) return;
-    rail(false);
   });
   function onBreak() { drawer(false); sync(); }
   if (mq.addEventListener) mq.addEventListener('change', onBreak);

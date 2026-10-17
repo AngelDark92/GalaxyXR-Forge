@@ -169,12 +169,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-17` — Filter figures now count what each filter would show
 - `2026-10-17` — AstroQuest removed; badge errors no longer print
 - `2026-10-17` — Filters menu opens as a glass dropdown
 - `2026-10-17` — Filters rail moves out to the left on wide screens
 - `2026-10-17` — Orange cursor glow
 - `2026-10-17` — Filters move into a left side rail
-- `2026-10-16` — Input Forwarder for Apollo streaming
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

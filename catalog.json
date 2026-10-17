@@ -308,15 +308,6 @@
       "blurb": "Games running on the headset or beside it.",
       "repos": [
         {
-          "repo": "evertec82/AstroQuest",
-          "url": "https://github.com/evertec82/AstroQuest",
-          "about": "ASTRO BOT Rescue Mission via shadPS4 on standalone headsets and PC VR.",
-          "license": "GPL-2.0",
-          "release": "v0.8.5",
-          "added": "2026-10-13",
-          "tags": ["ps4", "emulator", "astro bot", "shadps4"]
-        },
-        {
           "repo": "WinlatorXR/WinlatorXR",
           "url": "https://github.com/WinlatorXR/WinlatorXR",
           "about": "Windows x86 games and apps emulator for standalone Android XR headsets.",

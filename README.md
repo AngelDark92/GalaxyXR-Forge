@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-55-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-54-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-16` — 55 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-16` — 54 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -99,7 +99,6 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 
 | Repository | What it does |
 | --- | --- |
-| **[evertec82/AstroQuest](https://github.com/evertec82/AstroQuest)**<br>![stars](https://img.shields.io/github/stars/evertec82/AstroQuest?style=flat-square) ![release](https://img.shields.io/github/v/release/evertec82/AstroQuest?include_prereleases&style=flat-square&label=release) | ASTRO BOT Rescue Mission via shadPS4 on standalone headsets and PC VR. |
 | **[WinlatorXR/WinlatorXR](https://github.com/WinlatorXR/WinlatorXR)**<br>![stars](https://img.shields.io/github/stars/WinlatorXR/WinlatorXR?style=flat-square) | Windows x86 games and apps emulator for standalone Android XR headsets. |
 | **[Shift-Foundry/project-hazard](https://github.com/Shift-Foundry/project-hazard)**<br>![stars](https://img.shields.io/github/stars/Shift-Foundry/project-hazard?style=flat-square) | Room-scale mixed-reality roguelite for Android XR glasses, including Galaxy XR. |
 | **[RJNY/Obtainium-Emulation-Pack](https://github.com/RJNY/Obtainium-Emulation-Pack)**<br>![stars](https://img.shields.io/github/stars/RJNY/Obtainium-Emulation-Pack?style=flat-square) ![release](https://img.shields.io/github/v/release/RJNY/Obtainium-Emulation-Pack?include_prereleases&style=flat-square&label=release) | Obtainium import list bundling Android emulator apps for one-shot install. |
@@ -170,12 +169,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-17` — AstroQuest removed; badge errors no longer print
 - `2026-10-17` — Filters menu opens as a glass dropdown
 - `2026-10-17` — Filters rail moves out to the left on wide screens
 - `2026-10-17` — Orange cursor glow
 - `2026-10-17` — Filters move into a left side rail
 - `2026-10-16` — Input Forwarder for Apollo streaming
-- `2026-10-16` — Stars and releases load live on the site cards
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -185,4 +184,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-16 · 55 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-16 · 54 repos</sub></div>

@@ -2,6 +2,12 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-17 — AstroQuest removed; badge errors no longer print
+
+- Removed evertec82/AstroQuest from Games & Emulation: the repository is gone now (GitHub answers 404), so its card linked nowhere.
+- Site cards no longer print an error word as a figure: when shields.io answers "invalid" or another error string, that badge is hidden rather than showing the word, the string is never cached, and the value is retried once the cache expires.
+- A release pill now only appears for repositories the catalog gives a single release stream, so the live lookup can no longer add one to a card built without a release badge.
+
 ## 2026-10-17 — Filters menu opens as a glass dropdown
 
 - The filter panel is frosted glass now: translucent gradient, blur and saturation backdrop filter, hairline border and a deep shadow, with an opaque fallback on browsers without backdrop-filter.

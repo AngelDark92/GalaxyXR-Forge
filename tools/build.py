@@ -324,9 +324,10 @@ def render_sections(cat):
             ).lower()
             added = r.get("added")
             added_attr = f' data-added="{html.escape(str(added), quote=True)}"' if added else ""
+            release_attr = ' data-release="1"' if r.get("release") else ""
             cards.append(
                 f'<article class="card" data-group="{g["id"]}" data-repo="{html.escape(r["repo"], quote=True)}"'
-                f' data-text="{html.escape(hay, quote=True)}"{added_attr}>'
+                f' data-text="{html.escape(hay, quote=True)}"{added_attr}{release_attr}>'
                 f'<div class="card-top"><h3><a href="{r["url"]}" target="_blank" rel="noopener">'
                 f'<span class="owner">{owner}/</span>{name}</a><span class="tag-new" hidden>NEW</span></h3>'
                 f'<div class="badges">{"".join(badges)}</div></div>'
@@ -916,31 +917,53 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     if (n >= 1000) return (n / 1000).toFixed(1).replace(/[.]0$/, '') + 'k';
     return String(n);
   }
-  // Each helper resolves {ok, value}; ok false means "could not determine,
-  // leave the badge image in place and retry on the next visit".
+  // Each helper resolves {ok, value, bad}; ok false means "could not determine",
+  // bad true means shields answered with a word instead of a value. shields.io
+  // does that whenever it cannot read the upstream data ("invalid" while its own
+  // GitHub tokens are rate limited, "repo not found" for a dead repo): an error
+  // string is not data, so it never becomes a pill, its badge image (which would
+  // show the same word) is dropped, and nothing is cached from it.
+  var BAD_VALUE = /invalid|not[ -]?found|no data|unable|error|rate limit|too many|unavailable/i;
+  var NO_RELEASE = /no releases/i;
+  var STARS_OK = /^[\\d.,]+[kM]?/;
+
   function fetchStars(repo) {
     return getJSON('https://img.shields.io/github/stars/' + repo + '.json')
-      .then(function (d) { var v = String(d.value || ''); return { ok: !!v, value: v }; })
+      .then(function (d) {
+        var v = String(d.value || '').trim();
+        if (NO_RELEASE.test(v) || BAD_VALUE.test(v)) return { ok: false, bad: true, value: null };
+        if (!STARS_OK.test(v)) return { ok: false, bad: false, value: null };
+        return { ok: true, bad: false, value: v };
+      })
       .catch(function () {
         return getJSON('https://ungh.cc/repos/' + repo)
-          .then(function (d) { return { ok: true, value: compact((d.repo || {}).stars) }; })
-          .catch(function () { return { ok: false, value: null }; });
+          .then(function (d) {
+            var n = (d.repo || {}).stars;
+            if (!isFinite(Number(n))) return { ok: false, bad: false, value: null };
+            return { ok: true, bad: false, value: compact(n) };
+          })
+          .catch(function () { return { ok: false, bad: false, value: null }; });
       });
   }
   function fetchRelease(repo) {
     return getJSON('https://img.shields.io/github/v/release/' + repo + '.json?include_prereleases')
       .then(function (d) {
-        var v = String(d.value || '');
-        if (!v || /no releases|not found/i.test(v)) return { ok: true, value: null };
-        return { ok: true, value: v };
+        var v = String(d.value || '').trim();
+        // "no releases" is definitive (the repo publishes none); other words are
+        // shields failing, which is worth hiding and retrying.
+        if (NO_RELEASE.test(v)) return { ok: true, bad: true, value: null };
+        if (BAD_VALUE.test(v)) return { ok: false, bad: true, value: null };
+        if (!v) return { ok: true, bad: false, value: null };
+        return { ok: true, bad: false, value: v };
       })
       .catch(function () {
         return getJSON('https://ungh.cc/repos/' + repo + '/releases/latest')
           .then(function (d) {
             var tag = d.release && d.release.tag ? String(d.release.tag) : null;
-            return { ok: true, value: tag };
+            if (!tag) return { ok: false, bad: false, value: null };
+            return { ok: true, bad: false, value: tag };
           })
-          .catch(function () { return { ok: false, value: null }; });
+          .catch(function () { return { ok: false, bad: false, value: null }; });
       });
   }
   function dropImg(badges, which) {
@@ -977,7 +1000,11 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       if (sp.parentNode !== badges) badges.insertBefore(sp, badges.firstChild);
       dropImg(badges, 'stars');
     }
-    if (data.rn) {
+    if (data.rn && card.dataset.release) {
+      // data-release marks the repos whose catalog entry has a single release
+      // stream (release: null means per-module tags, where a "latest release"
+      // badge would mislead). The live fetch refreshes that badge's value only,
+      // it never adds a release to a card that was built without one.
       dropImg(badges, 'release');
       var old = badges.querySelector('a.pill.rel');
       if (data.r) {
@@ -1011,7 +1038,12 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     schedule(function () {
       return Promise.all([fetchStars(repo), fetchRelease(repo)]).then(function (res) {
         var stars = res[0], rel = res[1];
-        if (!stars.ok && !rel.ok) return; // keep the badges; retry on the next visit
+        // Hide the badge image when shields answered with a word: the image would
+        // render the same error text, so it carries no value worth keeping.
+        var bd = card.querySelector('.badges');
+        if (bd && stars.bad) dropImg(bd, 'stars');
+        if (bd && rel.bad) dropImg(bd, 'release');
+        if (!stars.ok && !rel.ok) return; // keep the badges; retry after the cache TTL
         var entry = {
           s: stars.ok ? stars.value : (hit && hit.s) || null,
           r: rel.ok ? rel.value : (hit && hit.r) || null,

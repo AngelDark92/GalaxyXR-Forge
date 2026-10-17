@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-17 — AstroQuest back in the catalog
+
+- Restored evertec82/AstroQuest to Games & Emulation. It had answered 404 from three independent checks — the GitHub API, shields.io and a signed-in browser — and was removed; it answers again, so the card is back.
+- Its release badge now reads v0.8.6 (Game 1.04 soccer timing fix, 2026-10-14). Every other catalogued repo was re-checked the same way: 54 of 54 are present, none renamed, transferred, archived or gone.
+
 ## 2026-10-17 — Filter figures now count what each filter would show
 
 - Every number in the filters panel is computed from the current selection: group counts follow the search box and the active status filters, status counts also follow the chosen group, and each status chip counts the repositories it would leave on screen.

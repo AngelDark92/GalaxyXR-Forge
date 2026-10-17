@@ -2,6 +2,12 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-17 — Filters move into a left side rail
+
+- Site layout: search, group and status filters now sit in a rail on the left of the catalog — sticky on desktop and collapsed or expanded with the Filters button.
+- On narrow screens the rail becomes an off-canvas drawer with a backdrop, closed by the X, the backdrop, Escape or the Show-N button; the Changelog tab hides the rail.
+- The rail shows live counts per group and per status chip; the desktop show / hide choice is remembered in the browser.
+
 ## 2026-10-16 — Input Forwarder for Apollo streaming
 
 - Added BlueScorpioVR/androidInputForwarder to PC VR & Streaming: a root-only app that forwards a Bluetooth controller, keyboard and mouse to an Apollo PC while another app owns the screen.

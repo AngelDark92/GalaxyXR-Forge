@@ -232,13 +232,16 @@ def render_readme(cat, changelog):
 def render_chips(cat):
     total = sum(len(g["repos"]) for g in cat["groups"])
     chips = [
-        f'<button type="button" class="chip is-active" data-group="all" style="--hue:#f97316">'
-        f'<span class="dot"></span>All <b>{total}</b></button>'
+        f'<button type="button" class="chip is-active" data-group="all" aria-pressed="true" '
+        f'style="--hue:#f97316" title="Show every group">'
+        f'<span class="dot"></span><span class="lbl">All</span><b>{total}</b></button>'
     ]
     for g in cat["groups"]:
         chips.append(
-            f'<button type="button" class="chip" data-group="{g["id"]}" style="--hue:{g["hue"]}">'
-            f'<span class="dot"></span>{g["icon"]} {html.escape(g["title"])} <b>{len(g["repos"])}</b></button>'
+            f'<button type="button" class="chip" data-group="{g["id"]}" aria-pressed="false" '
+            f'style="--hue:{g["hue"]}" title="{html.escape(g["blurb"], quote=True)}">'
+            f'<span class="dot"></span><span class="lbl">{g["icon"]} {html.escape(g["title"])}</span>'
+            f'<b>{len(g["repos"])}</b></button>'
         )
     return "\n        ".join(chips)
 
@@ -282,7 +285,7 @@ def render_status_chips(cat):
         chips.append(
             f'<button type="button" class="chip" data-status="{key}" aria-pressed="false" '
             f'title="{html.escape(title, quote=True)}" style="--hue:{hue}">'
-            f'{label} <b id="{chip_id}">{start}</b></button>'
+            f'<span class="lbl">{label}</span><b id="{chip_id}">{start}</b></button>'
         )
     return "\n        ".join(chips)
 
@@ -398,31 +401,74 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .stat:first-child{padding-left:0;border-left:0}
 .stat b{display:block;font:600 22px var(--font-mono);color:var(--ink)}
 .stat span{font:12px var(--font-mono);color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
-.filters{position:sticky;top:0;z-index:30;background:rgba(10,14,20,.97);border-bottom:1px solid var(--line)}
-.filters-inner{max-width:1120px;margin:0 auto;padding:10px 22px 12px;display:flex;flex-direction:column;gap:10px}
-#q{flex:1 1 240px;min-width:200px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--ink);border-radius:10px;padding:10px 14px;font:14px var(--font-sans);outline:none}
-#q:focus{border-color:var(--accent)}
-#q::placeholder{color:var(--dim)}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:7px 13px;font:500 12.5px var(--font-mono);cursor:pointer;min-height:34px}
-.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--hue,var(--line-2));flex:none}
-.chip b{font-weight:500;color:var(--dim)}
-.chip:hover{border-color:var(--muted);color:var(--ink)}
-.chip.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
-.chip[data-status="new"].is-active{border-color:rgba(249,115,22,.6);background:rgba(249,115,22,.12)}
-.chip[data-status="fav"].is-active{border-color:rgba(251,191,36,.6);background:rgba(251,191,36,.12)}
-.chip[data-status="done"].is-active{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
-.chip[data-status="todo"].is-active{border-color:var(--muted);background:rgba(148,163,184,.10)}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;align-self:stretch;border-bottom:1px solid var(--line);padding-bottom:10px}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(10,14,20,.97);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1120px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.menu-btn{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:7px 15px 7px 12px;font:500 13px var(--font-mono);cursor:pointer;min-height:36px}
+.menu-btn:hover{border-color:var(--muted);color:var(--ink)}
+.menu-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
+.menu-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.menu-btn svg{width:15px;height:15px;flex:none}
 .tab{border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:8px 16px;font:500 13px var(--font-mono);cursor:pointer;min-height:36px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
 .tab b{font-weight:500;color:var(--dim)}
 .tab:hover{border-color:var(--muted);color:var(--ink)}
 .tab.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.12)}
 .tab.is-active b{color:var(--accent-2)}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.catalog-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;min-width:0}
-.catalog-controls[hidden]{display:none}
-.changelog{max-width:1120px;margin:0 auto;padding:30px 22px 10px}
+.shell{max-width:1120px;margin:0 auto;padding:26px 22px 0;display:grid;grid-template-columns:308px minmax(0,1fr);gap:26px;align-items:start}
+.content{min-width:0}
+.side{position:sticky;top:74px;max-height:calc(100vh - 96px);overflow:auto;display:flex;flex-direction:column;gap:18px;padding:16px 14px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--bg-2),var(--bg));scrollbar-width:thin}
+.side::-webkit-scrollbar{width:8px}
+.side::-webkit-scrollbar-track{background:transparent}
+.side::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+.side::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+.side-head{display:none;align-items:center;justify-content:space-between}
+.side-title{font:600 12px var(--font-disp);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.side-close{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:9px;cursor:pointer}
+.side-close:hover{border-color:var(--muted);color:var(--ink)}
+.side-close svg{width:13px;height:13px}
+.side-section{display:flex;flex-direction:column;gap:8px;min-width:0}
+.side-label{font:500 10.5px var(--font-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+#q{width:100%;background:var(--bg);border:1px solid var(--line-2);color:var(--ink);border-radius:9px;padding:9px 12px;font:13px var(--font-sans);outline:none}
+#q:focus{border-color:var(--accent)}
+#q::placeholder{color:var(--dim)}
+.chips{display:flex;flex-direction:column;gap:6px;min-width:0}
+.chip{display:flex;align-items:center;gap:9px;width:100%;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:9px;padding:8px 11px;font:500 12.5px var(--font-mono);cursor:pointer;min-height:34px;text-align:left}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--hue,var(--line-2));flex:none}
+.chip .lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip b{margin-left:auto;flex:none;font-weight:500;color:var(--dim)}
+.chip:hover{border-color:var(--muted);color:var(--ink)}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chip.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
+.chip.is-active b{color:var(--ink)}
+.chip[data-group].is-active{border-color:var(--hue)}
+.chip[data-status="new"].is-active{border-color:rgba(249,115,22,.6);background:rgba(249,115,22,.12)}
+.chip[data-status="fav"].is-active{border-color:rgba(251,191,36,.6);background:rgba(251,191,36,.12)}
+.chip[data-status="done"].is-active{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
+.chip[data-status="todo"].is-active{border-color:var(--muted);background:rgba(148,163,184,.10)}
+.side-done{display:none;align-items:center;justify-content:center;gap:8px;width:100%;border:1px solid rgba(249,115,22,.55);background:rgba(249,115,22,.14);color:var(--ink);border-radius:10px;padding:11px 14px;font:500 13px var(--font-mono);cursor:pointer;min-height:42px}
+.side-done:hover{background:rgba(249,115,22,.24)}
+.side-done b{color:var(--accent-2);font-weight:600}
+.backdrop{display:none}
+#catalog,#changelog{scroll-margin-top:74px}
+body.view-changelog .side,body.view-changelog .menu-btn{display:none}
+body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
+@media (min-width:1001px){
+  body.side-closed .shell{grid-template-columns:minmax(0,1fr)}
+  body.side-closed .side{display:none}
+}
+@media (max-width:1000px){
+  .shell{grid-template-columns:minmax(0,1fr);padding-top:20px}
+  .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 16px 16px 0;border-left:0;padding:16px 16px 22px;transform:translateX(-104%);visibility:hidden;transition:transform .22s ease}
+  body.side-open .side{transform:none;visibility:visible;box-shadow:0 40px 90px -30px #000}
+  .side-head{display:flex}
+  .side-done{display:flex}
+  .backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:50;background:rgba(4,7,11,.62)}
+}
+@media (prefers-reduced-motion:reduce){
+  .side{transition:none}
+}
+.changelog{padding:6px 0 10px}
 .changelog h2{font:600 1.35rem var(--font-disp);margin:0 0 6px}
 .entries{list-style:none;margin:0;padding:0}
 .entry{border-top:1px solid var(--line);padding:18px 0}
@@ -432,8 +478,8 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .entry-head h3{font:600 16px var(--font-disp);margin:0}
 .entry ul{margin:8px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
 .entry li{margin:4px 0}
-main{padding:34px 0 6px}
-.group{max-width:1120px;margin:0 auto 42px;padding:0 22px}
+main{padding:0 0 6px}
+.group{margin:0 0 42px}
 .group-head h2{display:flex;align-items:center;gap:10px;font:600 1.35rem var(--font-disp);margin:0 0 6px}
 .group-head .dot{width:10px;height:10px;border-radius:3px;background:var(--hue);flex:none}
 .blurb{color:var(--muted);margin:0 0 18px;font-size:14.5px}
@@ -475,7 +521,7 @@ main{padding:34px 0 6px}
 .card-foot .links{display:flex;gap:12px;flex:none}
 .card-foot a{color:var(--muted);font:500 12px var(--font-mono)}
 .card-foot a:hover{color:var(--accent)}
-.empty{max-width:1120px;margin:0 auto;padding:0 22px 30px;color:var(--muted);font-style:italic}
+.empty{margin:0;padding:0 0 30px;color:var(--muted);font-style:italic}
 footer{border-top:1px solid var(--line);margin-top:14px;padding:22px 0 42px;color:var(--dim);font-size:13px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
 footer a{color:var(--muted)}
@@ -485,13 +531,19 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   .hero .wrap{padding-top:44px;padding-bottom:30px}
   .stat{padding:0 14px}
   .stat b{font-size:18px}
-  .filters-inner{padding:8px 14px 10px}
-  .tabs{padding-bottom:8px}
-  .chips{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px;scrollbar-width:none}
-  .chips::-webkit-scrollbar{display:none}
-  .chip{flex:none}
+  .topbar-inner{padding:9px 14px}
+  .shell{padding:18px 14px 0}
+  .menu-btn span{display:none}
+  .menu-btn{padding:7px 11px}
 }
 </style>
+<noscript><style>
+/* No JS: the drawer cannot open, so show the rail inline on small screens. */
+@media (max-width:1000px){
+  .side{position:static;transform:none;visibility:visible;max-height:none;width:auto;border-radius:14px;border-left:1px solid var(--line)}
+  .menu-btn,.side-head,.side-done{display:none}
+}
+</style></noscript>
 </head>
 <body>
 <a class="skip" href="#catalog">Skip to catalog</a>
@@ -507,30 +559,55 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     </div>
   </div>
 </header>
-<nav class="filters" aria-label="Views and filters">
-  <div class="filters-inner">
+<nav class="topbar" aria-label="Views">
+  <div class="topbar-inner">
+    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="true" aria-controls="sidebar" title="Show or hide the filters">
+      <svg viewBox="0 0 16 16" aria-hidden="true" fill="none"><path d="M2 3.5h12M2 8h12M2 12.5h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>Filters</span>
+    </button>
     <div class="tabs" role="tablist" aria-label="Views">
       <button type="button" class="tab is-active" data-view="catalog" role="tab" aria-selected="true">Catalog <b>__TOTAL__</b></button>
       <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>__CHANGELOG_COUNT__</b></button>
     </div>
-    <div class="catalog-controls" id="catalog-controls">
-      <input id="q" type="search" placeholder="Filter repos: name, tag, description…" aria-label="Filter repositories">
-      <div class="chips" role="group" aria-label="Repository groups">
+  </div>
+</nav>
+<div class="shell" id="shell">
+  <aside class="side" id="sidebar" aria-label="Filters">
+    <div class="side-head">
+      <span class="side-title">Filters</span>
+      <button type="button" class="side-close" id="side-close" aria-label="Close filters">
+        <svg viewBox="0 0 14 14" aria-hidden="true" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="side-section">
+      <label class="side-label" for="q">Search</label>
+      <input id="q" type="search" placeholder="name, tag, description…" aria-label="Filter repositories">
+    </div>
+    <div class="side-section">
+      <span class="side-label" id="lbl-groups">Group</span>
+      <div class="chips" role="group" aria-labelledby="lbl-groups">
         __CHIPS__
       </div>
-      <div class="chips" role="group" aria-label="Checked and favourite repositories">
+    </div>
+    <div class="side-section">
+      <span class="side-label" id="lbl-status">Status</span>
+      <div class="chips" role="group" aria-labelledby="lbl-status">
         __STATUS__
       </div>
     </div>
+    <button type="button" class="side-done" id="side-done">Show <b id="side-count">__TOTAL__</b> repos</button>
+  </aside>
+  <div class="content">
+    <main id="catalog">
+      __SECTIONS__
+      <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
+    </main>
+    <div id="changelog" hidden>
+      __CHANGELOG__
+    </div>
   </div>
-</nav>
-<main id="catalog">
-  __SECTIONS__
-  <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
-</main>
-<div id="changelog" hidden>
-  __CHANGELOG__
 </div>
+<div class="backdrop" id="backdrop" hidden></div>
 <footer>
   <div class="wrap">
     <span>Unofficial community hub — not affiliated with Samsung. Each project keeps its own license.</span>
@@ -654,14 +731,17 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     setCount('cnt-done', doneN);
     setCount('cnt-todo', cards.length - doneN);
     if (count) count.textContent = shown;
+    setCount('side-count', shown);
     if (empty) empty.style.display = shown ? 'none' : '';
   }
 
   if (q) q.addEventListener('input', function () { state.q = q.value; apply(); });
   groupChips.forEach(function (ch) {
     ch.addEventListener('click', function () {
-      groupChips.forEach(function (c) { c.classList.remove('is-active'); });
-      ch.classList.add('is-active');
+      groupChips.forEach(function (c) {
+        c.classList.toggle('is-active', c === ch);
+        c.setAttribute('aria-pressed', c === ch ? 'true' : 'false');
+      });
       state.group = ch.dataset.group;
       apply();
     });
@@ -694,12 +774,60 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   apply();
 })();
 
+// Filters rail. Desktop: a sticky rail left of the catalog, collapsed and expanded
+// with the Filters button, choice remembered in localStorage. Narrow screens: the
+// same rail becomes an off-canvas drawer with a backdrop, closed on load and closed
+// again by the X, the backdrop, Escape or the Show-N button. The Changelog view
+// hides it (body.view-changelog).
+(function () {
+  var KEY = 'gxrforge.sidebar';
+  var btn = document.getElementById('menu-btn');
+  if (!btn) return;
+  var closeBtn = document.getElementById('side-close');
+  var doneBtn = document.getElementById('side-done');
+  var backdrop = document.getElementById('backdrop');
+  var mq = window.matchMedia('(max-width:1000px)');
+
+  function drawerOpen() { return document.body.classList.contains('side-open'); }
+  function drawer(isOpen) {
+    document.body.classList.toggle('side-open', isOpen);
+    if (backdrop) backdrop.hidden = !isOpen;
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+  function rail(isOpen) {
+    document.body.classList.toggle('side-closed', !isOpen);
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    try { window.localStorage.setItem(KEY, isOpen ? '1' : '0'); } catch (e) {}
+  }
+  function sync() {
+    var isOpen = mq.matches ? drawerOpen() : !document.body.classList.contains('side-closed');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+  window.gxrForgeCloseFilters = function () { if (mq.matches) drawer(false); };
+
+  try { if (window.localStorage.getItem(KEY) === '0') document.body.classList.add('side-closed'); } catch (e) {}
+  sync();
+
+  btn.addEventListener('click', function () {
+    if (mq.matches) drawer(!drawerOpen());
+    else rail(document.body.classList.contains('side-closed'));
+  });
+  if (closeBtn) closeBtn.addEventListener('click', function () { drawer(false); });
+  if (doneBtn) doneBtn.addEventListener('click', function () { drawer(false); });
+  if (backdrop) backdrop.addEventListener('click', function () { drawer(false); });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && drawerOpen()) drawer(false);
+  });
+  function onBreak() { drawer(false); sync(); }
+  if (mq.addEventListener) mq.addEventListener('change', onBreak);
+  else if (mq.addListener) mq.addListener(onBreak);
+})();
+
 // Catalog / Changelog views. The active view is mirrored in the URL hash, so a
 // link like #changelog opens the history directly.
 (function () {
   var tabs = [].slice.call(document.querySelectorAll('.tab'));
   var views = { catalog: document.getElementById('catalog'), changelog: document.getElementById('changelog') };
-  var controls = document.getElementById('catalog-controls');
   function show(view) {
     tabs.forEach(function (t) {
       var on = t.dataset.view === view;
@@ -709,7 +837,9 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     Object.keys(views).forEach(function (k) {
       if (views[k]) views[k].hidden = k !== view;
     });
-    if (controls) controls.hidden = view !== 'catalog';
+    // The filter rail belongs to the catalog view only; an open drawer also closes.
+    document.body.classList.toggle('view-changelog', view !== 'catalog');
+    if (view !== 'catalog' && typeof window.gxrForgeCloseFilters === 'function') window.gxrForgeCloseFilters();
     if (window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + view);
   }
   tabs.forEach(function (t) {

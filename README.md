@@ -170,12 +170,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-17` — Filters move into a left side rail
 - `2026-10-16` — Input Forwarder for Apollo streaming
 - `2026-10-16` — Stars and releases load live on the site cards
 - `2026-10-16` — ALVR face-tracking module, and a badge bump
 - `2026-10-14` — NEW badge and New filter brought back into sync
 - `2026-10-14` — NEW badge tuned to real additions
-- `2026-10-14` — NEW badges for freshly added repos
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

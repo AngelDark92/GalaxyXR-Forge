@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-17 — Filters menu opens as a glass dropdown
+
+- The filter panel is frosted glass now: translucent gradient, blur and saturation backdrop filter, hairline border and a deep shadow, with an opaque fallback on browsers without backdrop-filter.
+- Opening and closing is pure CSS — fade, drop and a slight scale from the top-left corner, sliding in the same panel on phones — and the panel closes on Escape or a click outside it, like a dropdown.
+
 ## 2026-10-17 — Filters rail moves out to the left on wide screens
 
 - Site layout: from 1840px up the filter rail leaves the centered column and sits to its left with a fixed 26px gap — closer to the window edge, but never flush against it.

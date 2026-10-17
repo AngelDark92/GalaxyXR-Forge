@@ -422,7 +422,15 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .shell{max-width:1120px;margin:0 auto;padding:26px 22px 0;display:grid;grid-template-columns:308px minmax(0,1fr);gap:26px;align-items:start}
 .content{min-width:0}
-.side{position:sticky;top:74px;max-height:calc(100vh - 96px);overflow:auto;display:flex;flex-direction:column;gap:18px;padding:16px 14px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--bg-2),var(--bg));scrollbar-width:thin}
+.side{position:sticky;top:74px;max-height:calc(100vh - 96px);overflow:auto;display:flex;flex-direction:column;gap:18px;padding:16px 14px;width:308px;border:1px solid rgba(148,163,184,.20);border-radius:16px;
+  background:linear-gradient(160deg,rgba(30,41,56,.72),rgba(12,18,26,.80));
+  -webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);
+  box-shadow:0 28px 70px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06);
+  transform-origin:top left;
+  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.9,.3,1.15),visibility 0s linear 0s;scrollbar-width:thin}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .side{background:linear-gradient(160deg,#141d29,#0c121a)}
+}
 .side::-webkit-scrollbar{width:8px}
 .side::-webkit-scrollbar-track{background:transparent}
 .side::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
@@ -460,7 +468,8 @@ body.view-changelog .side,body.view-changelog .menu-btn{display:none}
 body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
 @media (min-width:1001px){
   body.side-closed .shell{grid-template-columns:minmax(0,1fr)}
-  body.side-closed .side{display:none}
+  body.side-closed .side{opacity:0;transform:translateY(-10px) scale(.97);visibility:hidden;pointer-events:none;
+    transition:opacity .16s ease,transform .2s ease,visibility 0s linear .2s}
 }
 @media (min-width:1840px){
   /* The rail leaves the centered column: its grid track collapses to zero and a
@@ -474,11 +483,14 @@ body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:1000px){
   .shell{grid-template-columns:minmax(0,1fr);padding-top:20px}
-  .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 16px 16px 0;border-left:0;padding:16px 16px 22px;transform:translateX(-104%);visibility:hidden;transition:transform .22s ease}
-  body.side-open .side{transform:none;visibility:visible;box-shadow:0 40px 90px -30px #000}
+  .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 16px 16px 0;border-left:0;padding:16px 16px 22px;
+    background:linear-gradient(160deg,rgba(24,34,47,.88),rgba(9,13,19,.92));
+    transform:translateX(-104%);visibility:hidden;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear .24s}
+  body.side-open .side{transform:none;visibility:visible;box-shadow:0 40px 90px -30px #000;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear 0s}
   .side-head{display:flex}
   .side-done{display:flex}
-  .backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:50;background:rgba(4,7,11,.62)}
+  .backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:50;background:rgba(4,7,11,.60);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 }
 @media (prefers-reduced-motion:reduce){
   .side{transition:none}
@@ -831,8 +843,17 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   if (closeBtn) closeBtn.addEventListener('click', function () { drawer(false); });
   if (doneBtn) doneBtn.addEventListener('click', function () { drawer(false); });
   if (backdrop) backdrop.addEventListener('click', function () { drawer(false); });
+  // Dropdown manners: Escape and a click anywhere outside the panel close it.
   document.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape' && drawerOpen()) drawer(false);
+    if (ev.key !== 'Escape') return;
+    if (drawerOpen()) drawer(false);
+    else if (!mq.matches) rail(false);
+  });
+  document.addEventListener('click', function (ev) {
+    if (mq.matches || document.body.classList.contains('side-closed')) return;
+    var t = ev.target;
+    if (t && t.closest && (t.closest('.side') || t.closest('.menu-btn'))) return;
+    rail(false);
   });
   function onBreak() { drawer(false); sync(); }
   if (mq.addEventListener) mq.addEventListener('change', onBreak);

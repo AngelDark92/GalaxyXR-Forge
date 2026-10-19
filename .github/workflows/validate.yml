@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 jobs:
   catalog:
@@ -41,3 +42,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python tools/check-repos.py
+
+      # Branch protection requires the "catalog" context on main. A check run from
+      # a workflow_dispatch is not attached to the pull request, so publish a commit
+      # status as well: protection matches either form, and a status always lands on
+      # the commit it was posted for.
+      - name: Publish the catalog commit status
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESULT: ${{ job.status }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ "$RESULT" = "success" ]; then STATE=success; else STATE=failure; fi
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/statuses/$SHA" \
+            -d "{\"state\":\"$STATE\",\"context\":\"catalog\",\"description\":\"build, generated files, links, repo state\"}" \
+            >/dev/null
+          echo "posted catalog=$STATE for $SHA"

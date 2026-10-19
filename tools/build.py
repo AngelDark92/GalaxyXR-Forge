@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 """Build the Galaxy XR Forge index.
 
-    catalog.json  ->  README.md  +  docs/index.html
+    catalog.json + changelog.json  ->  README.md + CHANGELOG.md + docs/index.html
 
 Usage:
     python tools/build.py           validate, then write the generated files
-    python tools/build.py --check   validate catalog.json only
+    python tools/build.py --check   validate the inputs only
 
 Rules:
-    - catalog.json is the single source of truth. Never hand-edit README.md
-      or docs/index.html; edit the catalog and rerun this script.
+    - catalog.json is the single source of truth for the repo list; changelog.json
+      holds the change history. Never hand-edit README.md, CHANGELOG.md or
+      docs/index.html: edit the inputs and rerun this script.
     - Dependency-free: Python 3.10+, stdlib only, runs on any host.
 """
 
@@ -21,10 +22,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG_PATH = ROOT / "catalog.json"
+CHANGELOG_PATH = ROOT / "changelog.json"
 README_PATH = ROOT / "README.md"
+CHANGELOG_MD_PATH = ROOT / "CHANGELOG.md"
 SITE_PATH = ROOT / "docs" / "index.html"
 
 REPO_URL = "https://github.com/AngelDark92/GalaxyXR-Forge"
+SITE_URL = "https://angeldark92.github.io/GalaxyXR-Forge"
 TAGLINE = (
     "Every community repo for the Samsung Galaxy XR (SM-I610) in one place: "
     "root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics."
@@ -73,7 +77,60 @@ def validate(cat):
                 errors.append(f"{repo}: missing about")
             elif len(about) > 160:
                 errors.append(f"{repo}: about too long ({len(about)} chars)")
+            added = r.get("added")
+            if added is not None and (
+                len(str(added)) != 10 or str(added)[4] != "-" or str(added)[7] != "-"
+            ):
+                errors.append(f"{repo}: bad added date {added!r} (want YYYY-MM-DD)")
     return errors, seen_repos
+
+
+# ---------------------------------------------------------------------------
+# changelog loading and validation
+# ---------------------------------------------------------------------------
+
+
+def load_changelog():
+    with CHANGELOG_PATH.open(encoding="utf-8") as f:
+        return json.load(f)
+
+
+def validate_changelog(changelog):
+    """Every catalog change needs an entry: date, title and at least one item."""
+    errors = []
+    entries = changelog.get("entries") or []
+    if not entries:
+        errors.append("changelog has no entries")
+    for i, e in enumerate(entries):
+        label = f"changelog entry {i + 1}"
+        when = str(e.get("date", ""))
+        if len(when) != 10 or when[4] != "-" or when[7] != "-":
+            errors.append(f"{label}: bad date {when!r} (want YYYY-MM-DD)")
+        if not e.get("title"):
+            errors.append(f"{label}: missing title")
+        if not (e.get("items") or []):
+            errors.append(f"{label}: no items")
+        for item in e.get("items") or []:
+            if not str(item).strip():
+                errors.append(f"{label}: empty item")
+    return errors
+
+
+def render_changelog_md(changelog):
+    L = [
+        "# Changelog",
+        "",
+        "Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) "
+        "by `tools/build.py` — never edit this file by hand.",
+        "",
+    ]
+    for e in changelog["entries"]:
+        L.append(f'## {e["date"]} — {e["title"]}')
+        L.append("")
+        for item in e["items"]:
+            L.append(f"- {item}")
+        L.append("")
+    return "\n".join(L)
 
 
 # ---------------------------------------------------------------------------
@@ -81,7 +138,7 @@ def validate(cat):
 # ---------------------------------------------------------------------------
 
 
-def render_readme(cat):
+def render_readme(cat, changelog):
     groups = cat["groups"]
     total = sum(len(g["repos"]) for g in groups)
     updated = cat.get("updated", date.today().isoformat())
@@ -126,7 +183,7 @@ def render_readme(cat):
             badges = [f'![stars](https://img.shields.io/github/stars/{r["repo"]}?style=flat-square)']
             if r.get("release"):
                 badges.append(
-                    f'![release](https://img.shields.io/github/v/release/{r["repo"]}?style=flat-square&label=release)'
+                    f'![release](https://img.shields.io/github/v/release/{r["repo"]}?include_prereleases&style=flat-square&label=release)'
                 )
             name = f'**[{r["repo"]}]({r["url"]})**<br>{" ".join(badges)}'
             A(f'| {name} | {r["about"]} |')
@@ -149,6 +206,13 @@ def render_readme(cat):
         "[`.agents/skills/`](.agents/skills/) maps every Galaxy XR repo and its local checkout."
     )
     A("")
+    A("## Changelog")
+    A("")
+    for e in changelog.get("entries", [])[:6]:
+        A(f'- `{e["date"]}` — {e["title"]}')
+    A("")
+    A(f'Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab]({SITE_URL}/#changelog).')
+    A("")
     A("## Notes")
     A("")
     A("- Unofficial community hub — not affiliated with Samsung. Each catalogued project keeps its own license.")
@@ -168,20 +232,47 @@ def render_readme(cat):
 def render_chips(cat):
     total = sum(len(g["repos"]) for g in cat["groups"])
     chips = [
-        f'<button type="button" class="chip is-active" data-group="all" style="--hue:#f97316">'
-        f'<span class="dot"></span>All <b>{total}</b></button>'
+        f'<button type="button" class="chip is-active" data-group="all" aria-pressed="true" '
+        f'style="--hue:#f97316" title="Show every group">'
+        f'<span class="dot"></span><span class="lbl">All</span><b>{total}</b></button>'
     ]
     for g in cat["groups"]:
         chips.append(
-            f'<button type="button" class="chip" data-group="{g["id"]}" style="--hue:{g["hue"]}">'
-            f'<span class="dot"></span>{g["icon"]} {html.escape(g["title"])} <b>{len(g["repos"])}</b></button>'
+            f'<button type="button" class="chip" data-group="{g["id"]}" aria-pressed="false" '
+            f'style="--hue:{g["hue"]}" title="{html.escape(g["blurb"], quote=True)}">'
+            f'<span class="dot"></span><span class="lbl">{g["icon"]} {html.escape(g["title"])}</span>'
+            f'<b>{len(g["repos"])}</b></button>'
         )
     return "\n        ".join(chips)
+
+
+def count_new(cat, days=5):
+    """How many repos were added within the last `days` days, by the build date.
+
+    The site recomputes this in the browser on every load (see the NEW badge JS);
+    this build-time number is only the starting value before scripts run.
+    """
+    today = date.today()
+    n = 0
+    for g in cat["groups"]:
+        for r in g["repos"]:
+            added = r.get("added")
+            if not added:
+                continue
+            try:
+                when = date(int(str(added)[0:4]), int(str(added)[5:7]), int(str(added)[8:10]))
+            except (TypeError, ValueError):
+                continue
+            if 0 <= (today - when).days < days:
+                n += 1
+    return n
 
 
 def render_status_chips(cat):
     total = sum(len(g["repos"]) for g in cat["groups"])
     spec = [
+        ("new", "#f97316", "\u2726 New", "cnt-new", count_new(cat),
+         "Show only repositories added in the last 5 days \u2014 combines with the other mark filters (AND)"),
         ("fav", "#fbbf24", "\u2605 Favourites", "cnt-fav", 0,
          "Show only favourites \u2014 combines with the other mark filters (AND)"),
         ("done", "#34d399", "\u2713 Checked", "cnt-done", 0,
@@ -194,7 +285,7 @@ def render_status_chips(cat):
         chips.append(
             f'<button type="button" class="chip" data-status="{key}" aria-pressed="false" '
             f'title="{html.escape(title, quote=True)}" style="--hue:{hue}">'
-            f'{label} <b id="{chip_id}">{start}</b></button>'
+            f'<span class="lbl">{label}</span><b id="{chip_id}">{start}</b></button>'
         )
     return "\n        ".join(chips)
 
@@ -207,12 +298,12 @@ def render_sections(cat):
             repo = r["repo"]
             owner, name = repo.split("/")
             badges = [
-                f'<img src="https://img.shields.io/github/stars/{r["repo"]}?style=flat-square" '
+                f'<img data-badge="stars" src="https://img.shields.io/github/stars/{r["repo"]}?style=flat-square" '
                 f'alt="GitHub stars" loading="lazy">'
             ]
             if r.get("release"):
                 badges.append(
-                    f'<img src="https://img.shields.io/github/v/release/{r["repo"]}?style=flat-square&label=release" '
+                    f'<img data-badge="release" src="https://img.shields.io/github/v/release/{r["repo"]}?include_prereleases&style=flat-square&label=release" '
                     f'alt="latest release" loading="lazy">'
                 )
             flags = (
@@ -231,11 +322,14 @@ def render_sections(cat):
             hay = " ".join(
                 [r["repo"], r.get("about", ""), r.get("license") or ""] + list(r.get("tags", []))
             ).lower()
+            added = r.get("added")
+            added_attr = f' data-added="{html.escape(str(added), quote=True)}"' if added else ""
+            release_attr = ' data-release="1"' if r.get("release") else ""
             cards.append(
                 f'<article class="card" data-group="{g["id"]}" data-repo="{html.escape(r["repo"], quote=True)}"'
-                f' data-text="{html.escape(hay, quote=True)}">'
+                f' data-text="{html.escape(hay, quote=True)}"{added_attr}{release_attr}>'
                 f'<div class="card-top"><h3><a href="{r["url"]}" target="_blank" rel="noopener">'
-                f'<span class="owner">{owner}/</span>{name}</a></h3>'
+                f'<span class="owner">{owner}/</span>{name}</a><span class="tag-new" hidden>NEW</span></h3>'
                 f'<div class="badges">{"".join(badges)}</div></div>'
                 f'<p class="about">{html.escape(r["about"])}</p>'
                 f'<div class="card-foot"><span class="license">{html.escape(r.get("license") or "")}</span>'
@@ -284,6 +378,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-sa
 a{color:inherit;text-decoration:none}
 .skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:#0a0e14;padding:8px 12px;border-radius:0 0 8px 0;z-index:60}
 .skip:focus{left:0}
+.glow{position:fixed;left:0;top:0;width:620px;height:620px;margin:-310px 0 0 -310px;z-index:-1;pointer-events:none;border-radius:50%;
+  background:radial-gradient(closest-side, rgba(249,115,22,.22), rgba(249,115,22,.07) 55%, transparent 100%);
+  transform:translate3d(var(--gx,50vw),var(--gy,28vh),0);opacity:0;transition:opacity .5s ease;will-change:transform}
+body.glow-on .glow{opacity:1}
+@media (prefers-reduced-motion:reduce){.glow{display:none}}
 .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
 .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
   background:
@@ -308,22 +407,110 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .stat:first-child{padding-left:0;border-left:0}
 .stat b{display:block;font:600 22px var(--font-mono);color:var(--ink)}
 .stat span{font:12px var(--font-mono);color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
-.filters{position:sticky;top:0;z-index:30;background:rgba(10,14,20,.97);border-bottom:1px solid var(--line)}
-.filters-inner{max-width:1120px;margin:0 auto;padding:12px 22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-#q{flex:1 1 240px;min-width:200px;background:var(--bg-2);border:1px solid var(--line-2);color:var(--ink);border-radius:10px;padding:10px 14px;font:14px var(--font-sans);outline:none}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(10,14,20,.97);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1120px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.menu-btn{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:7px 15px 7px 12px;font:500 13px var(--font-mono);cursor:pointer;min-height:36px}
+.menu-btn:hover{border-color:var(--muted);color:var(--ink)}
+.menu-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
+.menu-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.menu-btn svg{width:15px;height:15px;flex:none}
+.tab{border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:8px 16px;font:500 13px var(--font-mono);cursor:pointer;min-height:36px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.tab b{font-weight:500;color:var(--dim)}
+.tab:hover{border-color:var(--muted);color:var(--ink)}
+.tab.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.12)}
+.tab.is-active b{color:var(--accent-2)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shell{max-width:1120px;margin:0 auto;padding:26px 22px 0;display:grid;grid-template-columns:308px minmax(0,1fr);gap:26px;align-items:start}
+.content{min-width:0}
+.side{position:sticky;top:74px;max-height:calc(100vh - 96px);overflow:auto;display:flex;flex-direction:column;gap:18px;padding:16px 14px;width:308px;border:1px solid rgba(148,163,184,.20);border-radius:16px;
+  background:linear-gradient(160deg,rgba(30,41,56,.72),rgba(12,18,26,.80));
+  -webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);
+  box-shadow:0 28px 70px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06);
+  transform-origin:top left;
+  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.9,.3,1.15),visibility 0s linear 0s;scrollbar-width:thin}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .side{background:linear-gradient(160deg,#141d29,#0c121a)}
+}
+.side::-webkit-scrollbar{width:8px}
+.side::-webkit-scrollbar-track{background:transparent}
+.side::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+.side::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+.side-head{display:none;align-items:center;justify-content:space-between}
+.side-title{font:600 12px var(--font-disp);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.side-close{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:9px;cursor:pointer}
+.side-close:hover{border-color:var(--muted);color:var(--ink)}
+.side-close svg{width:13px;height:13px}
+.side-section{display:flex;flex-direction:column;gap:8px;min-width:0}
+.side-label{font:500 10.5px var(--font-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+#q{width:100%;background:var(--bg);border:1px solid var(--line-2);color:var(--ink);border-radius:9px;padding:9px 12px;font:13px var(--font-sans);outline:none}
 #q:focus{border-color:var(--accent)}
 #q::placeholder{color:var(--dim)}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:7px 13px;font:500 12.5px var(--font-mono);cursor:pointer;min-height:34px}
+.chips{display:flex;flex-direction:column;gap:6px;min-width:0}
+.chip{display:flex;align-items:center;gap:9px;width:100%;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:9px;padding:8px 11px;font:500 12.5px var(--font-mono);cursor:pointer;min-height:34px;text-align:left}
 .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--hue,var(--line-2));flex:none}
-.chip b{font-weight:500;color:var(--dim)}
+.chip .lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip b{margin-left:auto;flex:none;font-weight:500;color:var(--dim)}
 .chip:hover{border-color:var(--muted);color:var(--ink)}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .chip.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
+.chip.is-active b{color:var(--ink)}
+.chip[data-group].is-active{border-color:var(--hue)}
+.chip[data-status="new"].is-active{border-color:rgba(249,115,22,.6);background:rgba(249,115,22,.12)}
 .chip[data-status="fav"].is-active{border-color:rgba(251,191,36,.6);background:rgba(251,191,36,.12)}
 .chip[data-status="done"].is-active{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
 .chip[data-status="todo"].is-active{border-color:var(--muted);background:rgba(148,163,184,.10)}
-main{padding:34px 0 6px}
-.group{max-width:1120px;margin:0 auto 42px;padding:0 22px}
+.side-done{display:none;align-items:center;justify-content:center;gap:8px;width:100%;border:1px solid rgba(249,115,22,.55);background:rgba(249,115,22,.14);color:var(--ink);border-radius:10px;padding:11px 14px;font:500 13px var(--font-mono);cursor:pointer;min-height:42px}
+.side-done:hover{background:rgba(249,115,22,.24)}
+.side-done b{color:var(--accent-2);font-weight:600}
+.backdrop{display:none}
+#catalog,#changelog{scroll-margin-top:74px}
+body.view-changelog .side,body.view-changelog .menu-btn{display:none}
+body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
+@media (min-width:1001px){
+  /* Collapsed: keep two tracks and shrink the first to zero. A single-column
+     template would wrap .content into a second row below the (invisible) rail
+     and shove the whole catalog down the page. */
+  body.side-closed .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
+  body.side-closed .side{opacity:0;transform:translateY(-10px) scale(.97);visibility:hidden;pointer-events:none;
+    transition:opacity .16s ease,transform .2s ease,visibility 0s linear .2s}
+}
+@media (min-width:1840px){
+  /* The rail leaves the centered column: its grid track collapses to zero and a
+     negative margin pulls the panel out to the left, a constant 26px from the repo
+     grid, which keeps the freed width (three cards per row). Sticky stays, so the
+     rail still starts below the hero and pins under the top bar on scroll.
+     1840px is where 308px rail + gap + 1120px column fit without crowding the
+     window edge. */
+  .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
+  .side{width:308px;margin-left:-334px}
+}
+@media (max-width:1000px){
+  .shell{grid-template-columns:minmax(0,1fr);padding-top:20px}
+  .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 16px 16px 0;border-left:0;padding:16px 16px 22px;
+    background:linear-gradient(160deg,rgba(24,34,47,.88),rgba(9,13,19,.92));
+    transform:translateX(-104%);visibility:hidden;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear .24s}
+  body.side-open .side{transform:none;visibility:visible;box-shadow:0 40px 90px -30px #000;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear 0s}
+  .side-head{display:flex}
+  .side-done{display:flex}
+  .backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:50;background:rgba(4,7,11,.60);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .side{transition:none}
+}
+.changelog{padding:6px 0 10px}
+.changelog h2{font:600 1.35rem var(--font-disp);margin:0 0 6px}
+.entries{list-style:none;margin:0;padding:0}
+.entry{border-top:1px solid var(--line);padding:18px 0}
+.entry:first-child{border-top:0}
+.entry-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.entry-head time{font:500 12.5px var(--font-mono);color:var(--accent);letter-spacing:.06em}
+.entry-head h3{font:600 16px var(--font-disp);margin:0}
+.entry ul{margin:8px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
+.entry li{margin:4px 0}
+main{padding:0 0 6px}
+.group{margin:0 0 42px}
 .group-head h2{display:flex;align-items:center;gap:10px;font:600 1.35rem var(--font-disp);margin:0 0 6px}
 .group-head .dot{width:10px;height:10px;border-radius:3px;background:var(--hue);flex:none}
 .blurb{color:var(--muted);margin:0 0 18px;font-size:14.5px}
@@ -340,12 +527,19 @@ main{padding:34px 0 6px}
 .card.is-done .card-foot .license{color:#4b596b}
 .card.is-done .card-foot a{color:#5d6b7e}
 .card.is-done:hover{transform:none;box-shadow:none;border-color:var(--line-2)}
+.card.is-new{border-color:rgba(249,115,22,.38)}
+.tag-new{display:none;align-items:center;margin-left:8px;padding:2px 8px;border-radius:999px;font:600 10px/1.7 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:#180b02;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 6px 18px -12px rgba(249,115,22,.9);vertical-align:middle;white-space:nowrap}
+.card.is-new .tag-new{display:inline-flex}
 .card-top{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
 .card h3{font:600 16px/1.3 var(--font-disp);margin:0;flex:1 1 auto;min-width:0;overflow-wrap:anywhere;word-break:break-word}
 .card h3 .owner{font:400 13px var(--font-mono);color:var(--dim);overflow-wrap:anywhere}
 .card h3 a:hover{color:var(--accent-2)}
 .badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
 .badges img{height:20px;display:block}
+.pill{display:inline-flex;align-items:center;gap:5px;max-width:170px;height:20px;padding:0 8px;border:1px solid var(--line-2);border-radius:999px;font:500 10.5px var(--font-mono);color:var(--muted);white-space:nowrap}
+.pill:hover{border-color:var(--accent);color:var(--ink)}
+.pill .sym{color:var(--accent-2)}
+.pill .v{overflow:hidden;text-overflow:ellipsis}
 .card .about{color:var(--muted);font-size:13.5px;margin:0;flex:1;overflow-wrap:anywhere;word-break:break-word}
 .card-foot{display:flex;align-items:center;gap:10px;font:11.5px var(--font-mono);color:var(--dim);padding-top:9px;border-top:1px solid var(--line);min-width:0}
 .card-foot .license{min-width:0;overflow-wrap:anywhere}
@@ -358,7 +552,7 @@ main{padding:34px 0 6px}
 .card-foot .links{display:flex;gap:12px;flex:none}
 .card-foot a{color:var(--muted);font:500 12px var(--font-mono)}
 .card-foot a:hover{color:var(--accent)}
-.empty{max-width:1120px;margin:0 auto;padding:0 22px 30px;color:var(--muted);font-style:italic}
+.empty{margin:0;padding:0 0 30px;color:var(--muted);font-style:italic}
 footer{border-top:1px solid var(--line);margin-top:14px;padding:22px 0 42px;color:var(--dim);font-size:13px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
 footer a{color:var(--muted)}
@@ -368,15 +562,23 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   .hero .wrap{padding-top:44px;padding-bottom:30px}
   .stat{padding:0 14px}
   .stat b{font-size:18px}
-  .filters-inner{padding:10px 14px;gap:8px}
-  .chips{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:2px;scrollbar-width:none}
-  .chips::-webkit-scrollbar{display:none}
-  .chip{flex:none}
+  .topbar-inner{padding:9px 14px}
+  .shell{padding:18px 14px 0}
+  .menu-btn span{display:none}
+  .menu-btn{padding:7px 11px}
 }
 </style>
+<noscript><style>
+/* No JS: the drawer cannot open, so show the rail inline on small screens. */
+@media (max-width:1000px){
+  .side{position:static;transform:none;visibility:visible;max-height:none;width:auto;border-radius:14px;border-left:1px solid var(--line)}
+  .menu-btn,.side-head,.side-done{display:none}
+}
+</style></noscript>
 </head>
 <body>
 <a class="skip" href="#catalog">Skip to catalog</a>
+<div class="glow" aria-hidden="true"></div>
 <header class="hero">
   <div class="wrap">
     <p class="kicker">Samsung Galaxy XR · SM-I610 · Android XR</p>
@@ -389,25 +591,59 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     </div>
   </div>
 </header>
-<nav class="filters" aria-label="Filter repositories">
-  <div class="filters-inner">
-    <input id="q" type="search" placeholder="Filter repos: name, tag, description…" aria-label="Filter repositories">
-    <div class="chips" role="group" aria-label="Repository groups">
-        __CHIPS__
-    </div>
-    <div class="chips" role="group" aria-label="Checked and favourite repositories">
-        __STATUS__
+<nav class="topbar" aria-label="Views">
+  <div class="topbar-inner">
+    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="true" aria-controls="sidebar" title="Show or hide the filters">
+      <svg viewBox="0 0 16 16" aria-hidden="true" fill="none"><path d="M2 3.5h12M2 8h12M2 12.5h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>Filters</span>
+    </button>
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button type="button" class="tab is-active" data-view="catalog" role="tab" aria-selected="true">Catalog <b>__TOTAL__</b></button>
+      <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>__CHANGELOG_COUNT__</b></button>
     </div>
   </div>
 </nav>
-<main id="catalog">
-  __SECTIONS__
-  <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
-</main>
+<div class="shell" id="shell">
+  <aside class="side" id="sidebar" aria-label="Filters">
+    <div class="side-head">
+      <span class="side-title">Filters</span>
+      <button type="button" class="side-close" id="side-close" aria-label="Close filters">
+        <svg viewBox="0 0 14 14" aria-hidden="true" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="side-section">
+      <label class="side-label" for="q">Search</label>
+      <input id="q" type="search" placeholder="name, tag, description…" aria-label="Filter repositories">
+    </div>
+    <div class="side-section">
+      <span class="side-label" id="lbl-groups">Group</span>
+      <div class="chips" role="group" aria-labelledby="lbl-groups">
+        __CHIPS__
+      </div>
+    </div>
+    <div class="side-section">
+      <span class="side-label" id="lbl-status">Status</span>
+      <div class="chips" role="group" aria-labelledby="lbl-status">
+        __STATUS__
+      </div>
+    </div>
+    <button type="button" class="side-done" id="side-done">Show <b id="side-count">__TOTAL__</b> repos</button>
+  </aside>
+  <div class="content">
+    <main id="catalog">
+      __SECTIONS__
+      <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
+    </main>
+    <div id="changelog" hidden>
+      __CHANGELOG__
+    </div>
+  </div>
+</div>
+<div class="backdrop" id="backdrop" hidden></div>
 <footer>
   <div class="wrap">
     <span>Unofficial community hub — not affiliated with Samsung. Each project keeps its own license.</span>
-    <span>Add a repo: edit <code>catalog.json</code>, run <code>python tools/build.py</code>, open a PR · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
+    <span>Add a repo: edit <code>catalog.json</code> and <code>changelog.json</code>, run <code>python tools/build.py</code>, open a PR · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
   </div>
 </footer>
 <script>
@@ -423,6 +659,20 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   var empty = document.getElementById('empty');
   var main = document.getElementById('catalog');
   var state = { q: '', group: 'all', status: {}, fav: {}, done: {} };
+
+  // "New" is computed here, in the visitor's browser, from the date the entry was
+  // added to the catalog. GitHub Pages is static with no per-request logic, and the
+  // date-only string is parsed as local midnight, so no timezone or server clock
+  // enters into it. Cards age out of NEW on their own, without a rebuild.
+  var NEW_MS = 5 * 24 * 60 * 60 * 1000;
+  function isNewCard(card) {
+    var raw = card.dataset.added;
+    if (!raw) return false;
+    var p = raw.split('-');
+    if (p.length !== 3) return false;
+    var t = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])).getTime();
+    return Date.now() - t < NEW_MS;
+  }
 
   // Star and check marks live in localStorage, with a cookie kept in sync as a
   // fallback, so they survive reloads and a browser restart. Nothing is sent anywhere.
@@ -465,14 +715,30 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   function apply() {
     var query = state.q.trim().toLowerCase();
     var active = [];
-    ['fav', 'done', 'todo'].forEach(function (s) { if (state.status[s]) active.push(s); });
-    var shown = 0, favN = 0, doneN = 0;
+    ['new', 'fav', 'done', 'todo'].forEach(function (s) { if (state.status[s]) active.push(s); });
+    var shown = 0;
+    var groupN = {};
+    var statusN = { 'new': 0, fav: 0, done: 0, todo: 0 };
     cards.forEach(function (c) {
       var repo = c.dataset.repo;
       var fav = !!state.fav[repo];
       var done = !!state.done[repo];
-      if (fav) favN++;
-      if (done) doneN++;
+      var isNew = isNewCard(c);
+      var mark = { 'new': isNew, fav: fav, done: done, todo: !done };
+      // Facet numbers: every figure in the rail counts the cards that would be
+      // listed if that filter were picked, given the other active filters and the
+      // search box. Group numbers ignore the group selection because those chips
+      // are alternatives, not toggles; a status chip's own predicate is always
+      // part of its count, so "Checked 0" means checking would show nothing.
+      function pass() {
+        for (var i = 0; i < active.length; i++) {
+          if (!mark[active[i]]) return false;
+        }
+        return true;
+      }
+      var pill = c.querySelector('.tag-new');
+      if (pill) pill.hidden = !isNew;
+      c.classList.toggle('is-new', isNew);
       c.classList.toggle('is-fav', fav);
       c.classList.toggle('is-done', done);
       var favBtn = c.querySelector('.flag.fav');
@@ -487,11 +753,17 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       }
       var okGroup = state.group === 'all' || c.dataset.group === state.group;
       var okText = !query || c.dataset.text.indexOf(query) > -1;
-      var okMark = active.every(function (s) {
-        if (s === 'fav') return fav;
-        if (s === 'done') return done;
-        return !done;
-      });
+      var okMark = pass();
+      if (okText && okMark) {
+        groupN[c.dataset.group] = (groupN[c.dataset.group] || 0) + 1;
+      }
+      if (okText && okMark && okGroup) {
+        // Status chips read as "what this filter shows right now", so they follow
+        // the search box, the other status filters and the selected group.
+        ['new', 'fav', 'done', 'todo'].forEach(function (s) {
+          if (mark[s]) statusN[s]++;
+        });
+      }
       var show = okGroup && okText && okMark;
       c.style.display = show ? '' : 'none';
       if (show) shown++;
@@ -502,18 +774,30 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       });
       s.style.display = any ? '' : 'none';
     });
-    setCount('cnt-fav', favN);
-    setCount('cnt-done', doneN);
-    setCount('cnt-todo', cards.length - doneN);
+    groupChips.forEach(function (ch) {
+      var id = ch.dataset.group;
+      var n = id === 'all'
+        ? Object.keys(groupN).reduce(function (a, k) { return a + groupN[k]; }, 0)
+        : (groupN[id] || 0);
+      var b = ch.querySelector('b');
+      if (b) b.textContent = n;
+    });
+    setCount('cnt-new', statusN['new']);
+    setCount('cnt-fav', statusN.fav);
+    setCount('cnt-done', statusN.done);
+    setCount('cnt-todo', statusN.todo);
     if (count) count.textContent = shown;
+    setCount('side-count', shown);
     if (empty) empty.style.display = shown ? 'none' : '';
   }
 
   if (q) q.addEventListener('input', function () { state.q = q.value; apply(); });
   groupChips.forEach(function (ch) {
     ch.addEventListener('click', function () {
-      groupChips.forEach(function (c) { c.classList.remove('is-active'); });
-      ch.classList.add('is-active');
+      groupChips.forEach(function (c) {
+        c.classList.toggle('is-active', c === ch);
+        c.setAttribute('aria-pressed', c === ch ? 'true' : 'false');
+      });
       state.group = ch.dataset.group;
       apply();
     });
@@ -545,13 +829,312 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   loadMarks();
   apply();
 })();
+
+// Filters rail. Desktop: a sticky rail left of the catalog, collapsed and expanded
+// with the Filters button, choice remembered in localStorage. Narrow screens: the
+// same rail becomes an off-canvas drawer with a backdrop, closed on load and closed
+// again by the X, the backdrop, Escape or the Show-N button. The Changelog view
+// hides it (body.view-changelog).
+(function () {
+  var KEY = 'gxrforge.sidebar';
+  var btn = document.getElementById('menu-btn');
+  if (!btn) return;
+  var closeBtn = document.getElementById('side-close');
+  var doneBtn = document.getElementById('side-done');
+  var backdrop = document.getElementById('backdrop');
+  var mq = window.matchMedia('(max-width:1000px)');
+
+  function drawerOpen() { return document.body.classList.contains('side-open'); }
+  function drawer(isOpen) {
+    document.body.classList.toggle('side-open', isOpen);
+    if (backdrop) backdrop.hidden = !isOpen;
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+  function rail(isOpen) {
+    document.body.classList.toggle('side-closed', !isOpen);
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    try { window.localStorage.setItem(KEY, isOpen ? '1' : '0'); } catch (e) {}
+  }
+  function sync() {
+    var isOpen = mq.matches ? drawerOpen() : !document.body.classList.contains('side-closed');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+  window.gxrForgeCloseFilters = function () { if (mq.matches) drawer(false); };
+
+  try { if (window.localStorage.getItem(KEY) === '0') document.body.classList.add('side-closed'); } catch (e) {}
+  sync();
+
+  btn.addEventListener('click', function () {
+    if (mq.matches) drawer(!drawerOpen());
+    else rail(document.body.classList.contains('side-closed'));
+  });
+  if (closeBtn) closeBtn.addEventListener('click', function () { drawer(false); });
+  if (doneBtn) doneBtn.addEventListener('click', function () { drawer(false); });
+  if (backdrop) backdrop.addEventListener('click', function () { drawer(false); });
+  // Escape closes the panel; on phones the backdrop does the same. No click-away
+  // on desktop: the rail is a filter panel you keep open while flagging cards, and
+  // closing it on every card click made the catalog jump.
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Escape') return;
+    if (drawerOpen()) drawer(false);
+    else if (!mq.matches) rail(false);
+  });
+  function onBreak() { drawer(false); sync(); }
+  if (mq.addEventListener) mq.addEventListener('change', onBreak);
+  else if (mq.addListener) mq.addListener(onBreak);
+})();
+
+// Catalog / Changelog views. The active view is mirrored in the URL hash, so a
+// link like #changelog opens the history directly.
+(function () {
+  var tabs = [].slice.call(document.querySelectorAll('.tab'));
+  var views = { catalog: document.getElementById('catalog'), changelog: document.getElementById('changelog') };
+  function show(view) {
+    tabs.forEach(function (t) {
+      var on = t.dataset.view === view;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    Object.keys(views).forEach(function (k) {
+      if (views[k]) views[k].hidden = k !== view;
+    });
+    // The filter rail belongs to the catalog view only; an open drawer also closes.
+    document.body.classList.toggle('view-changelog', view !== 'catalog');
+    if (view !== 'catalog' && typeof window.gxrForgeCloseFilters === 'function') window.gxrForgeCloseFilters();
+    if (window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + view);
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { show(t.dataset.view); });
+  });
+  if (window.location.hash === '#changelog') show('changelog');
+})();
+
+// Live stars and latest release, fetched in the visitor's browser so both stay
+// current with no rebuild: shields.io JSON endpoints (CORS-open, edge-cached),
+// ungh.cc as fallback, results cached in localStorage for 30 minutes and
+// refreshed in the background. The badge images stay until a value arrives, so
+// nothing breaks without JS or when a fetch fails.
+(function () {
+  var STORE = 'gxrforge.live.v1';
+  var TTL = 30 * 60 * 1000;
+  var MAX_PARALLEL = 6;
+  var cards = [].slice.call(document.querySelectorAll('.card[data-repo]'));
+  if (!cards.length || !window.fetch) return;
+  var cache = {};
+  try { cache = JSON.parse(window.localStorage.getItem(STORE) || '{}') || {}; } catch (e) { cache = {}; }
+  var queue = [];
+  var active = 0;
+
+  function save() {
+    try { window.localStorage.setItem(STORE, JSON.stringify(cache)); } catch (e) {}
+  }
+  function getJSON(url) {
+    return window.fetch(url, { credentials: 'omit' }).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    });
+  }
+  function compact(n) {
+    n = Number(n);
+    if (!isFinite(n)) return '';
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/[.]0$/, '') + 'k';
+    return String(n);
+  }
+  // Each helper resolves {ok, value, bad}; ok false means "could not determine",
+  // bad true means shields answered with a word instead of a value. shields.io
+  // does that whenever it cannot read the upstream data ("invalid" while its own
+  // GitHub tokens are rate limited, "repo not found" for a dead repo): an error
+  // string is not data, so it never becomes a pill, its badge image (which would
+  // show the same word) is dropped, and nothing is cached from it.
+  var BAD_VALUE = /invalid|not[ -]?found|no data|unable|error|rate limit|too many|unavailable/i;
+  var NO_RELEASE = /no releases/i;
+  var STARS_OK = /^[\\d.,]+[kM]?/;
+
+  function fetchStars(repo) {
+    return getJSON('https://img.shields.io/github/stars/' + repo + '.json')
+      .then(function (d) {
+        var v = String(d.value || '').trim();
+        if (NO_RELEASE.test(v) || BAD_VALUE.test(v)) return { ok: false, bad: true, value: null };
+        if (!STARS_OK.test(v)) return { ok: false, bad: false, value: null };
+        return { ok: true, bad: false, value: v };
+      })
+      .catch(function () {
+        return getJSON('https://ungh.cc/repos/' + repo)
+          .then(function (d) {
+            var n = (d.repo || {}).stars;
+            if (!isFinite(Number(n))) return { ok: false, bad: false, value: null };
+            return { ok: true, bad: false, value: compact(n) };
+          })
+          .catch(function () { return { ok: false, bad: false, value: null }; });
+      });
+  }
+  function fetchRelease(repo) {
+    return getJSON('https://img.shields.io/github/v/release/' + repo + '.json?include_prereleases')
+      .then(function (d) {
+        var v = String(d.value || '').trim();
+        // "no releases" is definitive (the repo publishes none); other words are
+        // shields failing, which is worth hiding and retrying.
+        if (NO_RELEASE.test(v)) return { ok: true, bad: true, value: null };
+        if (BAD_VALUE.test(v)) return { ok: false, bad: true, value: null };
+        if (!v) return { ok: true, bad: false, value: null };
+        return { ok: true, bad: false, value: v };
+      })
+      .catch(function () {
+        return getJSON('https://ungh.cc/repos/' + repo + '/releases/latest')
+          .then(function (d) {
+            var tag = d.release && d.release.tag ? String(d.release.tag) : null;
+            if (!tag) return { ok: false, bad: false, value: null };
+            return { ok: true, bad: false, value: tag };
+          })
+          .catch(function () { return { ok: false, bad: false, value: null }; });
+      });
+  }
+  function dropImg(badges, which) {
+    var img = badges.querySelector('img[data-badge="' + which + '"]');
+    if (img && img.parentNode) img.parentNode.removeChild(img);
+  }
+  function pill(badges, cls, href, sym) {
+    var el = badges.querySelector('a.pill.' + cls);
+    if (el) return el;
+    el = document.createElement('a');
+    el.className = 'pill ' + cls;
+    el.href = href;
+    el.target = '_blank';
+    el.rel = 'noopener';
+    if (sym) {
+      var s = document.createElement('span');
+      s.className = 'sym';
+      s.setAttribute('aria-hidden', 'true');
+      s.textContent = sym;
+      el.appendChild(s);
+    }
+    var v = document.createElement('span');
+    v.className = 'v';
+    el.appendChild(v);
+    return el;
+  }
+  function render(card, repo, data) {
+    var badges = card.querySelector('.badges');
+    if (!badges) return;
+    if (data.s) {
+      var sp = pill(badges, 'stars', 'https://github.com/' + repo + '/stargazers', '\u2605');
+      sp.querySelector('.v').textContent = data.s;
+      sp.title = data.s + ' stars on GitHub';
+      if (sp.parentNode !== badges) badges.insertBefore(sp, badges.firstChild);
+      dropImg(badges, 'stars');
+    }
+    if (data.rn && card.dataset.release) {
+      // data-release marks the repos whose catalog entry has a single release
+      // stream (release: null means per-module tags, where a "latest release"
+      // badge would mislead). The live fetch refreshes that badge's value only,
+      // it never adds a release to a card that was built without one.
+      dropImg(badges, 'release');
+      var old = badges.querySelector('a.pill.rel');
+      if (data.r) {
+        var rp = pill(badges, 'rel', 'https://github.com/' + repo + '/releases', null);
+        rp.querySelector('.v').textContent = data.r;
+        rp.title = 'Latest release: ' + data.r;
+        if (rp.parentNode !== badges) {
+          var sp2 = badges.querySelector('a.pill.stars');
+          if (sp2 && sp2.parentNode === badges) badges.insertBefore(rp, sp2.nextSibling);
+          else badges.insertBefore(rp, badges.firstChild);
+        }
+      } else if (old && old.parentNode) {
+        old.parentNode.removeChild(old);
+      }
+    }
+  }
+  function pump() {
+    while (active < MAX_PARALLEL && queue.length) {
+      active++;
+      (queue.shift())().then(function () { active--; pump(); }, function () { active--; pump(); });
+    }
+  }
+  function schedule(fn) { queue.push(fn); pump(); }
+
+  cards.forEach(function (card) {
+    var repo = card.dataset.repo;
+    if (!repo || repo.indexOf('/') < 0) return;
+    var hit = cache[repo] || null;
+    if (hit) render(card, repo, { s: hit.s, r: hit.r, rn: hit.rn });
+    if (hit && Date.now() - (hit.t || 0) < TTL) return;
+    schedule(function () {
+      return Promise.all([fetchStars(repo), fetchRelease(repo)]).then(function (res) {
+        var stars = res[0], rel = res[1];
+        // Hide the badge image when shields answered with a word: the image would
+        // render the same error text, so it carries no value worth keeping.
+        var bd = card.querySelector('.badges');
+        if (bd && stars.bad) dropImg(bd, 'stars');
+        if (bd && rel.bad) dropImg(bd, 'release');
+        if (!stars.ok && !rel.ok) return; // keep the badges; retry after the cache TTL
+        var entry = {
+          s: stars.ok ? stars.value : (hit && hit.s) || null,
+          r: rel.ok ? rel.value : (hit && hit.r) || null,
+          rn: rel.ok ? true : !!(hit && hit.rn),
+          t: Date.now()
+        };
+        cache[repo] = entry;
+        save();
+        render(card, repo, entry);
+      });
+    });
+  });
+})();
+
+// Cursor glow: one fixed radial-gradient layer, eased toward the pointer in a
+// single rAF loop and moved with a composited transform. Pointer devices only;
+// reduced-motion users keep the static page and the loop stops when the pointer
+// settles or the tab is hidden.
+(function () {
+  var glow = document.querySelector('.glow');
+  if (!glow || !window.matchMedia) return;
+  if (window.matchMedia('(pointer:coarse)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  var x = window.innerWidth / 2, y = window.innerHeight * 0.3, tx = x, ty = y, raf = 0, on = false;
+  glow.style.setProperty('--gx', x + 'px');
+  glow.style.setProperty('--gy', y + 'px');
+  function frame() {
+    raf = 0;
+    x += (tx - x) * 0.16;
+    y += (ty - y) * 0.16;
+    if (Math.abs(tx - x) < 0.4 && Math.abs(ty - y) < 0.4) { x = tx; y = ty; }
+    glow.style.setProperty('--gx', x.toFixed(1) + 'px');
+    glow.style.setProperty('--gy', y.toFixed(1) + 'px');
+    if (x !== tx || y !== ty) raf = window.requestAnimationFrame(frame);
+  }
+  window.addEventListener('pointermove', function (ev) {
+    if (ev.pointerType === 'touch') return;
+    tx = ev.clientX; ty = ev.clientY;
+    if (!on) { on = true; document.body.classList.add('glow-on'); }
+    if (!raf) raf = window.requestAnimationFrame(frame);
+  }, { passive: true });
+  function fade() { on = false; document.body.classList.remove('glow-on'); }
+  document.documentElement.addEventListener('mouseleave', fade);
+  window.addEventListener('blur', fade);
+})();
 </script>
 </body>
 </html>
 """
 
 
-def render_site(cat):
+def render_changelog_view(changelog):
+    entries = []
+    for e in changelog["entries"]:
+        items = "".join(f"<li>{html.escape(str(i))}</li>" for i in e["items"])
+        entries.append(
+            f'<li class="entry"><div class="entry-head">'
+            f'<time datetime="{e["date"]}">{e["date"]}</time>'
+            f'<h3>{html.escape(str(e["title"]))}</h3></div><ul>{items}</ul></li>'
+        )
+    return (
+        '<section class="changelog"><h2>Changelog</h2>'
+        '<p class="blurb">Every catalog change — repos added, moved or removed. Newest first.</p>'
+        f'<ol class="entries">{"".join(entries)}</ol></section>'
+    )
+
+
+def render_site(cat, changelog):
     total = sum(len(g["repos"]) for g in cat["groups"])
     updated = cat.get("updated", date.today().isoformat())
     page = SITE_TEMPLATE
@@ -562,6 +1145,8 @@ def render_site(cat):
     page = page.replace("__CHIPS__", render_chips(cat))
     page = page.replace("__STATUS__", render_status_chips(cat))
     page = page.replace("__SECTIONS__", render_sections(cat))
+    page = page.replace("__CHANGELOG_COUNT__", str(len(changelog.get("entries", []))))
+    page = page.replace("__CHANGELOG__", render_changelog_view(changelog))
     page = page.replace("__REPO_URL__", REPO_URL)
     return page
 
@@ -573,23 +1158,34 @@ def main():
     args = sys.argv[1:]
     check_only = "--check" in args
     cat = load_catalog()
+    changelog = load_changelog()
     errors, repos = validate(cat)
+    errors += validate_changelog(changelog)
     if errors:
-        print("catalog.json INVALID:")
+        print("input INVALID:")
         for e in errors:
             print("  -", e)
         return 1
     if check_only:
-        print(f"catalog OK: {len(repos)} repos in {len(cat['groups'])} groups")
+        print(
+            f"OK: {len(repos)} repos in {len(cat['groups'])} groups; "
+            f"changelog: {len(changelog['entries'])} entries"
+        )
         return 0
-    readme = render_readme(cat)
-    site = render_site(cat)
+    readme = render_readme(cat, changelog)
+    changelog_md = render_changelog_md(changelog)
+    site = render_site(cat, changelog)
     README_PATH.write_text(readme, encoding="utf-8", newline="\n")
+    CHANGELOG_MD_PATH.write_text(changelog_md, encoding="utf-8", newline="\n")
     SITE_PATH.parent.mkdir(parents=True, exist_ok=True)
     SITE_PATH.write_text(site, encoding="utf-8", newline="\n")
     print(f"wrote README.md ({len(readme)} bytes)")
+    print(f"wrote CHANGELOG.md ({len(changelog_md)} bytes)")
     print(f"wrote docs/index.html ({len(site)} bytes)")
-    print(f"catalog: {len(repos)} repos in {len(cat['groups'])} groups")
+    print(
+        f"catalog: {len(repos)} repos in {len(cat['groups'])} groups; "
+        f"changelog: {len(changelog['entries'])} entries"
+    )
     return 0
 
 

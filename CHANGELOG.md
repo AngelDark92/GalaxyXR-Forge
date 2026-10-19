@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-19 — Bachata-S4 added
+
+- Added JICA98/Bachata-S4 to Foundations & Upstreams (issue #2).
+
 ## 2026-10-19 — One-command add and a zero-backend contribution path
 
 - `tools/add-repo.py` adds a repo in one command: it refuses private, archived or already-listed repos, reads license, latest release and topics, writes the entry with today's date, appends the changelog entry, rebuilds every generated file and runs both link checks.

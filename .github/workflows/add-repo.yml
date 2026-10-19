@@ -61,7 +61,7 @@ jobs:
           code=$?
           echo "code=$code" >> "$GITHUB_OUTPUT"
           if [ "$code" -eq 2 ]; then
-            echo "::notice::Already in the catalog; nothing to do."
+            echo "::notice::Already listed or already proposed; nothing to do."
           elif [ "$code" -ne 0 ]; then
             echo "::error::add-repo.py failed with exit $code"
             exit 1
@@ -106,5 +106,5 @@ jobs:
           if [ "${OUTCOME:-}" = "0" ]; then
             gh issue comment "$ISSUE" --body "Queued a pull request: branch \`add-repo/issue-${ISSUE}\`. Review it under Pull requests; merging rebuilds the site." || true
           elif [ "${OUTCOME:-}" = "2" ]; then
-            gh issue comment "$ISSUE" --body "That repository is already in the catalog, so no pull request was opened." || true
+            gh issue comment "$ISSUE" --body "That repository is already in the catalog, or already has an open issue or pull request. Nothing was opened; follow the existing one." || true
           fi

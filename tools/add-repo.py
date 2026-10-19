@@ -33,6 +33,7 @@ import re
 import subprocess
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import date
 from pathlib import Path
@@ -168,6 +169,32 @@ def find_repo(cat, full):
     return None, None
 
 
+def repo_slug():
+    """owner/repo of this checkout, for searching its own issues and PRs."""
+    res = subprocess.run(
+        ["git", "config", "--get", "remote.origin.url"], cwd=str(ROOT), text=True, capture_output=True
+    )
+    url = (res.stdout or "").strip() or os.environ.get("GITHUB_REPOSITORY", "")
+    m = re.search(r"github\.com[:/]+([^/]+)/([^/]+?)(?:\.git)?$", url)
+    return f"{m.group(1)}/{m.group(2)}" if m else None
+
+
+def find_proposals(full):
+    """Open issues/PRs in this repository that already name this repo."""
+    slug = repo_slug()
+    if not slug:
+        return []
+    query = urllib.parse.quote(f'repo:{slug} is:open "{full}"')
+    code, data = api(f"https://api.github.com/search/issues?q={query}&per_page=10")
+    if code != 200 or not isinstance(data, dict):
+        return []
+    out = []
+    for item in data.get("items", []):
+        kind = "pr" if item.get("pull_request") else "issue"
+        out.append((item["number"], item.get("title", ""), item.get("html_url", ""), kind))
+    return out
+
+
 def guess_group(cat, owner, name, description):
     """Keyword heuristic; the CLI prints the guess so it can be overridden."""
     text = f"{name} {description}".lower()
@@ -290,6 +317,17 @@ def main(argv=None):
         print(f"already listed: {full} in {existing_group['id']} — nothing to do")
         return 2
 
+    # A second submission for the same repo is as much a duplicate as one already
+    # merged: check open issues and pull requests before touching anything.
+    if not args.force:
+        proposals = [p for p in find_proposals(full) if p[0] != issue]
+        if proposals:
+            number, title, url, kind = proposals[0]
+            print(f"already proposed: {kind} #{number} {url} — {title}")
+            for other in proposals[1:]:
+                print(f"  also open: {other[3]} #{other[0]} {other[2]}")
+            return 2
+
     meta = fetch_repo(owner, name)
     if meta["archived"]:
         raise SystemExit(f"error: {full} is archived; the catalog does not list dead projects")
@@ -343,7 +381,6 @@ def main(argv=None):
     CATALOG_PATH.write_text(dump_json(cat), encoding="utf-8", newline="\n")
     CHANGELOG_PATH.write_text(dump_json(changelog), encoding="utf-8", newline="\n")
     print(f"wrote catalog.json ({sum(len(g['repos']) for g in cat['groups'])} repos) and changelog.json")
-
     build = run(["tools/build.py"])
     if build.returncode != 0:
         sys.stderr.write(build.stdout + build.stderr)

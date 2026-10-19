@@ -77,9 +77,10 @@ jobs:
             else
               git rebase --abort || true
               echo "conflict: rebuilding the branch from its own entry"
-              # repair-add-pr.py resets onto main and re-applies the entry, so it
-              # also picks up main's tools even when this branch predates them.
-              if python tools/repair-add-pr.py --main origin/main; then
+              # Run repair from MAIN's copy: the branch checkout just replaced
+              # tools/ with the branch's (possibly older) version.
+              git show origin/main:tools/repair-add-pr.py > "$RUNNER_TEMP/repair-add-pr.py"
+              if python "$RUNNER_TEMP/repair-add-pr.py" --root "$GITHUB_WORKSPACE" --main origin/main; then
                 git push --force-with-lease origin "HEAD:$BR"
                 gh workflow run validate.yml --ref "$BR" || true
               else

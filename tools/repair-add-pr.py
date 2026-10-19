@@ -66,8 +66,16 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="Re-apply a branch's catalog entry onto main.")
     ap.add_argument("--repo", help="owner/name to keep (default: the one entry main lacks)")
     ap.add_argument("--main", default="origin/main", help="ref to rebuild on (default origin/main)")
+    ap.add_argument("--root", help="repository root (default: the tool's parent directory)")
     ap.add_argument("--dry-run", action="store_true", help="print the plan, change nothing")
     args = ap.parse_args(argv)
+
+    global ROOT, TOOLS, CATALOG, CHANGELOG
+    if args.root:
+        ROOT = Path(args.root).resolve()
+        TOOLS = ROOT / "tools"
+        CATALOG = ROOT / "catalog.json"
+        CHANGELOG = ROOT / "changelog.json"
 
     if not (ROOT / ".git").exists():
         raise SystemExit("error: run this inside the repository checkout")

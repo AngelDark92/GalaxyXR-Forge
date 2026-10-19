@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-56-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-57-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-19` — 56 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-19` — 57 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -154,6 +154,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[Vauzi-17/mesa-tu8](https://github.com/Vauzi-17/mesa-tu8)**<br>![stars](https://img.shields.io/github/stars/Vauzi-17/mesa-tu8?style=flat-square) | Turnip (Mesa) Vulkan driver build used by the headset emulation stack. |
 | **[stearnsbq/QuestLHSync](https://github.com/stearnsbq/QuestLHSync)**<br>![stars](https://img.shields.io/github/stars/stearnsbq/QuestLHSync?style=flat-square) | Base project for aligning Lighthouse devices to a headset's own camera tracking. |
 | **[Terminal-ennui/pyrowave](https://github.com/Terminal-ennui/pyrowave)**<br>![stars](https://img.shields.io/github/stars/Terminal-ennui/pyrowave?style=flat-square) | PyroWave wavelet codec fork used by the headset's ALVR 4:4:4 streaming builds. |
+| **[JICA98/Bachata-S4](https://github.com/JICA98/Bachata-S4)**<br>![stars](https://img.shields.io/github/stars/JICA98/Bachata-S4?style=flat-square) ![release](https://img.shields.io/github/v/release/JICA98/Bachata-S4?include_prereleases&style=flat-square&label=release) | Bachata S4 releases, compatibility reports, and public community portal |
 
 ---
 
@@ -179,12 +180,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-19` — Bachata-S4 added
 - `2026-10-19` — One-command add and a zero-backend contribution path
 - `2026-10-19` — ScreenStreamerXR added
 - `2026-10-17` — AstroQuest back in the catalog
 - `2026-10-17` — Filter figures now count what each filter would show
 - `2026-10-17` — AstroQuest removed; badge errors no longer print
-- `2026-10-17` — Filters menu opens as a glass dropdown
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -194,4 +195,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-19 · 56 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-19 · 57 repos</sub></div>

@@ -585,6 +585,15 @@
           "release": null,
           "added": "2026-10-13",
           "tags": ["codec", "vulkan", "streaming"]
+        },
+        {
+          "repo": "JICA98/Bachata-S4",
+          "url": "https://github.com/JICA98/Bachata-S4",
+          "about": "Bachata S4 releases, compatibility reports, and public community portal",
+          "license": "GPL-2.0",
+          "release": "v0.2.5",
+          "added": "2026-10-19",
+          "tags": ["android", "bachata-s4", "emulation", "playstation-4"]
         }
       ]
     }

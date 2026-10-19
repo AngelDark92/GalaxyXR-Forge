@@ -16,6 +16,7 @@ Rules:
 
 import html
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -1252,14 +1253,21 @@ def render_group_options(cat):
     )
 
 
+def inline_md(text):
+    """Escape, then honour the inline markers changelog entries use: `code` and **bold**."""
+    s = html.escape(str(text))
+    s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
+    return re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", s)
+
+
 def render_changelog_view(changelog):
     entries = []
     for e in changelog["entries"]:
-        items = "".join(f"<li>{html.escape(str(i))}</li>" for i in e["items"])
+        items = "".join(f"<li>{inline_md(i)}</li>" for i in e["items"])
         entries.append(
             f'<li class="entry"><div class="entry-head">'
             f'<time datetime="{e["date"]}">{e["date"]}</time>'
-            f'<h3>{html.escape(str(e["title"]))}</h3></div><ul>{items}</ul></li>'
+            f'<h3>{inline_md(e["title"])}</h3></div><ul>{items}</ul></li>'
         )
     return (
         '<section class="changelog"><h2>Changelog</h2>'

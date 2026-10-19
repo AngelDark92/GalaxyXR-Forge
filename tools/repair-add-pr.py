@@ -46,7 +46,10 @@ def load_addrepo():
 def git(*args, check=True):
     res = subprocess.run(["git", *args], cwd=ROOT, text=True, capture_output=True)
     if check and res.returncode != 0:
-        raise SystemExit(f"error: git {' '.join(args)} failed:\n{res.stderr.strip()}")
+        raise SystemExit(
+            f"error: git {' '.join(args)} failed (exit {res.returncode}):\n"
+            f"{res.stderr.strip()}\n{res.stdout.strip()}"
+        )
     return res
 
 
@@ -141,6 +144,8 @@ def main(argv=None):
         raise SystemExit("error: tools/build.py failed after the repair")
 
     git("add", "--", *GENERATED)
+    staged = git("diff", "--cached", "--name-only").stdout.strip()
+    print("staged:", staged.replace("\n", ", ") or "(nothing)")
     git("commit", "-m", f"fix: rebase {full} onto {args.main} (added date kept: {preserved.get('added')})")
     print(f"repaired on {args.main}: {full}, added {preserved.get('added')}")
     print("push the branch to update the pull request")

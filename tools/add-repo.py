@@ -249,6 +249,7 @@ def main(argv=None):
     ap.add_argument("--issue", type=int, default=0, help="issue number, for attribution")
     ap.add_argument("--dry-run", action="store_true", help="print the entry, write nothing")
     ap.add_argument("--no-checks", action="store_true", help="skip check-links / check-repos")
+    ap.add_argument("--force", action="store_true", help="run even if catalog files have uncommitted edits")
     args = ap.parse_args(argv)
 
     payload = {}
@@ -266,6 +267,21 @@ def main(argv=None):
 
     cat = load_json(CATALOG_PATH)
     changelog = load_json(CHANGELOG_PATH)
+
+    # A pending add from another branch or session in the same checkout would be
+    # carried into this entry, and its date would ride along. Refuse instead.
+    if not args.force:
+        proc = subprocess.run(
+            ["git", "status", "--porcelain", "--", "catalog.json", "changelog.json"],
+            cwd=str(ROOT),
+            text=True,
+            capture_output=True,
+        )
+        if proc.returncode == 0 and proc.stdout.strip():
+            raise SystemExit(
+                "error: catalog.json or changelog.json has uncommitted edits.\n"
+                "Commit or stash them first, or pass --force if they are yours."
+            )
 
     owner, name = parse_repo(repo_value)
     full = f"{owner}/{name}"
@@ -312,7 +328,6 @@ def main(argv=None):
         return 0
 
     group["repos"].append(entry)
-    cat["updated"] = today
     changelog["entries"].insert(
         0,
         {

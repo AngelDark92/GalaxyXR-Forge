@@ -139,10 +139,21 @@ def render_changelog_md(changelog):
 # ---------------------------------------------------------------------------
 
 
+def newest_date(cat, changelog):
+    """Newest `added`/changelog date, computed at build time.
+
+    Storing this in catalog.json made every single PR edit the same line, so two
+    pending adds always conflicted. Derive it instead.
+    """
+    dates = [r.get("added") for g in cat["groups"] for r in g["repos"] if r.get("added")]
+    dates += [e.get("date") for e in changelog.get("entries", []) if e.get("date")]
+    return max(dates) if dates else date.today().isoformat()
+
+
 def render_readme(cat, changelog):
     groups = cat["groups"]
     total = sum(len(g["repos"]) for g in groups)
-    updated = cat.get("updated", date.today().isoformat())
+    updated = newest_date(cat, changelog)
     L = []
     A = L.append
     A('<div align="center">')
@@ -1278,7 +1289,7 @@ def render_changelog_view(changelog):
 
 def render_site(cat, changelog):
     total = sum(len(g["repos"]) for g in cat["groups"])
-    updated = cat.get("updated", date.today().isoformat())
+    updated = newest_date(cat, changelog)
     page = SITE_TEMPLATE
     page = page.replace("__TAGLINE__", html.escape(TAGLINE, quote=True))
     page = page.replace("__TOTAL__", str(total))

@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-55-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-56-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-16` — 55 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-19` — 56 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -134,6 +134,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[andreylukin/mind-castle](https://github.com/andreylukin/mind-castle)**<br>![stars](https://img.shields.io/github/stars/andreylukin/mind-castle?style=flat-square) | Streams Mac windows into the Galaxy XR over USB. |
 | **[hyunaseo/OpenAI-for-Galaxy-XR](https://github.com/hyunaseo/OpenAI-for-Galaxy-XR)**<br>![stars](https://img.shields.io/github/stars/hyunaseo/OpenAI-for-Galaxy-XR?style=flat-square) | Showcase: passthrough capture with OpenAI multimodal voice queries on Galaxy XR. |
 | **[HyunsooleePG/GalaxyXR_Passthrough_WebCamTexture](https://github.com/HyunsooleePG/GalaxyXR_Passthrough_WebCamTexture)**<br>![stars](https://img.shields.io/github/stars/HyunsooleePG/GalaxyXR_Passthrough_WebCamTexture?style=flat-square) | Unity sample: access the passthrough camera texture on Galaxy XR. |
+| **[BlueScorpioVR/ScreenStreamerXR](https://github.com/BlueScorpioVR/ScreenStreamerXR)**<br>![stars](https://img.shields.io/github/stars/BlueScorpioVR/ScreenStreamerXR?style=flat-square) ![release](https://img.shields.io/github/v/release/BlueScorpioVR/ScreenStreamerXR?include_prereleases&style=flat-square&label=release) | Android XR screen-streaming app for Twitch, YouTube, custom RTMP and OmniStream, with chat, alerts and recording. |
 
 <a id="foundations"></a>
 
@@ -158,11 +159,19 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 
 ## Add your repo
 
-1. Add an entry to [`catalog.json`](catalog.json) — the single source of truth — in the right group.
-2. Regenerate the index: `python tools/build.py` (rewrites this README and the [docs site](docs/)).
-3. Verify `python tools/check-links.py` passes, then open a PR.
+**Fastest:** use the **Add repo** button on the [site](https://angeldark92.github.io/GalaxyXR-Forge/#add-repo) — paste the link, pick a group. CI adds the card, regenerates the README and site, and opens a pull request for review.
 
-Keep descriptions to one factual line. See [`.agents/skills/`](.agents/skills/) for the full procedure.
+Or run it locally, one command:
+
+```sh
+python tools/add-repo.py https://github.com/owner/name --group apps-samples
+```
+
+The tool refuses private or already-listed repos, reads the license and latest release, writes the entry with today's `added` date, appends a changelog entry, regenerates every generated file and runs both link checks. `--dry-run` prints the entry without writing anything.
+
+Manual edits still work: change `catalog.json` + `changelog.json`, run `python tools/build.py`, then `python tools/check-links.py` and `python tools/check-repos.py`.
+
+CI gates every pull request on all four checks, so a PR with stale or hand-edited generated files cannot merge. See [`.agents/skills/`](.agents/skills/) for the full procedure.
 
 ## For agents
 
@@ -170,12 +179,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-19` — One-command add and a zero-backend contribution path
+- `2026-10-19` — ScreenStreamerXR added
 - `2026-10-17` — AstroQuest back in the catalog
 - `2026-10-17` — Filter figures now count what each filter would show
 - `2026-10-17` — AstroQuest removed; badge errors no longer print
 - `2026-10-17` — Filters menu opens as a glass dropdown
-- `2026-10-17` — Filters rail moves out to the left on wide screens
-- `2026-10-17` — Orange cursor glow
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -185,4 +194,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-16 · 55 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-19 · 56 repos</sub></div>

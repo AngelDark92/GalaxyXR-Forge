@@ -15,7 +15,9 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 5. Do not rename group `id` values — README anchors, site filters and chips depend on them.
 6. Commit and push only when the user asked. Editing files and running `build.py` / `check-links.py` / `check-repos.py` are always fine; pushing to GitHub or changing Pages settings requires explicit authorization.
 7. Links only: never copy code, binaries or proprietary blobs from catalogued repos into this one.
-8. Keep `tools/build.py`, `tools/check-links.py` and `tools/check-repos.py` dependency-free (Python 3.10+, stdlib only) so any host can run them.
+8. Keep every tool in `tools/` dependency-free (Python 3.10+, stdlib only) so any host can run them.
+9. Add repos with `python tools/add-repo.py <url> --group <id>` — it validates visibility, writes the entry and changelog, rebuilds every generated file and runs both checks. Do not hand-write entries when the tool can do it.
+10. CI is the gate: `validate.yml` re-runs the build, fails any PR whose generated files differ (stale or hand-edited), and runs the link and repo-state checks. A red PR is not reviewable.
 
 ## Layout
 
@@ -26,7 +28,11 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | `tools/build.py` | Regenerates `README.md`, `CHANGELOG.md` and `docs/index.html` from the two JSON inputs |
 | `CHANGELOG.md` | Generated changelog (the GitHub view of `changelog.json`) |
 | `tools/check-links.py` | Checks that every catalog URL answers |
-| `tools/check-repos.py` | Checks each catalogued repo against GitHub: renamed, transferred, archived or gone |
+| `tools/check-repos.py` | Reads each repo back: renamed, transferred, archived or gone |
+| `tools/add-repo.py` | One-command contributor tool: validate, entry + changelog, rebuild, checks |
+| `tools/issue-payload.py` | Turns an `add-repo` issue body into the JSON payload the tool reads |
+| `.github/workflows/validate.yml` | PR gate: catalog check, generated files fresh, links, repo state |
+| `.github/workflows/add-repo.yml` | Issue labelled `add-repo` → branch + PR through `add-repo.py` |
 | `README.md` | Generated GitHub landing page |
 | `docs/` | Generated GitHub Pages site (Pages: branch `main`, folder `/docs`) |
 | `docs/.nojekyll` | Disables Jekyll on Pages; keep it |
@@ -55,6 +61,7 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 | Task | Do this |
 | --- | --- |
 | Add / update / remove a catalog entry (plus its changelog entry) | Follow `.agents/skills/galaxyxr-forge-catalog/SKILL.md` |
+| A visitor proposed a repo (issue labelled `add-repo`) | `add-repo.yml` already ran `tools/add-repo.py` and opened a PR; review and merge it |
 | Find where a repo or project lives; which repo to touch | `.agents/skills/galaxyxr-forge-map/SKILL.md` |
 | Adjust README or site layout | Edit the templates inside `tools/build.py`, rerun it |
 | Confirm catalogued repos still exist and are not renamed, transferred or archived | `python tools/check-repos.py` |
@@ -76,5 +83,6 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 - The NEW badge is browser-side logic over `data-added`; it expires on its own after 5 days with no rebuild. Do not freeze "new" into the generated README or the site HTML.
 - Star counts and latest releases on the site cards are fetched in the visitor's browser (shields.io JSON + `localStorage` cache; the badge image is the no-JS/failure fallback). Live values are never baked into the README, the site HTML or the changelog.
 - `python tools/check-links.py` reports no failures.
+- `validate.yml` is green on the PR: catalog check, stale-generated check, links, repo state.
 - `python tools/check-repos.py` reports no renames, transfers, archived or missing repos. A renamed repo still answers, so link checks alone will not catch it.
 - Never claim the Pages site updated without fetching the live URL.

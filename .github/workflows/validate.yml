@@ -1,0 +1,43 @@
+name: validate
+
+# Every pull request must land compliant: the catalog and changelog validate,
+# the generated files match their sources, every URL answers, and no repo has
+# been renamed, transferred or archived.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate catalog.json and changelog.json
+        run: python tools/build.py --check
+
+      - name: Generated files match their sources
+        run: |
+          python tools/build.py
+          if ! git diff --exit-code -- README.md CHANGELOG.md docs/index.html; then
+            echo "::error::Generated files are stale or hand-edited. Run 'python tools/build.py' and commit the result (see AGENTS.md)."
+            exit 1
+          fi
+
+      - name: Every catalog URL answers
+        run: python tools/check-links.py
+
+      - name: No renamed, transferred, archived or missing repos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python tools/check-repos.py

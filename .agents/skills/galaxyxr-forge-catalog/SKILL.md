@@ -16,6 +16,17 @@ metadata:
 
 ## Procedure
 
+**Prefer the tool.** For an addition it does everything below in one command:
+
+```sh
+python tools/add-repo.py https://github.com/owner/name --group apps-samples
+# optional: --about "…" --tags a,b --issue 12 --dry-run
+```
+
+It refuses private, archived or already-listed repos, reads license/release/topics, writes the entry with today's `added` date, appends the changelog entry, rebuilds all generated files and runs `check-links.py` + `check-repos.py`. The manual steps stay for moves, removals and overrides.
+
+### Manual steps
+
 1. Open `catalog.json` and pick the target group by `groups[].id` (`root-kernel`, `kernelsu-modules`, `face-eye`, `pcvr-drivers`, `app-patches`, `games`, `tools`, `apps-samples`, `foundations`).
 2. Add or edit one entry per repo:
 

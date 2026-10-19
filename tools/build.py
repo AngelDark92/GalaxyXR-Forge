@@ -192,11 +192,32 @@ def render_readme(cat, changelog):
     A("")
     A("## Add your repo")
     A("")
-    A("1. Add an entry to [`catalog.json`](catalog.json) — the single source of truth — in the right group.")
-    A("2. Regenerate the index: `python tools/build.py` (rewrites this README and the [docs site](docs/)).")
-    A("3. Verify `python tools/check-links.py` passes, then open a PR.")
+    A(
+        f"**Fastest:** use the **Add repo** button on the [site]({SITE_URL}/#add-repo) — paste the link, pick a group. "
+        "CI adds the card, regenerates the README and site, and opens a pull request for review."
+    )
     A("")
-    A("Keep descriptions to one factual line. See [`.agents/skills/`](.agents/skills/) for the full procedure.")
+    A("Or run it locally, one command:")
+    A("")
+    A("```sh")
+    A("python tools/add-repo.py https://github.com/owner/name --group apps-samples")
+    A("```")
+    A("")
+    A(
+        "The tool refuses private or already-listed repos, reads the license and latest release, writes the entry "
+        "with today's `added` date, appends a changelog entry, regenerates every generated file and runs both link "
+        "checks. `--dry-run` prints the entry without writing anything."
+    )
+    A("")
+    A(
+        "Manual edits still work: change `catalog.json` + `changelog.json`, run `python tools/build.py`, then "
+        "`python tools/check-links.py` and `python tools/check-repos.py`."
+    )
+    A("")
+    A(
+        "CI gates every pull request on all four checks, so a PR with stale or hand-edited generated files cannot merge. "
+        "See [`.agents/skills/`](.agents/skills/) for the full procedure."
+    )
     A("")
     A("## For agents")
     A("")
@@ -558,6 +579,25 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-betw
 footer a{color:var(--muted)}
 footer a:hover{color:var(--accent)}
 code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.9em}
+.add-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(249,115,22,.45);background:rgba(249,115,22,.12);color:var(--ink);border-radius:999px;padding:8px 16px;font:600 13px var(--font-mono);cursor:pointer;min-height:36px;text-decoration:none}
+.add-btn:hover{background:rgba(249,115,22,.2);border-color:var(--accent)}
+.add-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.add-dialog{border:1px solid var(--line-2);border-radius:16px;background:var(--card);color:var(--ink);padding:0;width:min(540px,calc(100vw - 28px));box-shadow:0 30px 80px -30px #000}
+.add-dialog::backdrop{background:rgba(4,7,11,.72)}
+.add-form{display:flex;flex-direction:column;gap:9px;padding:22px 22px 18px}
+.add-form h2{font:600 1.25rem var(--font-disp);margin:0}
+.add-form .dlg-lede{margin:0 0 4px;color:var(--muted);font-size:13.5px}
+.add-form label{font:500 11.5px var(--font-mono);color:var(--dim);text-transform:uppercase;letter-spacing:.09em;margin-top:7px}
+.add-form label .opt{text-transform:none;letter-spacing:0;color:var(--dim)}
+.add-form input,.add-form select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--ink);border-radius:10px;padding:10px 12px;font:14px var(--font-sans);outline:none;width:100%}
+.add-form input:focus,.add-form select:focus{border-color:var(--accent)}
+.dlg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.dlg-close{border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:8px;width:30px;height:30px;cursor:pointer;font:13px/1 var(--font-mono)}
+.dlg-close:hover{color:var(--ink);border-color:var(--muted)}
+.dlg-actions{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.add-submit{display:inline-flex;align-items:center;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#180b02;font:600 13px var(--font-mono);padding:10px 16px;border-radius:10px;text-decoration:none}
+.add-submit.is-disabled{opacity:.45;pointer-events:none}
+.dlg-alt{color:var(--dim);font-size:12px}
 @media (max-width:640px){
   .hero .wrap{padding-top:44px;padding-bottom:30px}
   .stat{padding:0 14px}
@@ -601,6 +641,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       <button type="button" class="tab is-active" data-view="catalog" role="tab" aria-selected="true">Catalog <b>__TOTAL__</b></button>
       <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>__CHANGELOG_COUNT__</b></button>
     </div>
+    <a class="add-btn" id="add-repo-btn" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" aria-haspopup="dialog" aria-controls="add-repo-dialog">＋ Add repo</a>
   </div>
 </nav>
 <div class="shell" id="shell">
@@ -640,10 +681,31 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   </div>
 </div>
 <div class="backdrop" id="backdrop" hidden></div>
+<dialog id="add-repo-dialog" class="add-dialog" aria-labelledby="add-repo-title">
+  <div class="add-form">
+    <div class="dlg-head">
+      <h2 id="add-repo-title">Add a repo</h2>
+      <button type="button" class="dlg-close" id="add-repo-close" aria-label="Close">✕</button>
+    </div>
+    <p class="dlg-lede">Paste the GitHub link and pick a group. This opens a prefilled issue; CI writes the card, regenerates the README and site, and opens a pull request.</p>
+    <label for="add-repo-url">Repository URL</label>
+    <input id="add-repo-url" type="url" inputmode="url" placeholder="https://github.com/owner/name" autocomplete="off" spellcheck="false">
+    <label for="add-repo-group">Group</label>
+    <select id="add-repo-group">
+      __GROUP_OPTIONS__
+    </select>
+    <label for="add-repo-about">Description <span class="opt">(optional)</span></label>
+    <input id="add-repo-about" maxlength="160" placeholder="One short line — defaults to the repo's GitHub description" autocomplete="off">
+    <div class="dlg-actions">
+      <a class="add-submit" id="add-repo-issue" href="#" target="_blank" rel="noopener">Open GitHub issue</a>
+      <span class="dlg-alt">Prefers a terminal? <code>python tools/add-repo.py &lt;url&gt; --group &lt;id&gt;</code></span>
+    </div>
+  </div>
+</dialog>
 <footer>
   <div class="wrap">
     <span>Unofficial community hub — not affiliated with Samsung. Each project keeps its own license.</span>
-    <span>Add a repo: edit <code>catalog.json</code> and <code>changelog.json</code>, run <code>python tools/build.py</code>, open a PR · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
+    <span>Add a repo: <a href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo">file it from the site</a>, or run <code>python tools/add-repo.py</code> · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
   </div>
 </footer>
 <script>
@@ -1112,10 +1174,82 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   document.documentElement.addEventListener('mouseleave', fade);
   window.addEventListener('blur', fade);
 })();
+
+// "Add repo" dialog. Pages is static, so the form cannot post anywhere itself:
+// it builds a prefilled GitHub issue, and the add-repo workflow turns that issue
+// into a branch and a pull request. Without JS the button is a plain link to the
+// issue template.
+(function () {
+  var dlg = document.getElementById('add-repo-dialog');
+  var btn = document.getElementById('add-repo-btn');
+  if (!dlg || !btn) return;
+  var closeBtn = document.getElementById('add-repo-close');
+  var urlInput = document.getElementById('add-repo-url');
+  var groupSel = document.getElementById('add-repo-group');
+  var aboutInput = document.getElementById('add-repo-about');
+  var go = document.getElementById('add-repo-issue');
+  var BASE = '__REPO_URL__';
+
+  function openDlg() {
+    if (typeof dlg.showModal === 'function') { dlg.showModal(); } else { dlg.setAttribute('open', ''); }
+    refresh();
+    window.setTimeout(function () { urlInput.focus(); }, 40);
+  }
+  function closeDlg() {
+    if (typeof dlg.close === 'function') { dlg.close(); } else { dlg.removeAttribute('open'); }
+  }
+
+  function issueHref() {
+    var raw = (urlInput.value || '').trim();
+    if (raw.slice(-4) === '.git') raw = raw.slice(0, -4);
+    while (raw.slice(-1) === '/') raw = raw.slice(0, -1);
+    var parts = raw.split('/');
+    if (parts.length !== 5 || parts[0] !== 'https:' || parts[1] !== '' ||
+        parts[2] !== 'github.com' || !parts[3] || !parts[4]) return null;
+    var m = [raw, parts[3], parts[4]];
+    if (m[1].indexOf('?') !== -1 || m[2].indexOf('?') !== -1) return null;
+    var body = '### Repo URL\\nhttps://github.com/' + m[1] + '/' + m[2] +
+      '\\n\\n### Group\\n' + groupSel.value + '\\n';
+    var about = (aboutInput.value || '').trim();
+    if (about) body += '\\n### About\\n' + about + '\\n';
+    return BASE + '/issues/new?labels=' + encodeURIComponent('add-repo') +
+      '&title=' + encodeURIComponent('Add repo: ' + m[1] + '/' + m[2]) +
+      '&body=' + encodeURIComponent(body);
+  }
+
+  function refresh() {
+    var href = issueHref();
+    go.href = href || '#';
+    go.classList.toggle('is-disabled', !href);
+    go.setAttribute('aria-disabled', href ? 'false' : 'true');
+  }
+
+  btn.addEventListener('click', function (ev) {
+    if (typeof dlg.showModal !== 'function') return; // plain link fallback
+    ev.preventDefault();
+    openDlg();
+  });
+  if (closeBtn) closeBtn.addEventListener('click', closeDlg);
+  dlg.addEventListener('click', function (ev) { if (ev.target === dlg) closeDlg(); });
+  [urlInput, aboutInput].forEach(function (el) { if (el) el.addEventListener('input', refresh); });
+  if (groupSel) groupSel.addEventListener('change', refresh);
+  go.addEventListener('click', function (ev) {
+    if (!issueHref()) { ev.preventDefault(); urlInput.focus(); }
+  });
+  refresh();
+  if (location.hash === '#add-repo') openDlg();
+})();
 </script>
 </body>
 </html>
 """
+
+
+def render_group_options(cat):
+    return "\n      ".join(
+        f'<option value="{g["id"]}">{g["icon"]} {html.escape(g["title"])}</option>'
+        for g in cat["groups"]
+    )
 
 
 def render_changelog_view(changelog):
@@ -1146,6 +1280,7 @@ def render_site(cat, changelog):
     page = page.replace("__STATUS__", render_status_chips(cat))
     page = page.replace("__SECTIONS__", render_sections(cat))
     page = page.replace("__CHANGELOG_COUNT__", str(len(changelog.get("entries", []))))
+    page = page.replace("__GROUP_OPTIONS__", render_group_options(cat))
     page = page.replace("__CHANGELOG__", render_changelog_view(changelog))
     page = page.replace("__REPO_URL__", REPO_URL)
     return page

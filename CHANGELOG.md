@@ -2,6 +2,17 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-19 — One-command add and a zero-backend contribution path
+
+- `tools/add-repo.py` adds a repo in one command: it refuses private, archived or already-listed repos, reads license, latest release and topics, writes the entry with today's date, appends the changelog entry, rebuilds every generated file and runs both link checks.
+- The site now has an **Add repo** button: paste the link, pick a group, and it opens a prefilled GitHub issue. `add-repo.yml` turns that issue into a branch and a pull request through the same tool; it never trusts the issue for anything but the URL and the group.
+- `validate.yml` gates every pull request: catalog and changelog validation, a stale-generated-file diff, `check-links.py` and `check-repos.py`. A PR with hand-edited or stale `README.md`, `CHANGELOG.md` or `docs/index.html` cannot merge.
+- `tools/issue-payload.py` parses the issue body; `.github/ISSUE_TEMPLATE/add-repo.md` is the manual form of the same three fields.
+
+## 2026-10-19 — ScreenStreamerXR added
+
+- Added BlueScorpioVR/ScreenStreamerXR to Apps & Samples (issue #1).
+
 ## 2026-10-17 — AstroQuest back in the catalog
 
 - Restored evertec82/AstroQuest to Games & Emulation. It had answered 404 from three independent checks — the GitHub API, shields.io and a signed-in browser — and was removed; it answers again, so the card is back.

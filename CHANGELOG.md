@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-19 — Star link on the site and in the README
+
+- Added a **Star on GitHub** link to the site header and footer, and a stars badge plus link at the top of the README.
+
 ## 2026-10-19 — ScreenStreamerXR added
 
 - Added BlueScorpioVR/ScreenStreamerXR to Apps & Samples (issue #1).

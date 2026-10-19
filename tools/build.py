@@ -266,10 +266,13 @@ def render_readme(cat, changelog):
     A("")
     A(f"[![community repos](https://img.shields.io/badge/community_repos-{total}-orange?style=flat-square)](#catalog)")
     A("[![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)")
+    A(f"[![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)]({REPO_URL})")
     A(f"[![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)]({REPO_URL}/commits/main)")
     A("")
     nav = " · ".join(f'[{g["icon"]} {g["title"]}](#{g["id"]})' for g in groups)
     A(f"<sub>{nav}</sub>")
+    A("")
+    A(f"⭐ **[Star this repo]({REPO_URL})** — it helps other Galaxy XR owners find the index.")
     A("")
     A("</div>")
     A("")
@@ -697,6 +700,9 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 .add-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(249,115,22,.45);background:rgba(249,115,22,.12);color:var(--ink);border-radius:999px;padding:8px 16px;font:600 13px var(--font-mono);cursor:pointer;min-height:36px;text-decoration:none}
 .add-btn:hover{background:rgba(249,115,22,.2);border-color:var(--accent)}
 .add-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.star-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:8px 14px;font:600 12.5px var(--font-mono);text-decoration:none;min-height:36px}
+.star-btn:hover{color:var(--ink);border-color:var(--muted)}
+.star-btn .s{color:var(--accent-2)}
 .add-dialog{border:1px solid var(--line-2);border-radius:16px;background:var(--card);color:var(--ink);padding:0;width:min(540px,calc(100vw - 28px));max-height:min(88vh,720px);overflow:auto;box-shadow:0 30px 80px -30px #000}
 .add-dialog::backdrop{background:rgba(4,7,11,.72)}
 .add-form{display:flex;flex-direction:column;gap:9px;padding:22px 22px 18px}
@@ -760,6 +766,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       <button type="button" class="tab is-active" data-view="catalog" role="tab" aria-selected="true">Catalog <b>__TOTAL__</b></button>
       <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>__CHANGELOG_COUNT__</b></button>
     </div>
+    <a class="star-btn" href="__REPO_URL__" target="_blank" rel="noopener" title="Star GalaxyXR-Forge on GitHub"><span class="s" aria-hidden="true">★</span> Star on GitHub</a>
     <a class="add-btn" id="add-repo-btn" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" aria-haspopup="dialog" aria-controls="add-repo-dialog">＋ Add repo</a>
   </div>
 </nav>
@@ -826,7 +833,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 <footer>
   <div class="wrap">
     <span>Unofficial community hub — not affiliated with Samsung. Each project keeps its own license.</span>
-    <span>Add a repo: <a href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo">file it from the site</a>, or run <code>python tools/add-repo.py</code> · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
+    <span>Add a repo: <a href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo">file it from the site</a>, or run <code>python tools/add-repo.py</code> · <a href="__REPO_URL__" target="_blank" rel="noopener">★ Star on GitHub</a> · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
   </div>
 </footer>
 <script>

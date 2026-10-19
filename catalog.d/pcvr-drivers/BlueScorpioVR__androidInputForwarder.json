@@ -1,0 +1,9 @@
+{
+  "repo": "BlueScorpioVR/androidInputForwarder",
+  "url": "https://github.com/BlueScorpioVR/androidInputForwarder",
+  "about": "Root-only app forwarding a Bluetooth controller, keyboard and mouse to an Apollo PC.",
+  "license": "GPL-3.0",
+  "release": "v0.1.0-alpha",
+  "added": "2026-10-16",
+  "tags": ["input", "apollo", "moonlight", "root", "controller"]
+}

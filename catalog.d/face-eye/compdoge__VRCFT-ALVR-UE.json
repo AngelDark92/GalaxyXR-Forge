@@ -1,0 +1,9 @@
+{
+  "repo": "compdoge/VRCFT-ALVR-UE",
+  "url": "https://github.com/compdoge/VRCFT-ALVR-UE",
+  "about": "VRCFaceTracking module that receives ALVR eye and face tracking on the PC.",
+  "license": "Apache-2.0",
+  "release": "v1.4.0",
+  "added": "2026-10-16",
+  "tags": ["face tracking", "eye tracking", "vrcft", "alvr"]
+}

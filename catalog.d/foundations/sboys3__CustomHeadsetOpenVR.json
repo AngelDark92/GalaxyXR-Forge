@@ -1,0 +1,9 @@
+{
+  "repo": "sboys3/CustomHeadsetOpenVR",
+  "url": "https://github.com/sboys3/CustomHeadsetOpenVR",
+  "about": "Base custom-headset SteamVR driver framework; both Galaxy XR drivers fork from it.",
+  "license": "GPL-2.0",
+  "release": "1.3.0",
+  "added": "2026-10-13",
+  "tags": ["steamvr", "framework", "driver"]
+}

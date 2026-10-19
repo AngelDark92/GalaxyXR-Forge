@@ -1,0 +1,9 @@
+{
+  "repo": "stearnsbq/QuestLHSync",
+  "url": "https://github.com/stearnsbq/QuestLHSync",
+  "about": "Base project for aligning Lighthouse devices to a headset's own camera tracking.",
+  "license": "MIT",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["lighthouse", "tracking", "base project"]
+}

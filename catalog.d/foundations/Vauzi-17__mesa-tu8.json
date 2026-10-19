@@ -1,0 +1,9 @@
+{
+  "repo": "Vauzi-17/mesa-tu8",
+  "url": "https://github.com/Vauzi-17/mesa-tu8",
+  "about": "Turnip (Mesa) Vulkan driver build used by the headset emulation stack.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["mesa", "turnip", "vulkan", "driver"]
+}

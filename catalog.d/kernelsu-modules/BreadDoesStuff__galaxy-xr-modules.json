@@ -1,0 +1,9 @@
+{
+  "repo": "BreadDoesStuff/galaxy-xr-modules",
+  "url": "https://github.com/BreadDoesStuff/galaxy-xr-modules",
+  "about": "Fan control, passthrough anywhere, camera debug stream and mic gain modules.",
+  "license": "MIT",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["modules", "fan", "passthrough", "camera", "mic"]
+}

@@ -1,0 +1,9 @@
+{
+  "repo": "MorpheApp/morphe-patches",
+  "url": "https://github.com/MorpheApp/morphe-patches",
+  "about": "Morphe's base patch library; the groundwork for Galaxy XR patch bundles.",
+  "license": "GPL-3.0",
+  "release": "v1.47.0",
+  "added": "2026-10-13",
+  "tags": ["morphe", "patches", "library"]
+}

@@ -1,0 +1,9 @@
+{
+  "repo": "shinyflvre/OpenVR-SpaceSync",
+  "url": "https://github.com/shinyflvre/OpenVR-SpaceSync",
+  "about": "Syncs Lighthouse devices to an SLAM headset's pose in SteamVR (Follow SLAM HMD mode).",
+  "license": "AGPL-3.0",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["lighthouse", "steamvr", "tracking", "slam"]
+}

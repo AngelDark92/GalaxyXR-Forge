@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-17",
+  "title": "Orange cursor glow",
+  "items": [
+    "The site now carries a soft orange glow that eases toward the pointer: one fixed radial-gradient layer moved with a composited transform in a single requestAnimationFrame loop.",
+    "The glow is skipped on touch devices and for reduced-motion visitors, and its loop stops when the pointer settles or the tab is hidden."
+  ]
+}

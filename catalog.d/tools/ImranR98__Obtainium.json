@@ -1,0 +1,9 @@
+{
+  "repo": "ImranR98/Obtainium",
+  "url": "https://github.com/ImranR98/Obtainium",
+  "about": "Android app updater that installs and tracks APKs straight from their sources.",
+  "license": "GPL-3.0",
+  "release": "v1.6.17",
+  "added": "2026-10-14",
+  "tags": ["apk", "updater", "obtainium", "utility"]
+}

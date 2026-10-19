@@ -1,0 +1,9 @@
+{
+  "repo": "HyunsooleePG/GalaxyXR_Passthrough_WebCamTexture",
+  "url": "https://github.com/HyunsooleePG/GalaxyXR_Passthrough_WebCamTexture",
+  "about": "Unity sample: access the passthrough camera texture on Galaxy XR.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["unity", "passthrough", "sample"]
+}

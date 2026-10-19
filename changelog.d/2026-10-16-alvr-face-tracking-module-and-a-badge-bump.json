@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-16",
+  "title": "ALVR face-tracking module, and a badge bump",
+  "items": [
+    "Added compdoge/VRCFT-ALVR-UE to Face & Eye Tracking: the PC-side VRCFaceTracking receiver that pairs with gxr-root-ft.",
+    "compdoge/gxr-root-ft release badge brought up to v1.3.8."
+  ]
+}

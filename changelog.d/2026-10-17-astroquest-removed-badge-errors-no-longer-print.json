@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-17",
+  "title": "AstroQuest removed; badge errors no longer print",
+  "items": [
+    "Removed evertec82/AstroQuest from Games & Emulation: the repository is gone now (GitHub answers 404), so its card linked nowhere.",
+    "Site cards no longer print an error word as a figure: when shields.io answers \"invalid\" or another error string, that badge is hidden rather than showing the word, the string is never cached, and the value is retried once the cache expires.",
+    "A release pill now only appears for repositories the catalog gives a single release stream, so the live lookup can no longer add one to a card built without a release badge."
+  ]
+}

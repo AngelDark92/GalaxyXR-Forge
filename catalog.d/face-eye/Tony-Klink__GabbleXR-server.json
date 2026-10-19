@@ -1,0 +1,9 @@
+{
+  "repo": "Tony-Klink/GabbleXR-server",
+  "url": "https://github.com/Tony-Klink/GabbleXR-server",
+  "about": "Bridges Galaxy XR face and eye tracking into Resonite via OSC.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["face tracking", "eye tracking", "resonite", "osc"]
+}

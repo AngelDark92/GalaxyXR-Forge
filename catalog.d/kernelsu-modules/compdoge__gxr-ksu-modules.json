@@ -1,0 +1,9 @@
+{
+  "repo": "compdoge/gxr-ksu-modules",
+  "url": "https://github.com/compdoge/gxr-ksu-modules",
+  "about": "KernelSU module source for the Galaxy XR: add it in the manager's Sources screen.",
+  "license": "MIT",
+  "release": null,
+  "added": "2026-10-14",
+  "tags": ["modules", "kernelsu", "source", "catalogue"]
+}

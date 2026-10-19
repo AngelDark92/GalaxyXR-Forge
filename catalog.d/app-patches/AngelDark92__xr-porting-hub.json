@@ -1,0 +1,9 @@
+{
+  "repo": "AngelDark92/xr-porting-hub",
+  "url": "https://github.com/AngelDark92/xr-porting-hub",
+  "about": "Morphe patches for Steam Link VR on Galaxy XR: resolution, colour, mic, tracking, face bridge.",
+  "license": "GPL-3.0",
+  "release": "v1.27.0",
+  "added": "2026-10-13",
+  "tags": ["morphe", "steam link", "patches", "android xr"]
+}

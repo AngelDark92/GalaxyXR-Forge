@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-13",
+  "title": "ALVR USB badge and pyrowave note",
+  "items": [
+    "Terminal-ennui/Galaxy_XR_ALVR_USB gained its v0.2.0-beta release badge and a sharper line.",
+    "Terminal-ennui/pyrowave is now marked as the codec fork behind the ALVR 4:4:4 builds."
+  ]
+}

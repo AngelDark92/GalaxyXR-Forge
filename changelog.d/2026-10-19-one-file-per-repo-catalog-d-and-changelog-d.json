@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-19",
+  "title": "One file per repo: catalog.d and changelog.d",
+  "items": [
+    "Catalog entries now live one file each (`catalog.d/<group>/<owner>__<name>.json`) and changelog entries one file each (`changelog.d/`). Two pending additions touch different files, so they cannot conflict — fork PRs included. `changelog.json` is gone.",
+    "`build.py` merges both directories, checks that each file name matches its entry, and derives the newest date. `add-repo.py`, `check-links.py`, `check-repos.py` and `repair-add-pr.py` all read through it.",
+    "Card and changelog order are deterministic: entries by file name within a group, changelog newest date first."
+  ]
+}

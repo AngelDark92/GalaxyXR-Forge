@@ -1,0 +1,9 @@
+{
+  "repo": "compdoge/gxr-root-ft",
+  "url": "https://github.com/compdoge/gxr-root-ft",
+  "about": "Headset-side face and eye relay plus a KernelSU module for PC VR face tracking.",
+  "license": "MIT",
+  "release": "v1.3.8",
+  "added": "2026-10-13",
+  "tags": ["face tracking", "eye tracking", "modules", "vrchat"]
+}

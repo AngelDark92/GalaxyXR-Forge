@@ -1,0 +1,7 @@
+{
+  "date": "2026-10-13",
+  "title": "diabl0w/KernelSU moved to Foundations",
+  "items": [
+    "Moved diabl0w/KernelSU out of Root & Kernel: it is the source base both root stacks build on, not an XR deliverable."
+  ]
+}

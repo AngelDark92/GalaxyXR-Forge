@@ -1,0 +1,9 @@
+{
+  "repo": "4uva4ek/KernelSU-GXR",
+  "url": "https://github.com/4uva4ek/KernelSU-GXR",
+  "about": "KernelSU manager and daemon built for the Galaxy XR: module installer and signed self-update.",
+  "license": "GPL-3.0",
+  "release": "gxr-v1.0.9",
+  "added": "2026-10-13",
+  "tags": ["root", "kernelsu", "manager", "daemon"]
+}

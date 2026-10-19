@@ -1,0 +1,9 @@
+{
+  "repo": "Terminal-ennui/pyrowave",
+  "url": "https://github.com/Terminal-ennui/pyrowave",
+  "about": "PyroWave wavelet codec fork used by the headset's ALVR 4:4:4 streaming builds.",
+  "license": "MIT",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["codec", "vulkan", "streaming"]
+}

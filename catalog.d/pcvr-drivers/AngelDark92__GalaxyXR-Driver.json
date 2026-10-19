@@ -1,0 +1,9 @@
+{
+  "repo": "AngelDark92/GalaxyXR-Driver",
+  "url": "https://github.com/AngelDark92/GalaxyXR-Driver",
+  "about": "SteamVR driver: native headset identity, controller and throw fixes, image processing; Companion GUI.",
+  "license": "GPL-3.0",
+  "release": "v1.8.0",
+  "added": "2026-10-13",
+  "tags": ["steamvr", "driver", "steam link", "colour", "distortion"]
+}

@@ -1,0 +1,7 @@
+{
+  "date": "2026-10-16",
+  "title": "Input Forwarder for Apollo streaming",
+  "items": [
+    "Added BlueScorpioVR/androidInputForwarder to PC VR & Streaming: a root-only app that forwards a Bluetooth controller, keyboard and mouse to an Apollo PC while another app owns the screen."
+  ]
+}

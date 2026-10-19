@@ -1,0 +1,9 @@
+{
+  "repo": "mbucchia/PimaxMagic4All",
+  "url": "https://github.com/mbucchia/PimaxMagic4All",
+  "about": "Brings Pimax dynamic foveated rendering to non-Pimax headsets in SteamVR apps.",
+  "license": "MIT",
+  "release": "1.0",
+  "added": "2026-10-13",
+  "tags": ["foveated rendering", "eye tracking", "steamvr", "performance"]
+}

@@ -1,0 +1,9 @@
+{
+  "repo": "4uva4ek/overport-galaxyxr",
+  "url": "https://github.com/4uva4ek/overport-galaxyxr",
+  "about": "APK converter with a Galaxy XR preset: 3552x3840 per eye, BOOST, 90 Hz, Unity EGL fix.",
+  "license": "GPL-3.0",
+  "release": "galaxyxr-v0.1.1",
+  "added": "2026-10-13",
+  "tags": ["overport", "apk", "converter", "graphics"]
+}

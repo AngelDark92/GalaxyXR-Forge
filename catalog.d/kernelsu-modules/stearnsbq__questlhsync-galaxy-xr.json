@@ -1,0 +1,9 @@
+{
+  "repo": "stearnsbq/questlhsync-galaxy-xr",
+  "url": "https://github.com/stearnsbq/questlhsync-galaxy-xr",
+  "about": "KernelSU module aligning Lighthouse trackers with the XR's camera tracking (QuestLHSync PC side required).",
+  "license": "MIT",
+  "release": "v0.4.1",
+  "added": "2026-10-13",
+  "tags": ["modules", "lighthouse", "tracking", "steamvr"]
+}

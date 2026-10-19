@@ -1,0 +1,9 @@
+{
+  "repo": "BlueScorpioVR/galaxyxr-modules",
+  "url": "https://github.com/BlueScorpioVR/galaxyxr-modules",
+  "about": "Experimental personal KernelSU modules for the Galaxy XR.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["modules", "experimental"]
+}

@@ -1,0 +1,9 @@
+{
+  "repo": "timkhronos/CustomHeadsetOpenVrGxR",
+  "url": "https://github.com/timkhronos/CustomHeadsetOpenVrGxR",
+  "about": "Original Galaxy XR SteamVR driver fork: pose fixes, colour pipeline, distortion tuner.",
+  "license": "GPL-2.0",
+  "release": "1.1.5",
+  "added": "2026-10-13",
+  "tags": ["steamvr", "driver", "distortion"]
+}

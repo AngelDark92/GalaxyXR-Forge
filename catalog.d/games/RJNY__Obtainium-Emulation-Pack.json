@@ -1,0 +1,9 @@
+{
+  "repo": "RJNY/Obtainium-Emulation-Pack",
+  "url": "https://github.com/RJNY/Obtainium-Emulation-Pack",
+  "about": "Obtainium import list bundling Android emulator apps for one-shot install.",
+  "license": "Unlicense",
+  "release": "v7.19.0",
+  "added": "2026-10-14",
+  "tags": ["emulation", "obtainium", "android", "pack"]
+}

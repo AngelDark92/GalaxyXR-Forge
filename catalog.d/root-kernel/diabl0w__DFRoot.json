@@ -1,0 +1,9 @@
+{
+  "repo": "diabl0w/DFRoot",
+  "url": "https://github.com/diabl0w/DFRoot",
+  "about": "Kernel-module loader that loads KernelSU-GXR without flashing a boot image.",
+  "license": null,
+  "release": "v4.1",
+  "added": "2026-10-13",
+  "tags": ["root", "loader", "module"]
+}

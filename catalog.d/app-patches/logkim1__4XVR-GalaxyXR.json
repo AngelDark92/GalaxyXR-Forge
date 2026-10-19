@@ -1,0 +1,9 @@
+{
+  "repo": "logkim1/4XVR-GalaxyXR",
+  "url": "https://github.com/logkim1/4XVR-GalaxyXR",
+  "about": "4XVR video player patched for GXR: HDR tone mapping, memory fix, subtitle controls.",
+  "license": null,
+  "release": "v1.0",
+  "added": "2026-10-13",
+  "tags": ["4xvr", "video", "hdr", "patch"]
+}

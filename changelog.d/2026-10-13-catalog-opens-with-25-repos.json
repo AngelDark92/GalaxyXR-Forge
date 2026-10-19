@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-13",
+  "title": "Catalog opens with 25 repos",
+  "items": [
+    "Added the first 25 repos across 8 groups: root and kernel tooling, KernelSU modules, PC VR drivers, app patches, emulation and diagnostics.",
+    "README, Pages site and agent docs published, all generated from catalog.json."
+  ]
+}

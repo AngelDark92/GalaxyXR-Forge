@@ -1,0 +1,9 @@
+{
+  "repo": "AngelDark92/SteamVRColourLab",
+  "url": "https://github.com/AngelDark92/SteamVRColourLab",
+  "about": "In-headset colour test suite: gradients, dark scenes, 8-bit vs 10-bit comparison.",
+  "license": "MIT",
+  "release": "v0.4.0",
+  "added": "2026-10-13",
+  "tags": ["colour", "10-bit", "banding", "test"]
+}

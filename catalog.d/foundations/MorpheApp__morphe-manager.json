@@ -1,0 +1,9 @@
+{
+  "repo": "MorpheApp/morphe-manager",
+  "url": "https://github.com/MorpheApp/morphe-manager",
+  "about": "The on-device Morphe patcher that applies .mpp patch bundles.",
+  "license": "GPL-3.0",
+  "release": "v1.35.0",
+  "added": "2026-10-13",
+  "tags": ["morphe", "patcher", "apk"]
+}

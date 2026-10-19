@@ -1,0 +1,9 @@
+{
+  "repo": "Gilleece/moonlight-android-xr",
+  "url": "https://github.com/Gilleece/moonlight-android-xr",
+  "about": "Moonlight fork: native OpenXR client with on-headset 2D-to-3D conversion.",
+  "license": "GPL-3.0",
+  "release": "v0.4",
+  "added": "2026-10-13",
+  "tags": ["moonlight", "streaming", "openxr", "3d"]
+}

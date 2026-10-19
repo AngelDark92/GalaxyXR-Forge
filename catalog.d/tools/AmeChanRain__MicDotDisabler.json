@@ -1,0 +1,9 @@
+{
+  "repo": "AmeChanRain/MicDotDisabler",
+  "url": "https://github.com/AmeChanRain/MicDotDisabler",
+  "about": "Hides the Android privacy indicator dot, built for Android XR devices.",
+  "license": "GPL-2.0",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["privacy dot", "android xr", "utility"]
+}

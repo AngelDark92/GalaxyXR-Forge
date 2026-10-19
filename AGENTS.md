@@ -8,17 +8,17 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 
 ## Golden rules
 
-1. `catalog.json` and `changelog.json` are the single sources of truth. Never hand-edit `README.md`, `CHANGELOG.md` or `docs/index.html` — they are generated.
+1. `catalog.json` (group metadata), `catalog.d/` (one file per repo) and `changelog.d/` (one file per change) are the single sources of truth. Never hand-edit `README.md`, `CHANGELOG.md`, `docs/index.html` or `docs/catalog-index.json` — they are generated.
 2. After every catalog change run `python tools/build.py` (regenerates README, changelog and site) and review the git diff before committing.
 3. Keep descriptions to one factual line (build enforces ≤160 chars; target ~14 words). No marketing.
-4. Every catalog change needs an entry in `changelog.json` (date, title, one item per repo added, moved or removed). `build.py` renders `CHANGELOG.md` and the site's Changelog tab from it — a catalog edit without a changelog entry is an incomplete change. Set `"added": "YYYY-MM-DD"` on every new entry: the site's NEW badge and New filter derive from it, computed client-side because Pages is static: one rule for both the badge and the New filter — an entry is NEW while its `added` date is inside the 5-day window.
+4. Every catalog change needs an entry in `changelog.d/` (date, title, one item per repo added, moved or removed). `build.py` renders `CHANGELOG.md` and the site's Changelog tab from it — a catalog edit without a changelog entry is an incomplete change. Set `"added": "YYYY-MM-DD"` on every new entry: the site's NEW badge and New filter derive from it, computed client-side because Pages is static: one rule for both the badge and the New filter — an entry is NEW while its `added` date is inside the 5-day window.
 5. Do not rename group `id` values — README anchors, site filters and chips depend on them.
 6. Commit and push only when the user asked. Editing files and running `build.py` / `check-links.py` / `check-repos.py` are always fine; pushing to GitHub or changing Pages settings requires explicit authorization.
 7. Links only: never copy code, binaries or proprietary blobs from catalogued repos into this one.
 8. Keep every tool in `tools/` dependency-free (Python 3.10+, stdlib only) so any host can run them.
 9. Add repos with `python tools/add-repo.py <url> --group <id>` — it validates visibility, writes the entry and changelog, rebuilds every generated file and runs both checks. Do not hand-write entries when the tool can do it.
 10. CI is the gate: `validate.yml` re-runs the build, fails any PR whose generated files differ (stale or hand-edited), and runs the link and repo-state checks. A red PR is not reviewable.
-11. Two add-PRs conflict by construction: both append to a group array, the changelog head and (before) the same `updated` line. Never hand-resolve those files. Run `python tools/repair-add-pr.py --main origin/main` on the branch: it takes main's copies, re-applies this branch's entry with its **original** `added` date, rebuilds and commits. `added` is a fact — a rebase must never re-date an entry.
+11. Entries are one file each, so two pending adds never touch the same file; only generated files can conflict. Never hand-resolve those: run `python tools/repair-add-pr.py --main origin/main` on the branch. It resets onto main, rewrites this branch's entry file with its **original** `added` date, rebuilds and commits. `added` is a fact — a rebase must never re-date an entry.
 12. `catalog.json` has no `updated` field: `build.py` derives it from entry and changelog dates, so one PR cannot overwrite another's stamp.
 13. Open in-repo PRs are rebased automatically when `main` moves (`rebase-open-prs.yml`): clean rebase pushed as-is, conflict rebuilt by `repair-add-pr.py`, then `validate.yml` is dispatched on the branch. Fork PRs are skipped — this workflow cannot push to them.
 14. `main` has branch protection requiring the `catalog` status. `validate.yml` publishes it as a **commit status**, not only a check run: a check run from a dispatched run is not attached to the pull request, so protection would sit at "blocked" forever. Admins are exempt, so direct pushes still work.
@@ -27,10 +27,11 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 
 | Path | Role |
 | --- | --- |
-| `catalog.json` | Source of truth: groups + repo entries; everything else derives from it |
-| `changelog.json` | Source of truth for the change history: one entry per catalog change |
-| `tools/build.py` | Regenerates `README.md`, `CHANGELOG.md` and `docs/index.html` from the two JSON inputs |
-| `CHANGELOG.md` | Generated changelog (the GitHub view of `changelog.json`) |
+| `catalog.json` | Group metadata (id, title, icon, hue, blurb); entries live in `catalog.d/` |
+| `catalog.d/<group>/<owner>__<name>.json` | One repo entry per file — an add touches exactly one file |
+| `changelog.d/<date>-<slug>.json` | One changelog entry per file; `build.py` sorts newest first |
+| `tools/build.py` | Merges `catalog.d/` + `changelog.d/` into `README.md`, `CHANGELOG.md`, `docs/index.html`, `docs/catalog-index.json` |
+| `CHANGELOG.md` | Generated changelog (the GitHub view of `changelog.d/`) |
 | `tools/check-links.py` | Checks that every catalog URL answers |
 | `tools/check-repos.py` | Reads each repo back: renamed, transferred, archived or gone |
 | `tools/add-repo.py` | One-command contributor tool: validate, entry + changelog, rebuild, checks |

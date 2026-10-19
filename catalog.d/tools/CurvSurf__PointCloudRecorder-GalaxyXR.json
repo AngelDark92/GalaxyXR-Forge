@@ -1,0 +1,9 @@
+{
+  "repo": "CurvSurf/PointCloudRecorder-GalaxyXR",
+  "url": "https://github.com/CurvSurf/PointCloudRecorder-GalaxyXR",
+  "about": "Records point clouds from Galaxy XR ARCore depth maps.",
+  "license": "MIT",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["point cloud", "arcore", "depth"]
+}

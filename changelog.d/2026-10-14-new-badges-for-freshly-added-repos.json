@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-14",
+  "title": "NEW badges for freshly added repos",
+  "items": [
+    "Every catalog entry now records the date it was added.",
+    "The site marks entries from the last 5 days with a NEW badge and a New filter, computed in the visitor's browser so they expire on their own."
+  ]
+}

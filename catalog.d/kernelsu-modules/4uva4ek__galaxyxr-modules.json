@@ -1,0 +1,9 @@
+{
+  "repo": "4uva4ek/galaxyxr-modules",
+  "url": "https://github.com/4uva4ek/galaxyxr-modules",
+  "about": "Tracking and haptic fixes: whitening, timestamp precision, OpenXR velocity, OTA control.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["modules", "tracking", "haptics", "ota"]
+}

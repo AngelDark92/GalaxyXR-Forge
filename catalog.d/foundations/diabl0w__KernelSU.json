@@ -1,0 +1,9 @@
+{
+  "repo": "diabl0w/KernelSU",
+  "url": "https://github.com/diabl0w/KernelSU",
+  "about": "KernelSU fork with the samsung-v1.0 branch that KernelSU-GXR builds on.",
+  "license": "GPL-3.0",
+  "release": "samsung-v1.0",
+  "added": "2026-10-13",
+  "tags": ["root", "kernelsu", "source"]
+}

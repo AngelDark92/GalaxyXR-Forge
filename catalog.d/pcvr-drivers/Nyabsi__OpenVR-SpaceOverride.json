@@ -1,0 +1,9 @@
+{
+  "repo": "Nyabsi/OpenVR-SpaceOverride",
+  "url": "https://github.com/Nyabsi/OpenVR-SpaceOverride",
+  "about": "Uses Lighthouse devices on non-Lighthouse headsets like the Galaxy XR.",
+  "license": "AGPL-3.0",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["lighthouse", "steamvr", "controllers"]
+}

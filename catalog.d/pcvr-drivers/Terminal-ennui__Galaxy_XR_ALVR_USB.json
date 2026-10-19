@@ -1,0 +1,9 @@
+{
+  "repo": "Terminal-ennui/Galaxy_XR_ALVR_USB",
+  "url": "https://github.com/Terminal-ennui/Galaxy_XR_ALVR_USB",
+  "about": "Streams SteamVR over USB 3 using stock ALVR 20.14.1 with a patched headset client.",
+  "license": "MIT",
+  "release": "v0.2.0-beta",
+  "added": "2026-10-13",
+  "tags": ["alvr", "usb", "streaming"]
+}

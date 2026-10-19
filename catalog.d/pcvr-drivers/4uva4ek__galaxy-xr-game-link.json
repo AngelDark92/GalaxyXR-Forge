@@ -1,0 +1,9 @@
+{
+  "repo": "4uva4ek/galaxy-xr-game-link",
+  "url": "https://github.com/4uva4ek/galaxy-xr-game-link",
+  "about": "Patched Samsung Game Link (XR Link) PC driver for the Galaxy XR, with crash fixes.",
+  "license": null,
+  "release": "v0.1.0",
+  "added": "2026-10-13",
+  "tags": ["streaming", "game link", "xr link"]
+}

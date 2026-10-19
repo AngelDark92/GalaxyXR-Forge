@@ -1,0 +1,9 @@
+{
+  "repo": "Molier/openxr-dispatcher-open",
+  "url": "https://github.com/Molier/openxr-dispatcher-open",
+  "about": "Open-source drop-in replacement for the closed OpenXR dispatcher in converted Quest apps.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["openxr", "dispatcher", "converted apps"]
+}

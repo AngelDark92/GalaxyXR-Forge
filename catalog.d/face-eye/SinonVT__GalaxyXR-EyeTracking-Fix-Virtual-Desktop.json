@@ -1,0 +1,9 @@
+{
+  "repo": "SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop",
+  "url": "https://github.com/SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop",
+  "about": "Fixes eye-gaze drift on head tilt in Virtual Desktop's VRCFaceTracking module.",
+  "license": "MIT",
+  "release": "v1.0.0",
+  "added": "2026-10-13",
+  "tags": ["eye tracking", "virtual desktop", "fix"]
+}

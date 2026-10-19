@@ -1,0 +1,9 @@
+{
+  "repo": "hyunaseo/OpenAI-for-Galaxy-XR",
+  "url": "https://github.com/hyunaseo/OpenAI-for-Galaxy-XR",
+  "about": "Showcase: passthrough capture with OpenAI multimodal voice queries on Galaxy XR.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["openai", "passthrough", "sample"]
+}

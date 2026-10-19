@@ -1,0 +1,9 @@
+{
+  "repo": "ngocthanhgl/morphe-audit-bot",
+  "url": "https://github.com/ngocthanhgl/morphe-audit-bot",
+  "about": "Diff-only security audit bot for Morphe patch repos.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["morphe", "security", "audit", "bot"]
+}

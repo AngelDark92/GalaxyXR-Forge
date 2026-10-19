@@ -1,0 +1,9 @@
+{
+  "repo": "tw0b33rs/xr-native-sensor-access",
+  "url": "https://github.com/tw0b33rs/xr-native-sensor-access",
+  "about": "Raw low-latency IMU sensor access for Galaxy XR apps (NDK/C++ sample).",
+  "license": "Apache-2.0",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["sensors", "imu", "ndk", "sample"]
+}

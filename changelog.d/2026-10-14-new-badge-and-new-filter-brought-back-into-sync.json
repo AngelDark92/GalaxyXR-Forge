@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-14",
+  "title": "NEW badge and New filter brought back into sync",
+  "items": [
+    "Fixed: the badge's own CSS overrode the hidden attribute, so every card wore NEW while the filter matched only the window set.",
+    "The 5-day window is now the only rule — no baseline — and the badge, the chip count and the New filter share one predicate."
+  ]
+}

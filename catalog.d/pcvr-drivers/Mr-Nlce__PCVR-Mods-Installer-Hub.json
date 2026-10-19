@@ -1,0 +1,9 @@
+{
+  "repo": "Mr-Nlce/PCVR-Mods-Installer-Hub",
+  "url": "https://github.com/Mr-Nlce/PCVR-Mods-Installer-Hub",
+  "about": "Portable installer and launcher for publicly available PC VR game mods.",
+  "license": "MIT",
+  "release": "v0.8.7.9",
+  "added": "2026-10-13",
+  "tags": ["pcvr mods", "installer", "flat2vr", "launcher"]
+}

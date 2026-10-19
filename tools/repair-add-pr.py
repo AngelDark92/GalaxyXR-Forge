@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 """Rebase one pending catalog addition onto current main, without hand-resolving JSON.
 
-Two add-PRs made on the same day conflict on the same lines: the new entry's tail,
-the changelog head, and (before it was derived) the `updated` field. Resolving those
-by hand is where an entry loses its original `added` date. This tool rebuilds the
-branch deterministically:
+Catalog entries live one per file (catalog.d/<group>/<owner>__<name>.json), so a
+rebuild is: take main, write this branch's one file again. The entry keeps its
+original `added` date and its changelog line.
 
-    1. read this branch's entry (repo, group, about, tags, added) from HEAD
-    2. take catalog.json + changelog.json + generated files from main
-    3. append the entry and its changelog line, with the ORIGINAL `added` date
-    4. rebuild README/CHANGELOG/site and commit
+    1. read this branch's entry (repo, group, about, tags, added) from the worktree
+    2. reset the branch onto main
+    3. write the entry file and its changelog file, with the ORIGINAL `added` date
+    4. rebuild README/CHANGELOG/site/index and commit
 
 Usage:
     python tools/repair-add-pr.py                  # the single entry this branch adds
     python tools/repair-add-pr.py --repo o/n       # pick one if the branch adds several
     python tools/repair-add-pr.py --main origin/main --dry-run
+    python tools/repair-add-pr.py --root .
 
 Exit codes: 0 repaired, 1 error, 2 nothing to repair (entry already on main).
 """
@@ -28,16 +28,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
-CATALOG = ROOT / "catalog.json"
-CHANGELOG = ROOT / "changelog.json"
-GENERATED = ["catalog.json", "changelog.json", "README.md", "CHANGELOG.md", "docs/index.html"]
+GENERATED = ["README.md", "CHANGELOG.md", "docs/index.html", "docs/catalog-index.json"]
 
 
-def load_addrepo():
-    """Import tools/add-repo.py (hyphen in the name, so load it by path)."""
-    spec = importlib.util.spec_from_file_location("add_repo", TOOLS / "add-repo.py")
+def load_build():
+    spec = importlib.util.spec_from_file_location("gxr_build", TOOLS / "build.py")
     if spec is None or spec.loader is None:
-        raise SystemExit("error: cannot load tools/add-repo.py")
+        raise SystemExit("error: cannot load tools/build.py from the workspace")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -53,13 +50,46 @@ def git(*args, check=True):
     return res
 
 
-def show_json(ref, path):
-    res = git("show", f"{ref}:{path}")
-    return json.loads(res.stdout)
+def read_entries(root):
+    """{repo_lower: (group_id, entry)} from catalog.d, else the legacy catalog.json."""
+    out = {}
+    folder = root / "catalog.d"
+    if folder.is_dir():
+        for path in sorted(folder.glob("*/*.json")):
+            entry = json.loads(path.read_text(encoding="utf-8"))
+            out[entry["repo"].lower()] = (path.parent.name, entry)
+        return out
+    cat = json.loads((root / "catalog.json").read_text(encoding="utf-8"))
+    for group in cat["groups"]:
+        for entry in group.get("repos", []):
+            out[entry["repo"].lower()] = (group["id"], entry)
+    return out
 
 
-def entries_by_repo(catalog):
-    return {r["repo"].lower(): (g, r) for g in catalog["groups"] for r in g["repos"]}
+def read_changelog_entry(root, full):
+    """The branch's changelog entry for this repo, so hand-edited wording survives."""
+    folder = root / "changelog.d"
+    if folder.is_dir():
+        for path in sorted(folder.glob("*.json")):
+            entry = json.loads(path.read_text(encoding="utf-8"))
+            if full in " ".join(entry.get("items", [])):
+                return entry
+        return None
+    log = json.loads((root / "changelog.json").read_text(encoding="utf-8"))
+    return next((e for e in log["entries"] if full in " ".join(e.get("items", []))), None)
+
+
+def main_entries(ref):
+    """Repos already on <ref>, read through git so the worktree stays untouched."""
+    tree = git("ls-tree", "-r", "--name-only", ref, "--", "catalog.d").stdout.split()
+    if tree:
+        out = {}
+        for name in tree:
+            entry = json.loads(git("show", f"{ref}:{name}").stdout)
+            out[entry["repo"].lower()] = name.split("/")[1]
+        return out
+    cat = json.loads(git("show", f"{ref}:catalog.json").stdout)
+    return {r["repo"].lower(): g["id"] for g in cat["groups"] for r in g.get("repos", [])}
 
 
 def main(argv=None):
@@ -70,12 +100,10 @@ def main(argv=None):
     ap.add_argument("--dry-run", action="store_true", help="print the plan, change nothing")
     args = ap.parse_args(argv)
 
-    global ROOT, TOOLS, CATALOG, CHANGELOG
+    global ROOT, TOOLS
     if args.root:
         ROOT = Path(args.root).resolve()
         TOOLS = ROOT / "tools"
-        CATALOG = ROOT / "catalog.json"
-        CHANGELOG = ROOT / "changelog.json"
 
     if not (ROOT / ".git").exists():
         raise SystemExit("error: run this inside the repository checkout")
@@ -84,17 +112,13 @@ def main(argv=None):
         git("merge", "--abort")
 
     git("fetch", "origin", "main", check=False)
-    addrepo = load_addrepo()
 
-    branch_cat = addrepo.load_json(CATALOG)
-    main_cat = show_json(args.main, "catalog.json")
-    branch_entries = entries_by_repo(branch_cat)
-    main_entries = entries_by_repo(main_cat)
+    branch_entries = read_entries(ROOT)
+    on_main = main_entries(args.main)
+    added = [full for full in branch_entries if full not in on_main]
 
-    added = [full for full in branch_entries if full not in main_entries]
     if args.repo:
-        wanted = args.repo.strip().lower()
-        wanted = wanted.removeprefix("https://github.com/").removesuffix(".git")
+        wanted = args.repo.strip().lower().removeprefix("https://github.com/").removesuffix(".git")
         added = [full for full in added if full == wanted]
         if not added:
             raise SystemExit(f"error: {wanted} is not a new entry on this branch")
@@ -105,57 +129,42 @@ def main(argv=None):
         raise SystemExit("error: this branch adds several entries; pass --repo:\n  " + "\n  ".join(added))
 
     full = added[0]
-    group_branch, entry = branch_entries[full]
-    group_id = group_branch["id"]
-    group_main = next((g for g in main_cat["groups"] if g["id"] == group_id), None)
-    if group_main is None:
-        raise SystemExit(f"error: group {group_id!r} no longer exists on {args.main}")
+    group_id, entry = branch_entries[full]
+    print(f"entry:   {entry['repo']}")
+    print(f"group:   {group_id}")
+    print(f"added:   {entry.get('added')} (kept, not rewritten)")
 
-    # Keep the entry as the branch wrote it — including the day it was first added.
-    preserved = {k: entry[k] for k in ("repo", "url", "about", "license", "release", "added", "tags") if k in entry}
-    print(f"entry:   {full}")
-    print(f"group:   {group_id} ({group_main['title']})")
-    print(f"added:   {preserved.get('added')} (kept, not rewritten)")
-
-    # Changelog line from the branch, so hand-edited wording survives.
-    branch_log = addrepo.load_json(CHANGELOG)
-    old_entry = next((e for e in branch_log["entries"] if full in " ".join(e.get("items", []))), None)
-    item = old_entry["items"][0] if old_entry and old_entry.get("items") else f"Added {full} to {group_main['title']}."
-    day = preserved.get("added") or (old_entry or {}).get("date")
+    old_log = read_changelog_entry(ROOT, full)
+    item = (old_log or {}).get("items", [None])[0] or f"Added {full} to {group_id}."
+    day = entry.get("added") or (old_log or {}).get("date")
     log_entry = {"date": day, "title": f"{full.split('/')[1]} added", "items": [item]}
 
     if args.dry_run:
         print("\nplanned entry:")
-        print(json.dumps(preserved, indent=2, ensure_ascii=False))
+        print(json.dumps(entry, indent=2, ensure_ascii=False))
         print("planned changelog:", json.dumps(log_entry, ensure_ascii=False))
         return 0
 
-    # Rebuild the branch ON main. Rewriting the files on the old base is not enough:
+    # Rebuild the branch ON main. Rewriting files on the old base is not enough:
     # git still sees both sides changing the same hunks, which stays a conflict.
     print(f"rebuilding the branch on {args.main}")
     git("reset", "--hard", args.main)
 
-    catalog = addrepo.load_json(CATALOG)
-    changelog = addrepo.load_json(CHANGELOG)
-    group = next(g for g in catalog["groups"] if g["id"] == group_id)
-    group["repos"].append(preserved)
-    catalog.pop("updated", None)
-    same_day = [i for i, e in enumerate(changelog["entries"]) if e.get("date") == day]
-    changelog["entries"].insert(same_day[0] if same_day else 0, log_entry)
+    gxr = load_build()
+    entry_path = gxr.write_repo_entry(group_id, entry)
+    log_path = gxr.write_changelog_entry(log_entry)
 
-    CATALOG.write_text(addrepo.dump_json(catalog), encoding="utf-8", newline="\n")
-    CHANGELOG.write_text(addrepo.dump_json(changelog), encoding="utf-8", newline="\n")
-
-    build = subprocess.run([sys.executable, str(TOOLS / "build.py")], cwd=ROOT, text=True, capture_output=True)
-    if build.returncode != 0:
-        sys.stderr.write(build.stdout + build.stderr)
+    built = subprocess.run([sys.executable, str(TOOLS / "build.py")], cwd=ROOT, text=True, capture_output=True)
+    if built.returncode != 0:
+        sys.stderr.write(built.stdout + built.stderr)
         raise SystemExit("error: tools/build.py failed after the repair")
 
-    git("add", "--", *GENERATED)
+    paths = [str(entry_path.relative_to(ROOT)), str(log_path.relative_to(ROOT))] + GENERATED
+    git("add", "--", *paths)
     staged = git("diff", "--cached", "--name-only").stdout.strip()
     print("staged:", staged.replace("\n", ", ") or "(nothing)")
-    git("commit", "-m", f"fix: rebase {full} onto {args.main} (added date kept: {preserved.get('added')})")
-    print(f"repaired on {args.main}: {full}, added {preserved.get('added')}")
+    git("commit", "-m", f"fix: rebase {full} onto {args.main} (added date kept: {entry.get('added')})")
+    print(f"repaired on {args.main}: {full}, added {entry.get('added')}")
     print("push the branch to update the pull request")
     return 0
 

@@ -27,6 +27,7 @@ Exit codes:
 """
 
 import argparse
+import importlib.util
 import json
 import os
 import re
@@ -266,6 +267,16 @@ def run(cmd, capture=True):
     )
 
 
+def load_build():
+    """Load tools/build.py — it owns the layout, the JSON style and the writers."""
+    spec = importlib.util.spec_from_file_location("gxr_build", ROOT / "tools" / "build.py")
+    if spec is None or spec.loader is None:
+        raise SystemExit("error: cannot load tools/build.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Add a GitHub repo to the Galaxy XR Forge catalog.")
     ap.add_argument("repo", nargs="?", help="https://github.com/owner/name or owner/name")
@@ -292,21 +303,22 @@ def main(argv=None):
         tags_in = [str(t).strip().lower() for t in (payload.get("tags") or []) if str(t).strip()]
     issue = args.issue or int(payload.get("issue") or 0)
 
-    cat = load_json(CATALOG_PATH)
-    changelog = load_json(CHANGELOG_PATH)
+    gxr = load_build()
+    cat = gxr.load_catalog()
+    changelog = gxr.load_changelog()
 
     # A pending add from another branch or session in the same checkout would be
     # carried into this entry, and its date would ride along. Refuse instead.
     if not args.force:
         proc = subprocess.run(
-            ["git", "status", "--porcelain", "--", "catalog.json", "changelog.json"],
+            ["git", "status", "--porcelain", "--", "catalog.d", "changelog.d", "catalog.json"],
             cwd=str(ROOT),
             text=True,
             capture_output=True,
         )
         if proc.returncode == 0 and proc.stdout.strip():
             raise SystemExit(
-                "error: catalog.json or changelog.json has uncommitted edits.\n"
+                "error: catalog.d, changelog.d or catalog.json has uncommitted edits.\n"
                 "Commit or stash them first, or pass --force if they are yours."
             )
 
@@ -365,25 +377,23 @@ def main(argv=None):
         print(json.dumps(entry, indent=2, ensure_ascii=False))
         return 0
 
-    group["repos"].append(entry)
-    changelog["entries"].insert(
-        0,
-        {
-            "date": today,
-            "title": f"{name} added",
-            "items": [
-                f"Added {full} to {group['title']}"
-                + (f" (issue #{issue})." if issue else ".")
-            ],
-        },
-    )
+    log_entry = {
+        "date": today,
+        "title": f"{name} added",
+        "items": [
+            f"Added {full} to {group['title']}"
+            + (f" (issue #{issue})." if issue else ".")
+        ],
+    }
+    entry_path = gxr.write_repo_entry(group_id, entry)
+    log_path = gxr.write_changelog_entry(log_entry)
+    merged = gxr.load_catalog()
+    total = sum(len(g["repos"]) for g in merged["groups"])
+    print(f"wrote {entry_path.relative_to(ROOT)} and {log_path.relative_to(ROOT)} ({total} repos)")
 
-    CATALOG_PATH.write_text(dump_json(cat), encoding="utf-8", newline="\n")
-    CHANGELOG_PATH.write_text(dump_json(changelog), encoding="utf-8", newline="\n")
-    print(f"wrote catalog.json ({sum(len(g['repos']) for g in cat['groups'])} repos) and changelog.json")
-    build = run(["tools/build.py"])
-    if build.returncode != 0:
-        sys.stderr.write(build.stdout + build.stderr)
+    res_build = run(["tools/build.py"])
+    if res_build.returncode != 0:
+        sys.stderr.write(res_build.stdout + res_build.stderr)
         raise SystemExit("error: tools/build.py failed after the edit")
 
     if not args.no_checks:
@@ -397,8 +407,8 @@ def main(argv=None):
                 raise SystemExit(f"error: {tool} failed; fix before committing")
 
     print(
-        "next: review `git diff`, then commit catalog.json changelog.json README.md "
-        "CHANGELOG.md docs/index.html and open a PR"
+        "next: review `git diff`, then commit the new catalog.d/changelog.d files plus "
+        "README.md CHANGELOG.md docs/ and open a PR"
     )
     print("RESULT " + json.dumps({"repo": full, "group": group["id"], "added": today}))
     return 0

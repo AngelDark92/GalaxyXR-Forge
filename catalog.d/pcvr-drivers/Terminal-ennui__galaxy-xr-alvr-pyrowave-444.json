@@ -1,0 +1,9 @@
+{
+  "repo": "Terminal-ennui/galaxy-xr-alvr-pyrowave-444",
+  "url": "https://github.com/Terminal-ennui/galaxy-xr-alvr-pyrowave-444",
+  "about": "Full-chroma 4:4:4 wireless PC VR streaming via patched ALVR and the PyroWave codec.",
+  "license": "MIT",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["alvr", "streaming", "4:4:4", "pyrowave"]
+}

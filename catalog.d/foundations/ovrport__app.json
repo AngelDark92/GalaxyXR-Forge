@@ -1,0 +1,9 @@
+{
+  "repo": "ovrport/app",
+  "url": "https://github.com/ovrport/app",
+  "about": "Upstream Overport: patches Quest-targeting Android games; base of the Galaxy XR fork.",
+  "license": "GPL-3.0",
+  "release": "1.2.3",
+  "added": "2026-10-13",
+  "tags": ["overport", "quest", "apk"]
+}

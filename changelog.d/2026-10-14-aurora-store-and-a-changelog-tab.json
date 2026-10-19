@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-14",
+  "title": "Aurora Store and a changelog tab",
+  "items": [
+    "Added whyorean/AuroraStore to Tools & Diagnostics.",
+    "The site gained a Changelog tab, rendered from this file like everything else; CHANGELOG.md mirrors it for GitHub."
+  ]
+}

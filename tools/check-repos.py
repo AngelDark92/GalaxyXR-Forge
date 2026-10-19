@@ -38,6 +38,9 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import build  # noqa: E402  (same directory, dependency-free module)
+
 ROOT = Path(__file__).resolve().parent.parent
 
 TOKEN = os.environ.get("GITHUB_TOKEN", "").strip()
@@ -92,7 +95,7 @@ def main(argv=None):
                         help="check only this repo (repeatable)")
     args = parser.parse_args(argv)
 
-    cat = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
+    cat = build.load_catalog()
 
     checked = failed = warned = 0
     for g in cat["groups"]:

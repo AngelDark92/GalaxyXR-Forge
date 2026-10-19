@@ -1,0 +1,9 @@
+{
+  "repo": "compdoge/gxr-face-bridge",
+  "url": "https://github.com/compdoge/gxr-face-bridge",
+  "about": "OpenXR face-tracking bridge for Steam Link VR on the Galaxy XR.",
+  "license": "GPL-3.0",
+  "release": "v1.0.0",
+  "added": "2026-10-13",
+  "tags": ["face tracking", "openxr", "steam link"]
+}

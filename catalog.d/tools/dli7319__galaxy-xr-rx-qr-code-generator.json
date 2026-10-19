@@ -1,0 +1,9 @@
+{
+  "repo": "dli7319/galaxy-xr-rx-qr-code-generator",
+  "url": "https://github.com/dli7319/galaxy-xr-rx-qr-code-generator",
+  "about": "Generates the QR code for Galaxy XR prescription (RX) lens inserts.",
+  "license": "MIT",
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["lenses", "qr", "rx"]
+}

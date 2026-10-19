@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-17",
+  "title": "Filters rail moves out to the left on wide screens",
+  "items": [
+    "Site layout: from 1840px up the filter rail leaves the centered column and sits to its left with a fixed 26px gap — closer to the window edge, but never flush against it.",
+    "The width the rail frees goes to the repository grid, which shows three cards per row there; narrower screens keep the previous layout."
+  ]
+}

@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """Build the Galaxy XR Forge index.
 
-    catalog.json + changelog.json  ->  README.md + CHANGELOG.md + docs/index.html
+    catalog.json (groups) + catalog.d/ (one file per repo)
+    + changelog.d/ (one file per change)
+        ->  README.md + CHANGELOG.md + docs/index.html + docs/catalog-index.json
 
 Usage:
     python tools/build.py           validate, then write the generated files
@@ -23,7 +25,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG_PATH = ROOT / "catalog.json"
+CATALOG_DIR = ROOT / "catalog.d"
 CHANGELOG_PATH = ROOT / "changelog.json"
+CHANGELOG_DIR = ROOT / "changelog.d"
 README_PATH = ROOT / "README.md"
 CHANGELOG_MD_PATH = ROOT / "CHANGELOG.md"
 SITE_PATH = ROOT / "docs" / "index.html"
@@ -42,8 +46,88 @@ TAGLINE = (
 
 
 def load_catalog():
+    """Groups from catalog.json, entries from catalog.d/<group>/<owner>__<name>.json.
+
+    One file per repo is what makes two pending additions unable to conflict: they
+    add different files. Falls back to the single-file layout when catalog.d is absent.
+    """
     with CATALOG_PATH.open(encoding="utf-8") as f:
-        return json.load(f)
+        cat = json.load(f)
+    if not CATALOG_DIR.is_dir():
+        return cat
+
+    errors = []
+    for g in cat.get("groups", []):
+        gid = g.get("id", "")
+        g.pop("repos", None)
+        entries = []
+        folder = CATALOG_DIR / gid
+        for path in sorted(folder.glob("*.json")) if folder.is_dir() else []:
+            with path.open(encoding="utf-8") as f:
+                entry = json.load(f)
+            owner, sep, name = path.stem.partition("__")
+            want = f"{owner}/{name}"
+            if not sep or entry.get("repo", "").lower() != want.lower():
+                errors.append(
+                    f"{path.relative_to(ROOT)}: repo {entry.get('repo')!r} "
+                    f"does not match the file name ({want})"
+                )
+            entries.append(entry)
+        g["repos"] = entries
+    if errors:
+        raise SystemExit("catalog.d is inconsistent:\n  " + "\n  ".join(errors))
+    return cat
+
+
+def dump_json(value):
+    """2-space JSON, short string arrays inline — the catalog file style."""
+    return _dump(value, 0) + "\n"
+
+
+def _dump(value, depth):
+    pad = "  " * depth
+    if isinstance(value, dict):
+        if not value:
+            return "{}"
+        parts = [
+            f"{pad}  {json.dumps(k, ensure_ascii=False)}: {_dump(v, depth + 1).lstrip()}"
+            for k, v in value.items()
+        ]
+        return "{\n" + ",\n".join(parts) + "\n" + pad + "}"
+    if isinstance(value, list):
+        if not value:
+            return "[]"
+        if all(isinstance(x, str) for x in value):
+            inline = "[" + ", ".join(json.dumps(x, ensure_ascii=False) for x in value) + "]"
+            if len(inline) <= 78:
+                return inline
+        parts = [f"{pad}  {_dump(x, depth + 1).lstrip()}" for x in value]
+        return "[\n" + ",\n".join(parts) + "\n" + pad + "]"
+    return json.dumps(value, ensure_ascii=False)
+
+
+def repo_path(group_id, repo):
+    owner, name = repo.split("/", 1)
+    return CATALOG_DIR / group_id / f"{owner}__{name}.json"
+
+
+def write_repo_entry(group_id, entry):
+    path = repo_path(group_id, entry["repo"])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(dump_json(entry), encoding="utf-8", newline="\n")
+    return path
+
+
+def write_changelog_entry(entry):
+    slug = re.sub(r"[^a-z0-9]+", "-", str(entry["title"]).lower()).strip("-")[:48] or "change"
+    path = CHANGELOG_DIR / f"{entry['date']}-{slug}.json"
+    n = 2
+    while path.exists():
+        path = CHANGELOG_DIR / f"{entry['date']}-{slug}-{n}.json"
+        n += 1
+    CHANGELOG_DIR.mkdir(parents=True, exist_ok=True)
+    path.write_text(dump_json(entry), encoding="utf-8", newline="\n")
+    return path
 
 
 def validate(cat):
@@ -93,6 +177,18 @@ def validate(cat):
 
 
 def load_changelog():
+    """Entries from changelog.d/*.json, newest first; falls back to changelog.json."""
+    if CHANGELOG_DIR.is_dir():
+        entries = []
+        for path in CHANGELOG_DIR.glob("*.json"):
+            with path.open(encoding="utf-8") as f:
+                entry = json.load(f)
+            entry["_file"] = path.name
+            entries.append(entry)
+        entries.sort(key=lambda e: (str(e.get("date", "")), e["_file"]), reverse=True)
+        for entry in entries:
+            entry.pop("_file", None)
+        return {"entries": entries}
     with CHANGELOG_PATH.open(encoding="utf-8") as f:
         return json.load(f)
 
@@ -223,8 +319,9 @@ def render_readme(cat, changelog):
     )
     A("")
     A(
-        "Manual edits still work: change `catalog.json` + `changelog.json`, run `python tools/build.py`, then "
-        "`python tools/check-links.py` and `python tools/check-repos.py`."
+        "Manual edits still work: add a file under `catalog.d/<group>/` and one under `changelog.d/`, run "
+        "`python tools/build.py`, then `python tools/check-links.py` and `python tools/check-repos.py`. One file "
+        "per repo is why two pending additions never conflict."
     )
     A("")
     A(

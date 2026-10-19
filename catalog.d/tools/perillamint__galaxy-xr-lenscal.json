@@ -1,0 +1,9 @@
+{
+  "repo": "perillamint/galaxy-xr-lenscal",
+  "url": "https://github.com/perillamint/galaxy-xr-lenscal",
+  "about": "Lens calibration QR builder for Galaxy XR.",
+  "license": null,
+  "release": null,
+  "added": "2026-10-13",
+  "tags": ["lenses", "calibration", "qr"]
+}

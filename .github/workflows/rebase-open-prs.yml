@@ -1,0 +1,91 @@
+name: rebase-open-prs
+
+# Keeps open PRs mergeable without hand-resolving generated files: when main moves,
+# every open in-repo PR is rebased. A clean rebase is pushed as-is; a conflict is
+# rebuilt by tools/repair-add-pr.py, which keeps the entry and its original `added`
+# date and takes main's README/CHANGELOG/docs.
+#
+# Fork PRs are skipped: this workflow cannot push to someone else's branch. The
+# add-repo issue flow exists for outside contributions.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR number to repair (blank: every open in-repo PR)"
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: rebase-open-prs
+  cancel-in-progress: false
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebase open PRs onto main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ONLY: ${{ inputs.pr }}
+        run: |
+          set -uo pipefail
+          git config user.name "gxr-forge-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ -n "${ONLY:-}" ]; then
+            LIST="$ONLY"
+          else
+            LIST=$(gh pr list --state open --json number,isCrossRepository \
+              --jq '.[] | select(.isCrossRepository==false) | .number')
+          fi
+
+          if [ -z "$LIST" ]; then
+            echo "No open in-repo pull requests."
+            exit 0
+          fi
+
+          for n in $LIST; do
+            BR=$(gh pr view "$n" --json headRefName --jq .headRefName)
+            echo "::group::PR #$n ($BR)"
+            git fetch origin "$BR" main
+            git checkout -B "$BR" "origin/$BR"
+            BEFORE=$(git rev-parse HEAD)
+
+            if git rebase origin/main >/dev/null 2>&1; then
+              if [ "$(git rev-parse HEAD)" != "$BEFORE" ]; then
+                git push --force-with-lease origin "HEAD:$BR"
+                gh workflow run validate.yml --ref "$BR" || true
+                echo "rebased cleanly and pushed"
+              else
+                echo "already up to date"
+              fi
+            else
+              git rebase --abort || true
+              echo "conflict: rebuilding the branch from its own entry"
+              # Use main's tools: an old branch may predate repair-add-pr.py, and its
+              # build.py would regenerate files that fail the freshness check.
+              git checkout origin/main -- tools/ || true
+              if python tools/repair-add-pr.py --main origin/main; then
+                git push --force-with-lease origin "HEAD:$BR"
+                gh workflow run validate.yml --ref "$BR" || true
+              else
+                gh pr comment "$n" --body "Automatic rebase failed: this PR changes more than one catalog entry or edits a generated file. Rebase locally with 'git fetch origin && git rebase origin/main', then 'python tools/repair-add-pr.py --main origin/main' and 'python tools/build.py'." || true
+              fi
+            fi
+            echo "::endgroup::"
+          done

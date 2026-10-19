@@ -20,6 +20,8 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 10. CI is the gate: `validate.yml` re-runs the build, fails any PR whose generated files differ (stale or hand-edited), and runs the link and repo-state checks. A red PR is not reviewable.
 11. Two add-PRs conflict by construction: both append to a group array, the changelog head and (before) the same `updated` line. Never hand-resolve those files. Run `python tools/repair-add-pr.py --main origin/main` on the branch: it takes main's copies, re-applies this branch's entry with its **original** `added` date, rebuilds and commits. `added` is a fact — a rebase must never re-date an entry.
 12. `catalog.json` has no `updated` field: `build.py` derives it from entry and changelog dates, so one PR cannot overwrite another's stamp.
+13. Open in-repo PRs are rebased automatically when `main` moves (`rebase-open-prs.yml`): clean rebase pushed as-is, conflict rebuilt by `repair-add-pr.py`, then `validate.yml` is dispatched on the branch. Fork PRs are skipped — this workflow cannot push to them.
+14. `main` has a ruleset requiring the `catalog` check: a PR cannot merge until `validate.yml` passes. Admins bypass it, so direct pushes stay possible.
 
 ## Layout
 
@@ -36,6 +38,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | `tools/issue-payload.py` | Turns an `add-repo` issue body into the JSON payload the tool reads |
 | `.github/workflows/validate.yml` | PR gate: catalog check, generated files fresh, links, repo state |
 | `.github/workflows/add-repo.yml` | Issue labelled `add-repo` → branch + PR through `add-repo.py` |
+| `.github/workflows/rebase-open-prs.yml` | On every `main` push: rebases open PRs, repairs conflicts, re-runs `validate` |
 | `README.md` | Generated GitHub landing page |
 | `docs/` | Generated GitHub Pages site (Pages: branch `main`, folder `/docs`) |
 | `docs/.nojekyll` | Disables Jekyll on Pages; keep it |

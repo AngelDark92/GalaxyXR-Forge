@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-19 — gitignore added
+
+- Added github/gitignore to Tools & Diagnostics.
+
 ## 2026-10-19 — Add-PR conflicts repaired, entry dates preserved
 
 - `catalog.json` no longer stores `updated`: `build.py` derives the newest date from entries and the changelog, so two pending adds no longer edit the same line.

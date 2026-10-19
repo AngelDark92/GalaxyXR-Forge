@@ -431,6 +431,15 @@
           "release": null,
           "added": "2026-10-14",
           "tags": ["play store", "apk", "apps", "utility"]
+        },
+        {
+          "repo": "github/gitignore",
+          "url": "https://github.com/github/gitignore",
+          "about": "Scratch entry for the auto-rebase test; the PR is closed unmerged.",
+          "license": "CC0-1.0",
+          "release": null,
+          "added": "2026-10-19",
+          "tags": ["git", "gitignore"]
         }
       ]
     },

@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-57-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-58-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -14,7 +14,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-19` — 57 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-19` — 58 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -121,6 +121,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[AmeChanRain/MicDotDisabler](https://github.com/AmeChanRain/MicDotDisabler)**<br>![stars](https://img.shields.io/github/stars/AmeChanRain/MicDotDisabler?style=flat-square) | Hides the Android privacy indicator dot, built for Android XR devices. |
 | **[ImranR98/Obtainium](https://github.com/ImranR98/Obtainium)**<br>![stars](https://img.shields.io/github/stars/ImranR98/Obtainium?style=flat-square) ![release](https://img.shields.io/github/v/release/ImranR98/Obtainium?include_prereleases&style=flat-square&label=release) | Android app updater that installs and tracks APKs straight from their sources. |
 | **[whyorean/AuroraStore](https://github.com/whyorean/AuroraStore)**<br>![stars](https://img.shields.io/github/stars/whyorean/AuroraStore?style=flat-square) | Google Play client: search, download and update Play apps and APKs on device. |
+| **[github/gitignore](https://github.com/github/gitignore)**<br>![stars](https://img.shields.io/github/stars/github/gitignore?style=flat-square) | Scratch entry for the auto-rebase test; the PR is closed unmerged. |
 
 <a id="apps-samples"></a>
 
@@ -180,12 +181,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-19` — gitignore added
 - `2026-10-19` — Add-PR conflicts repaired, entry dates preserved
 - `2026-10-19` — Bachata-S4 added
 - `2026-10-19` — One-command add and a zero-backend contribution path
 - `2026-10-19` — ScreenStreamerXR added
 - `2026-10-17` — AstroQuest back in the catalog
-- `2026-10-17` — Filter figures now count what each filter would show
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -195,4 +196,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-19 · 57 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-19 · 58 repos</sub></div>

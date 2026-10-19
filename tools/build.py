@@ -62,7 +62,10 @@ def load_catalog():
         g.pop("repos", None)
         entries = []
         folder = CATALOG_DIR / gid
-        for path in sorted(folder.glob("*.json")) if folder.is_dir() else []:
+        files = folder.glob("*.json") if folder.is_dir() else []
+        # pathlib orders case-insensitively on Windows and by bytes on POSIX; name
+        # keys keep the card order identical on every host (CI included).
+        for path in sorted(files, key=lambda f: (f.name.lower(), f.name)):
             with path.open(encoding="utf-8") as f:
                 entry = json.load(f)
             owner, sep, name = path.stem.partition("__")
@@ -185,7 +188,9 @@ def load_changelog():
                 entry = json.load(f)
             entry["_file"] = path.name
             entries.append(entry)
-        entries.sort(key=lambda e: (str(e.get("date", "")), e["_file"]), reverse=True)
+        entries.sort(
+            key=lambda e: (str(e.get("date", "")), e["_file"].lower(), e["_file"]), reverse=True
+        )
         for entry in entries:
             entry.pop("_file", None)
         return {"entries": entries}
@@ -802,7 +807,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       <button type="button" class="dlg-close" id="add-repo-close" aria-label="Close">✕</button>
     </div>
     <p class="dlg-lede">Paste the link and pick a group. This opens a prefilled issue; CI prepares the card and a pull request — <strong>nothing merges automatically</strong>.</p>
-    <p class="dlg-note"><strong>Reviewed, never auto-merged.</strong> A maintainer merges only after verifying the repository is public, relevant to the Galaxy XR, clearly licensed, and not already listed or proposed.</p>
+    <p class="dlg-note"><strong>Reviewed before merge.</strong> Nothing is added automatically: a maintainer checks that the repository is public, relevant to the Galaxy XR, clearly licensed, and not already listed or proposed.</p>
     <label for="add-repo-url">Repository URL</label>
     <input id="add-repo-url" type="url" inputmode="url" placeholder="https://github.com/owner/name" autocomplete="off" spellcheck="false">
     <p class="dlg-status" id="add-repo-status" role="status" aria-live="polite"></p>

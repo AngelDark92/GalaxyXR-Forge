@@ -180,12 +180,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-19` — Add-PR conflicts repaired, entry dates preserved
 - `2026-10-19` — Bachata-S4 added
 - `2026-10-19` — One-command add and a zero-backend contribution path
 - `2026-10-19` — ScreenStreamerXR added
 - `2026-10-17` — AstroQuest back in the catalog
 - `2026-10-17` — Filter figures now count what each filter would show
-- `2026-10-17` — AstroQuest removed; badge errors no longer print
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

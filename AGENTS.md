@@ -18,6 +18,8 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 8. Keep every tool in `tools/` dependency-free (Python 3.10+, stdlib only) so any host can run them.
 9. Add repos with `python tools/add-repo.py <url> --group <id>` — it validates visibility, writes the entry and changelog, rebuilds every generated file and runs both checks. Do not hand-write entries when the tool can do it.
 10. CI is the gate: `validate.yml` re-runs the build, fails any PR whose generated files differ (stale or hand-edited), and runs the link and repo-state checks. A red PR is not reviewable.
+11. Two add-PRs conflict by construction: both append to a group array, the changelog head and (before) the same `updated` line. Never hand-resolve those files. Run `python tools/repair-add-pr.py --main origin/main` on the branch: it takes main's copies, re-applies this branch's entry with its **original** `added` date, rebuilds and commits. `added` is a fact — a rebase must never re-date an entry.
+12. `catalog.json` has no `updated` field: `build.py` derives it from entry and changelog dates, so one PR cannot overwrite another's stamp.
 
 ## Layout
 
@@ -30,6 +32,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | `tools/check-links.py` | Checks that every catalog URL answers |
 | `tools/check-repos.py` | Reads each repo back: renamed, transferred, archived or gone |
 | `tools/add-repo.py` | One-command contributor tool: validate, entry + changelog, rebuild, checks |
+| `tools/repair-add-pr.py` | Rebuilds a conflicted add-PR on main; keeps the entry's original `added` date |
 | `tools/issue-payload.py` | Turns an `add-repo` issue body into the JSON payload the tool reads |
 | `.github/workflows/validate.yml` | PR gate: catalog check, generated files fresh, links, repo state |
 | `.github/workflows/add-repo.yml` | Issue labelled `add-repo` → branch + PR through `add-repo.py` |

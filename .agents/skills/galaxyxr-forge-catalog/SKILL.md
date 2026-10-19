@@ -25,6 +25,18 @@ python tools/add-repo.py https://github.com/owner/name --group apps-samples
 
 It refuses private, archived or already-listed repos, reads license/release/topics, writes the entry with today's `added` date, appends the changelog entry, rebuilds all generated files and runs `check-links.py` + `check-repos.py`. The manual steps stay for moves, removals and overrides.
 
+It also refuses to run when `catalog.json` or `changelog.json` has uncommitted edits: a pending add from another branch in the same checkout would otherwise be carried into this entry. Commit or stash first (`--force` overrides).
+
+## When the PR conflicts
+
+Two add-PRs conflict by construction — both append to the same group array and the changelog head, and the generated files are rebuilt on each side. Do not hand-resolve. On the PR branch:
+
+```sh
+python tools/repair-add-pr.py --main origin/main
+```
+
+It reads this branch's entry, takes main's `catalog.json`, `changelog.json` and generated files, re-appends the entry with its **original** `added` date and changelog line, rebuilds and commits. The date is data: a rebase must never re-date an entry, or the NEW badge silently restarts.
+
 ### Manual steps
 
 1. Open `catalog.json` and pick the target group by `groups[].id` (`root-kernel`, `kernelsu-modules`, `face-eye`, `pcvr-drivers`, `app-patches`, `games`, `tools`, `apps-samples`, `foundations`).

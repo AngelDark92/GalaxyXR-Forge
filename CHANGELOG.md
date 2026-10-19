@@ -2,6 +2,12 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-19 — Add-PR conflicts repaired, entry dates preserved
+
+- `catalog.json` no longer stores `updated`: `build.py` derives the newest date from entries and the changelog, so two pending adds no longer edit the same line.
+- `tools/repair-add-pr.py` rebuilds a conflicted add-PR on main: it keeps this branch's entry and its **original** `added` date, takes main's generated files, rebuilds and commits. A rebase never re-dates an entry.
+- `tools/add-repo.py` refuses to run while `catalog.json` or `changelog.json` has uncommitted edits, so a pending add in the same checkout cannot ride into the next entry (`--force` overrides).
+
 ## 2026-10-19 — Bachata-S4 added
 
 - Added JICA98/Bachata-S4 to Foundations & Upstreams (issue #2).

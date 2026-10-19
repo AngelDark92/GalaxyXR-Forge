@@ -21,7 +21,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 11. Two add-PRs conflict by construction: both append to a group array, the changelog head and (before) the same `updated` line. Never hand-resolve those files. Run `python tools/repair-add-pr.py --main origin/main` on the branch: it takes main's copies, re-applies this branch's entry with its **original** `added` date, rebuilds and commits. `added` is a fact — a rebase must never re-date an entry.
 12. `catalog.json` has no `updated` field: `build.py` derives it from entry and changelog dates, so one PR cannot overwrite another's stamp.
 13. Open in-repo PRs are rebased automatically when `main` moves (`rebase-open-prs.yml`): clean rebase pushed as-is, conflict rebuilt by `repair-add-pr.py`, then `validate.yml` is dispatched on the branch. Fork PRs are skipped — this workflow cannot push to them.
-14. `main` has a ruleset requiring the `catalog` check: a PR cannot merge until `validate.yml` passes. Admins bypass it, so direct pushes stay possible.
+14. `main` has branch protection requiring the `catalog` status. `validate.yml` publishes it as a **commit status**, not only a check run: a check run from a dispatched run is not attached to the pull request, so protection would sit at "blocked" forever. Admins are exempt, so direct pushes still work.
 
 ## Layout
 

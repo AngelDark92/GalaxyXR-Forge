@@ -2,6 +2,12 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-19 — PRs rebase themselves; merge needs a green catalog status
+
+- `rebase-open-prs.yml` runs on every push to `main` (and on demand): each open in-repo PR is rebased; a conflict is rebuilt by `repair-add-pr.py` — entry and original `added` date kept, main's generated files taken — then `validate.yml` is dispatched for the new head.
+- `main` now requires the `catalog` status before a PR can merge. `validate.yml` publishes it as a commit status, because a check run from a dispatched workflow is not attached to the pull request.
+- Fork PRs are skipped by the rebase workflow: it cannot push to another owner's branch. Use the Add repo issue flow for outside contributions.
+
 ## 2026-10-19 — Add-PR conflicts repaired, entry dates preserved
 
 - `catalog.json` no longer stores `updated`: `build.py` derives the newest date from entries and the changelog, so two pending adds no longer edit the same line.

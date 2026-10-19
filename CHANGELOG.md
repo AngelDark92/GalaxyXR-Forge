@@ -29,6 +29,11 @@ Catalog changes, newest first. Generated from [`changelog.json`](changelog.json)
 - `validate.yml` gates every pull request: catalog and changelog validation, a stale-generated-file diff, `check-links.py` and `check-repos.py`. A PR with hand-edited or stale `README.md`, `CHANGELOG.md` or `docs/index.html` cannot merge.
 - `tools/issue-payload.py` parses the issue body; `.github/ISSUE_TEMPLATE/add-repo.md` is the manual form of the same three fields.
 
+## 2026-10-19 — Button renamed to Suggest a repo
+
+- The site button and dialog, the issue template and the README section now say **Suggest a repo** — nothing is added until a maintainer reviews and merges the pull request.
+- The dialog opens on `#suggest-a-repo`; the old `#add-repo` hash still works.
+
 ## 2026-10-19 — Bachata-S4 added
 
 - Added JICA98/Bachata-S4 to Foundations & Upstreams (issue #2).

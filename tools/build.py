@@ -265,7 +265,7 @@ def render_readme(cat, changelog):
     A(f"**{TAGLINE}**")
     A("")
     A(f"[![community repos](https://img.shields.io/badge/community_repos-{total}-orange?style=flat-square)](#catalog)")
-    A("[![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)")
+    A("[![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)")
     A(f"[![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)]({REPO_URL})")
     A(f"[![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)]({REPO_URL}/commits/main)")
     A("")
@@ -307,11 +307,11 @@ def render_readme(cat, changelog):
         A("")
     A("---")
     A("")
-    A("## Add your repo")
+    A("## Suggest a repo")
     A("")
     A(
-        f"**Fastest:** use the **Add repo** button on the [site]({SITE_URL}/#add-repo) — paste the link, pick a group. "
-        "CI adds the card, regenerates the README and site, and opens a pull request for review."
+        f"**Fastest:** use the **Suggest a repo** button on the [site]({SITE_URL}/#suggest-a-repo) — paste the link, pick a group. "
+        "CI prepares the card and a pull request; nothing is added until a maintainer reviews and merges it."
     )
     A("")
     A("Or run it locally, one command:")
@@ -767,7 +767,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>__CHANGELOG_COUNT__</b></button>
     </div>
     <a class="star-btn" href="__REPO_URL__" target="_blank" rel="noopener" title="Star GalaxyXR-Forge on GitHub"><span class="s" aria-hidden="true">★</span> Star on GitHub</a>
-    <a class="add-btn" id="add-repo-btn" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" aria-haspopup="dialog" aria-controls="add-repo-dialog">＋ Add repo</a>
+    <a class="add-btn" id="add-repo-btn" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" aria-haspopup="dialog" aria-controls="add-repo-dialog">＋ Suggest a repo</a>
   </div>
 </nav>
 <div class="shell" id="shell">
@@ -810,10 +810,10 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 <dialog id="add-repo-dialog" class="add-dialog" aria-labelledby="add-repo-title">
   <div class="add-form">
     <div class="dlg-head">
-      <h2 id="add-repo-title">Add a repo</h2>
+      <h2 id="add-repo-title">Suggest a repo</h2>
       <button type="button" class="dlg-close" id="add-repo-close" aria-label="Close">✕</button>
     </div>
-    <p class="dlg-lede">Paste the link and pick a group. This opens a prefilled issue; CI prepares the card and a pull request — <strong>nothing merges automatically</strong>.</p>
+    <p class="dlg-lede">Paste the link and pick a group. This opens a proposal issue; CI prepares the card and a pull request — <strong>nothing is added until a maintainer merges it</strong>.</p>
     <p class="dlg-note"><strong>Reviewed before merge.</strong> Nothing is added automatically: a maintainer checks that the repository is public, relevant to the Galaxy XR, clearly licensed, and not already listed or proposed.</p>
     <label for="add-repo-url">Repository URL</label>
     <input id="add-repo-url" type="url" inputmode="url" placeholder="https://github.com/owner/name" autocomplete="off" spellcheck="false">
@@ -833,7 +833,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 <footer>
   <div class="wrap">
     <span>Unofficial community hub — not affiliated with Samsung. Each project keeps its own license.</span>
-    <span>Add a repo: <a href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo">file it from the site</a>, or run <code>python tools/add-repo.py</code> · <a href="__REPO_URL__" target="_blank" rel="noopener">★ Star on GitHub</a> · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
+    <span>Suggest a repo: <a href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo">file it from the site</a>, or run <code>python tools/add-repo.py</code> · <a href="__REPO_URL__" target="_blank" rel="noopener">★ Star on GitHub</a> · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
   </div>
 </footer>
 <script>
@@ -1303,7 +1303,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   window.addEventListener('blur', fade);
 })();
 
-// "Add repo" dialog. Pages is static, so the form cannot post anywhere itself:
+// "Suggest a repo" dialog. Pages is static, so the form cannot post anywhere itself:
 // it builds a prefilled GitHub issue, and the add-repo workflow turns that issue
 // into a branch and a pull request. Without JS the button is a plain link to the
 // issue template.
@@ -1341,7 +1341,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     var about = (aboutInput.value || '').trim();
     if (about) body += '\\n### About\\n' + about + '\\n';
     return BASE + '/issues/new?labels=' + encodeURIComponent('add-repo') +
-      '&title=' + encodeURIComponent('Add repo: ' + m[1] + '/' + m[2]) +
+      '&title=' + encodeURIComponent('Suggest repo: ' + m[1] + '/' + m[2]) +
       '&body=' + encodeURIComponent(body);
   }
 
@@ -1366,7 +1366,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     if (!issueHref()) { ev.preventDefault(); urlInput.focus(); }
   });
   refresh();
-  if (location.hash === '#add-repo') openDlg();
+  if (location.hash === '#add-repo' || location.hash === '#suggest-a-repo') openDlg();
 })();
 
 // Duplicate check: the generated catalog index plus open `add-repo` issues. The

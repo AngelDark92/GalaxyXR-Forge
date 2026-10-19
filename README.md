@@ -5,7 +5,7 @@
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
 [![community repos](https://img.shields.io/badge/community_repos-57-orange?style=flat-square)](#catalog)
-[![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#add-your-repo)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
 
@@ -161,9 +161,9 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 
 ---
 
-## Add your repo
+## Suggest a repo
 
-**Fastest:** use the **Add repo** button on the [site](https://angeldark92.github.io/GalaxyXR-Forge/#add-repo) — paste the link, pick a group. CI adds the card, regenerates the README and site, and opens a pull request for review.
+**Fastest:** use the **Suggest a repo** button on the [site](https://angeldark92.github.io/GalaxyXR-Forge/#suggest-a-repo) — paste the link, pick a group. CI prepares the card and a pull request; nothing is added until a maintainer reviews and merges it.
 
 Or run it locally, one command:
 
@@ -188,7 +188,7 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 - `2026-10-19` — PRs rebase themselves; merge needs a green catalog status
 - `2026-10-19` — One file per repo: catalog.d and changelog.d
 - `2026-10-19` — One-command add and a zero-backend contribution path
-- `2026-10-19` — Bachata-S4 added
+- `2026-10-19` — Button renamed to Suggest a repo
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

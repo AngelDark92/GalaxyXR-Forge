@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-19",
+  "title": "Button renamed to Suggest a repo",
+  "items": [
+    "The site button and dialog, the issue template and the README section now say **Suggest a repo** — nothing is added until a maintainer reviews and merges the pull request.",
+    "The dialog opens on `#suggest-a-repo`; the old `#add-repo` hash still works."
+  ]
+}

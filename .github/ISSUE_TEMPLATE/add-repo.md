@@ -1,14 +1,14 @@
 ---
-name: Add a repo
-about: Propose a GitHub repository for the Galaxy XR Forge catalog. CI opens the pull request for you.
-title: "Add repo: "
+name: Suggest a repo
+about: Propose a GitHub repository for the Galaxy XR Forge catalog. CI prepares the pull request; a maintainer reviews and merges it.
+title: "Suggest repo: "
 labels: add-repo
 ---
 
 <!--
-Fill the three sections below. The site's "Add repo" button fills this in for you.
+Fill the three sections below. The site's "Suggest a repo" button fills this in for you.
 CI reads the repo URL and the group, adds the card, regenerates README/site, and
-opens a pull request. One repo per issue.
+opens a pull request. Nothing is added until a maintainer merges it. One repo per issue.
 -->
 
 ### Repo URL

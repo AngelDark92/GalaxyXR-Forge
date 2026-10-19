@@ -1,6 +1,6 @@
 name: add-repo
 
-# A visitor submits the "Add repo" form on the Pages site (or files an issue with
+# A visitor submits the "Suggest a repo" form on the Pages site (or files an issue with
 # the `add-repo` label). This turns the issue into a compliant catalog entry,
 # regenerates README/CHANGELOG/site, and opens a pull request for review — the
 # issue is never trusted for anything but the repo URL and the group.
@@ -40,7 +40,7 @@ jobs:
         run: |
           set -euo pipefail
           if ! python tools/issue-payload.py > payload.json; then
-            echo "::error::Could not parse this issue. Use the Add repo form on the site, or the issue template."
+            echo "::error::Could not parse this issue. Use the Suggest a repo form on the site, or the issue template."
             exit 1
           fi
           cat payload.json

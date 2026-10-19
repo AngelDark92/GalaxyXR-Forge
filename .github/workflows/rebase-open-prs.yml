@@ -69,7 +69,6 @@ jobs:
             if git rebase origin/main >/dev/null 2>&1; then
               if [ "$(git rev-parse HEAD)" != "$BEFORE" ]; then
                 git push --force-with-lease origin "HEAD:$BR"
-                gh workflow run validate.yml --ref "$BR" || true
                 echo "rebased cleanly and pushed"
               else
                 echo "already up to date"
@@ -82,10 +81,18 @@ jobs:
               git show origin/main:tools/repair-add-pr.py > "$RUNNER_TEMP/repair-add-pr.py"
               if python "$RUNNER_TEMP/repair-add-pr.py" --root "$GITHUB_WORKSPACE" --main origin/main; then
                 git push --force-with-lease origin "HEAD:$BR"
-                gh workflow run validate.yml --ref "$BR" || true
               else
                 gh pr comment "$n" --body "Automatic rebase failed: this PR changes more than one catalog entry or edits a generated file. Rebase locally with 'git fetch origin && git rebase origin/main', then 'python tools/repair-add-pr.py --main origin/main' and 'python tools/build.py'." || true
               fi
+            fi
+
+            # A branch pushed by this workflow does not fire `pull_request`, so make
+            # sure the required check exists for the head commit.
+            SHA=$(git rev-parse HEAD)
+            RUNS=$(gh run list --workflow=validate.yml --commit "$SHA" --json databaseId --jq 'length' 2>/dev/null || echo 0)
+            if [ "${RUNS:-0}" = "0" ]; then
+              gh workflow run validate.yml --ref "$BR" || true
+              echo "dispatched validate for $SHA"
             fi
             echo "::endgroup::"
           done

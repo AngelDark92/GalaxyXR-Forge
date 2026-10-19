@@ -84,5 +84,6 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 - Star counts and latest releases on the site cards are fetched in the visitor's browser (shields.io JSON + `localStorage` cache; the badge image is the no-JS/failure fallback). Live values are never baked into the README, the site HTML or the changelog.
 - `python tools/check-links.py` reports no failures.
 - `validate.yml` is green on the PR: catalog check, stale-generated check, links, repo state.
+- A bot PR (`add-repo.yml`) dispatches `validate.yml` on its branch explicitly: a branch pushed with `GITHUB_TOKEN` never fires `pull_request`, so without the dispatch the gate would silently not run.
 - `python tools/check-repos.py` reports no renames, transfers, archived or missing repos. A renamed repo still answers, so link checks alone will not catch it.
 - Never claim the Pages site updated without fetching the live URL.

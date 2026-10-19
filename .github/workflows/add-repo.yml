@@ -13,6 +13,7 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  actions: write
 
 concurrency:
   group: add-repo-${{ github.event.issue.number }}
@@ -91,6 +92,9 @@ jobs:
               --title "Add ${REPO#https://github.com/} to the catalog" \
               --body "$BODY"
           fi
+          # A branch pushed with GITHUB_TOKEN does not fire `pull_request`, so the
+          # validate workflow would never run on this PR. Dispatch it on the branch.
+          gh workflow run validate.yml --ref "$BRANCH" || true
 
       - name: Report back on the issue
         if: always()

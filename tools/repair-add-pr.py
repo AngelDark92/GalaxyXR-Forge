@@ -119,8 +119,10 @@ def main(argv=None):
         print("planned changelog:", json.dumps(log_entry, ensure_ascii=False))
         return 0
 
-    # Take main's copies wholesale: generated files are never hand-resolved.
-    git("checkout", args.main, "--", *GENERATED)
+    # Rebuild the branch ON main. Rewriting the files on the old base is not enough:
+    # git still sees both sides changing the same hunks, which stays a conflict.
+    print(f"rebuilding the branch on {args.main}")
+    git("reset", "--hard", args.main)
 
     catalog = addrepo.load_json(CATALOG)
     changelog = addrepo.load_json(CHANGELOG)

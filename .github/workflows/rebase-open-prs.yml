@@ -77,9 +77,8 @@ jobs:
             else
               git rebase --abort || true
               echo "conflict: rebuilding the branch from its own entry"
-              # Use main's tools: an old branch may predate repair-add-pr.py, and its
-              # build.py would regenerate files that fail the freshness check.
-              git checkout origin/main -- tools/ || true
+              # repair-add-pr.py resets onto main and re-applies the entry, so it
+              # also picks up main's tools even when this branch predates them.
               if python tools/repair-add-pr.py --main origin/main; then
                 git push --force-with-lease origin "HEAD:$BR"
                 gh workflow run validate.yml --ref "$BR" || true

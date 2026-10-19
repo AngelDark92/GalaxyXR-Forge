@@ -431,6 +431,15 @@
           "release": null,
           "added": "2026-10-14",
           "tags": ["play store", "apk", "apps", "utility"]
+        },
+        {
+          "repo": "github/gitignore",
+          "url": "https://github.com/github/gitignore",
+          "about": "A collection of useful .gitignore templates",
+          "license": "CC0-1.0",
+          "release": null,
+          "added": "2026-10-19",
+          "tags": ["git", "gitignore"]
         }
       ]
     },

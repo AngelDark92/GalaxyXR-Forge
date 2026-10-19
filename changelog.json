@@ -2,6 +2,11 @@
   "entries": [
     {
       "date": "2026-10-19",
+      "title": "gitignore added",
+      "items": ["Added github/gitignore to Tools & Diagnostics (issue #5)."]
+    },
+    {
+      "date": "2026-10-19",
       "title": "PRs rebase themselves; merge needs a green catalog status",
       "items": [
         "`rebase-open-prs.yml` runs on every push to `main` (and on demand): each open in-repo PR is rebased; a conflict is rebuilt by `repair-add-pr.py` — entry and original `added` date kept, main's generated files taken — then `validate.yml` is dispatched for the new head.",

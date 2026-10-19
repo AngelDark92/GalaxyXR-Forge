@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-19 — gitignore added
+
+- Added github/gitignore to Tools & Diagnostics (issue #5).
+
 ## 2026-10-19 — PRs rebase themselves; merge needs a green catalog status
 
 - `rebase-open-prs.yml` runs on every push to `main` (and on demand): each open in-repo PR is rebased; a conflict is rebuilt by `repair-add-pr.py` — entry and original `added` date kept, main's generated files taken — then `validate.yml` is dispatched for the new head.

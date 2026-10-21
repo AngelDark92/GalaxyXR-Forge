@@ -1,0 +1,9 @@
+{
+  "repo": "AngelDark92/steamlink-androidxr-patched",
+  "url": "https://github.com/AngelDark92/steamlink-androidxr-patched",
+  "about": "Already patched SteamLink apks to be used in tandem with the Galaxy XR driver.",
+  "license": null,
+  "release": "v2.0.23-1.32.1",
+  "added": "2026-10-21",
+  "tags": ["releases", "patched", "steamlink", "compatible"]
+}

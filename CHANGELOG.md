@@ -6,6 +6,10 @@ Catalog changes, newest first. Generated from [`changelog.json`](changelog.json)
 
 - Added aali195/steamvr-addon-manager to Tools & Diagnostics (issue #11).
 
+## 2026-10-22 — gxr-ghostlock added
+
+- Added compdoge/gxr-ghostlock to Root & Kernel.
+
 ## 2026-10-22 — CreoleVR QuestLHSync added
 
 - Added CreoleVR/QuestLHSync to Foundations & Upstreams.

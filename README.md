@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-60-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-61-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
@@ -17,7 +17,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-22` — 60 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-22` — 61 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -30,6 +30,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | Repository | What it does |
 | --- | --- |
 | **[4uva4ek/KernelSU-GXR](https://github.com/4uva4ek/KernelSU-GXR)**<br>![stars](https://img.shields.io/github/stars/4uva4ek/KernelSU-GXR?style=flat-square) ![release](https://img.shields.io/github/v/release/4uva4ek/KernelSU-GXR?include_prereleases&style=flat-square&label=release) | KernelSU manager and daemon built for the Galaxy XR: module installer and signed self-update. |
+| **[compdoge/gxr-ghostlock](https://github.com/compdoge/gxr-ghostlock)**<br>![stars](https://img.shields.io/github/stars/compdoge/gxr-ghostlock?style=flat-square) | GhostLock (CVE-2026-43499) root port for firmware AZF3: source, runbook and prebuilt binaries. |
 | **[diabl0w/DFRoot](https://github.com/diabl0w/DFRoot)**<br>![stars](https://img.shields.io/github/stars/diabl0w/DFRoot?style=flat-square) ![release](https://img.shields.io/github/v/release/diabl0w/DFRoot?include_prereleases&style=flat-square&label=release) | Kernel-module loader that loads KernelSU-GXR without flashing a boot image. |
 
 <a id="kernelsu-modules"></a>
@@ -187,11 +188,11 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 ## Changelog
 
 - `2026-10-22` — steamvr-addon-manager added
+- `2026-10-22` — gxr-ghostlock added
 - `2026-10-22` — CreoleVR QuestLHSync added
 - `2026-10-21` — steamlink-androidxr-patched added
 - `2026-10-19` — Star link on the site and in the README
 - `2026-10-19` — ScreenStreamerXR added
-- `2026-10-19` — PRs rebase themselves; merge needs a green catalog status
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -201,4 +202,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-22 · 60 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-22 · 61 repos</sub></div>

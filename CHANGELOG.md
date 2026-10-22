@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-22 — steamvr-addon-manager added
+
+- Added aali195/steamvr-addon-manager to Tools & Diagnostics (issue #11).
+
 ## 2026-10-21 — steamlink-androidxr-patched added
 
 - Added AngelDark92/steamlink-androidxr-patched to PC VR & Streaming (issue #8).

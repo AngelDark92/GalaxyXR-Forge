@@ -1,0 +1,9 @@
+{
+  "repo": "aali195/steamvr-addon-manager",
+  "url": "https://github.com/aali195/steamvr-addon-manager",
+  "about": "A lightweight Windows tool for managing SteamVR drivers and startup overlays by editing SteamVR's config files (before SteamVR is run).",
+  "license": "MIT",
+  "release": "v1.0.0",
+  "added": "2026-10-22",
+  "tags": ["manage", "steamvr", "addons", "overlays"]
+}

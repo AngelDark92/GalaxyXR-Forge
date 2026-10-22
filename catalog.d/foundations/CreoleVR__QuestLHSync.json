@@ -1,0 +1,9 @@
+{
+  "repo": "CreoleVR/QuestLHSync",
+  "url": "https://github.com/CreoleVR/QuestLHSync",
+  "about": "QuestLHSync project aligning Lighthouse devices to a headset's own camera tracking, with Galaxy XR support.",
+  "license": "MIT",
+  "release": "v1.26",
+  "added": "2026-10-22",
+  "tags": ["lighthouse", "tracking", "galaxy xr", "steam frame"]
+}

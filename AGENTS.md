@@ -43,7 +43,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | `README.md` | Generated GitHub landing page |
 | `docs/` | Generated GitHub Pages site (Pages: branch `main`, folder `/docs`) |
 | `docs/.nojekyll` | Disables Jekyll on Pages; keep it |
-| `.agents/skills/` | Project skills; see the host table below |
+| `../.opencode/skills/` | Workspace skills; see the host table below |
 | `.research/` | Metadata snapshots and fetch scripts used to build the catalog (safe to publish; token comes from env) |
 | `IDEA.md` | Owner notes. Leave as-is. |
 
@@ -67,9 +67,9 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 
 | Task | Do this |
 | --- | --- |
-| Add / update / remove a catalog entry (plus its changelog entry) | Follow `.agents/skills/galaxyxr-forge-catalog/SKILL.md` |
+| Add / update / remove a catalog entry (plus its changelog entry) | Follow `../.opencode/skills/galaxyxr-forge-catalog/SKILL.md` |
 | A visitor proposed a repo (issue labelled `add-repo`) | `add-repo.yml` already ran `tools/add-repo.py` and opened a PR; review and merge it |
-| Find where a repo or project lives; which repo to touch | `.agents/skills/galaxyxr-forge-map/SKILL.md` |
+| Find where a repo or project lives; which repo to touch | `../.opencode/skills/galaxyxr-forge-map/SKILL.md` |
 | Adjust README or site layout | Edit the templates inside `tools/build.py`, rerun it |
 | Confirm catalogued repos still exist and are not renamed, transferred or archived | `python tools/check-repos.py` |
 | Bug in a driver, module, patch or app itself | Go to that project's checkout — do not fix it here |
@@ -78,6 +78,7 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 
 | Host | Always-loaded context | Skills |
 | --- | --- | --- |
+| OpenCode | `../AGENTS.md` and `AGENTS.md` | `../.opencode/skills/`; run from the workspace root |
 | Hermes | `AGENTS.md` (git-root → cwd chain) | `.agents/skills/` after `hermes skills trust` in this checkout root |
 | Codex | `AGENTS.md` | `.agents/skills/` |
 | Claude Code | `CLAUDE.md` (points here) | none |

@@ -6,6 +6,10 @@ Catalog changes, newest first. Generated from [`changelog.json`](changelog.json)
 
 - Added aali195/steamvr-addon-manager to Tools & Diagnostics (issue #11).
 
+## 2026-10-22 — QuestLHSync repointed to CreoleVR
+
+- Moved stearnsbq/QuestLHSync to CreoleVR/QuestLHSync in Foundations & Upstreams after the repo transfer.
+
 ## 2026-10-21 — steamlink-androidxr-patched added
 
 - Added AngelDark92/steamlink-androidxr-patched to PC VR & Streaming (issue #8).

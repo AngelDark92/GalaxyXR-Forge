@@ -1,0 +1,9 @@
+{
+  "repo": "compdoge/gxr-ghostlock",
+  "url": "https://github.com/compdoge/gxr-ghostlock",
+  "about": "GhostLock (CVE-2026-43499) root port for firmware AZF3: source, runbook and prebuilt binaries.",
+  "license": "Apache-2.0",
+  "release": null,
+  "added": "2026-10-22",
+  "tags": ["root", "exploit", "ghostlock", "azf3"]
+}

@@ -65,7 +65,7 @@ It refuses private, archived, already-listed repos **and repos that already have
    One item per repo added, moved or removed. Never rewrite or delete older files.
 4. Regenerate and validate: `python tools/build.py`, then `python tools/check-links.py` and `python tools/check-repos.py`.
 5. Review `git diff` — the README table, the site cards and the Changelog tab all come from your files.
-6. Commit. Push only when the user authorized it.
+6. Commit and push: stage the entry, the changelog file and every regenerated file, commit, and push the current branch. This is standing authorization — do not stop to ask. If the push is rejected, open a PR. Leave unrelated user edits out of the commit.
 
 ## When the PR conflicts
 
@@ -81,6 +81,7 @@ It resets the branch onto main, rewrites this branch's entry file and changelog 
 
 - Hand-editing a generated file is lost work: `build.py` overwrites it entirely.
 - A catalog change without a `changelog.d/` file is incomplete.
+- A catalog change that is left uncommitted or unpushed is incomplete.
 - Duplicate `repo` values (across any group) fail the build on purpose.
 - Group `id` values are README anchors and site filter keys. Renaming breaks links; don't.
 - Release badges are live (shields.io images with `?include_prereleases`); stars and latest tags load in the visitor's browser. Never hardcode versions or bake live values into generated files.

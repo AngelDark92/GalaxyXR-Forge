@@ -1,0 +1,40 @@
+---
+description: GalaxyXR-Forge catalog, generator, site and validation rules
+alwaysApply: true
+---
+
+# GalaxyXR-Forge
+
+Read `AGENTS.md` first. This repository only describes, links and curates Galaxy
+XR projects; it contains no device code, binaries or proprietary blobs.
+
+## Sources and generated files
+
+- Sources of truth: `catalog.json` (groups), `catalog.d/<group>/<owner>__<name>.json`
+  (one repo per file) and `changelog.d/<date>-<slug>.json` (one change per file).
+- Never hand-edit `README.md`, `CHANGELOG.md`, `docs/index.html` or
+  `docs/catalog-index.json`. Run `python tools/build.py` instead.
+- Add repos with `python tools/add-repo.py <url> --group <id>`, not by hand.
+- Every catalog change needs a changelog entry with its original `added` date.
+- Do not rename group `id` values; anchors, filters and chips depend on them.
+- Keep every tool dependency-free (Python 3.10+, stdlib only).
+
+## Validate
+
+```powershell
+python tools/build.py
+python tools/check-links.py
+python tools/check-repos.py
+```
+
+CI `validate.yml` fails when generated files are stale or hand-edited. A red PR
+is not reviewable. Commit and push every completed change: stage only the files
+you changed, run the checks, commit and push the current branch. This is standing
+authorization — do not stop to ask. If the push is rejected, open a PR. Leave
+unrelated user edits unstaged.
+
+## Skills
+
+`@galaxyxr-forge-catalog` for catalog edits, `@galaxyxr-forge-map` for routing and
+local paths, `@cavecrew` for delegation. Project skill copies live in
+`.opencode/skills/`.

@@ -13,7 +13,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 3. Keep descriptions to one factual line (build enforces ≤160 chars; target ~14 words). No marketing.
 4. Every catalog change needs an entry in `changelog.d/` (date, title, one item per repo added, moved or removed). `build.py` renders `CHANGELOG.md` and the site's Changelog tab from it — a catalog edit without a changelog entry is an incomplete change. Set `"added": "YYYY-MM-DD"` on every new entry: the site's NEW badge and New filter derive from it, computed client-side because Pages is static: one rule for both the badge and the New filter — an entry is NEW while its `added` date is inside the 5-day window.
 5. Do not rename group `id` values — README anchors, site filters and chips depend on them.
-6. Commit and push only when the user asked. Editing files and running `build.py` / `check-links.py` / `check-repos.py` are always fine; pushing to GitHub or changing Pages settings requires explicit authorization.
+6. Commit and push every completed change. This is standing authorization: after the checks pass and you have reviewed the diff, stage only the files you changed, commit, and push the current branch. Do not stop to ask for commit or push permission. Read-only subagents never commit; the main agent commits their integrated result. Leave unrelated user edits unstaged. If the push is rejected, open a PR. Changing Pages settings still requires explicit authorization.
 7. Links only: never copy code, binaries or proprietary blobs from catalogued repos into this one.
 8. Keep every tool in `tools/` dependency-free (Python 3.10+, stdlib only) so any host can run them.
 9. Add repos with `python tools/add-repo.py <url> --group <id>` — it validates visibility, writes the entry and changelog, rebuilds every generated file and runs both checks. Do not hand-write entries when the tool can do it.
@@ -43,7 +43,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | `README.md` | Generated GitHub landing page |
 | `docs/` | Generated GitHub Pages site (Pages: branch `main`, folder `/docs`) |
 | `docs/.nojekyll` | Disables Jekyll on Pages; keep it |
-| `../.opencode/skills/` | Workspace skills; see the host table below |
+| `.opencode/skills/` | Workspace skills; see the host table below |
 | `.research/` | Metadata snapshots and fetch scripts used to build the catalog (safe to publish; token comes from env) |
 | `IDEA.md` | Owner notes. Leave as-is. |
 
@@ -67,9 +67,9 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 
 | Task | Do this |
 | --- | --- |
-| Add / update / remove a catalog entry (plus its changelog entry) | Follow `../.opencode/skills/galaxyxr-forge-catalog/SKILL.md` |
+| Add / update / remove a catalog entry (plus its changelog entry) | Follow `.opencode/skills/galaxyxr-forge-catalog/SKILL.md` |
 | A visitor proposed a repo (issue labelled `add-repo`) | `add-repo.yml` already ran `tools/add-repo.py` and opened a PR; review and merge it |
-| Find where a repo or project lives; which repo to touch | `../.opencode/skills/galaxyxr-forge-map/SKILL.md` |
+| Find where a repo or project lives; which repo to touch | `.opencode/skills/galaxyxr-forge-map/SKILL.md` |
 | Adjust README or site layout | Edit the templates inside `tools/build.py`, rerun it |
 | Confirm catalogued repos still exist and are not renamed, transferred or archived | `python tools/check-repos.py` |
 | Bug in a driver, module, patch or app itself | Go to that project's checkout — do not fix it here |
@@ -78,7 +78,8 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 
 | Host | Always-loaded context | Skills |
 | --- | --- | --- |
-| OpenCode | `../AGENTS.md` and `AGENTS.md` | `../.opencode/skills/`; run from the workspace root |
+| OpenCode | `../AGENTS.md` and `AGENTS.md` | `.opencode/skills/` and `.opencode/agents/`; workspace copies also load when run from the root |
+| Cursor | `.cursor/rules/project.mdc`, `AGENTS.md` | rules only; skills stay in `.opencode/skills/` |
 | Hermes | `AGENTS.md` (git-root → cwd chain) | `.agents/skills/` after `hermes skills trust` in this checkout root |
 | Codex | `AGENTS.md` | `.agents/skills/` |
 | Claude Code | `CLAUDE.md` (points here) | none |
@@ -94,4 +95,5 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 - `validate.yml` is green on the PR: catalog check, stale-generated check, links, repo state.
 - A bot PR (`add-repo.yml`) dispatches `validate.yml` on its branch explicitly: a branch pushed with `GITHUB_TOKEN` never fires `pull_request`, so without the dispatch the gate would silently not run.
 - `python tools/check-repos.py` reports no renames, transfers, archived or missing repos. A renamed repo still answers, so link checks alone will not catch it.
+- Every completed change is committed and pushed; `git status --short` shows only unrelated user edits before you report done.
 - Never claim the Pages site updated without fetching the live URL.

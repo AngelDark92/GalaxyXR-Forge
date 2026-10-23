@@ -408,7 +408,8 @@ def main(argv=None):
 
     print(
         "next: review `git diff`, then commit the new catalog.d/changelog.d files plus "
-        "README.md CHANGELOG.md docs/ and open a PR"
+        "README.md CHANGELOG.md docs/ and push the current branch "
+        "(outside contributors: open a PR)"
     )
     print("RESULT " + json.dumps({"repo": full, "group": group["id"], "added": today}))
     return 0

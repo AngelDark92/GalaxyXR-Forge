@@ -1,0 +1,9 @@
+{
+  "repo": "tig3rmast3r/OFXR-Bridge",
+  "url": "https://github.com/tig3rmast3r/OFXR-Bridge",
+  "about": "Original OFXR Bridge: experimental OpenXR layer inserting optical-flow frames between rendered VR frames.",
+  "license": "LGPL-3.0",
+  "release": "0.2.1",
+  "added": "2026-10-23",
+  "tags": ["openxr", "frame generation", "optical flow", "steamvr"]
+}

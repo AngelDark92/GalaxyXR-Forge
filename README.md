@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-61-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-65-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
@@ -17,7 +17,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-22` — 61 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-23` — 65 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -74,13 +74,17 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[AngelDark92/steamlink-androidxr-patched](https://github.com/AngelDark92/steamlink-androidxr-patched)**<br>![stars](https://img.shields.io/github/stars/AngelDark92/steamlink-androidxr-patched?style=flat-square) ![release](https://img.shields.io/github/v/release/AngelDark92/steamlink-androidxr-patched?include_prereleases&style=flat-square&label=release) | Already patched SteamLink apks to be used in tandem with the Galaxy XR driver. |
 | **[BlueScorpioVR/androidInputForwarder](https://github.com/BlueScorpioVR/androidInputForwarder)**<br>![stars](https://img.shields.io/github/stars/BlueScorpioVR/androidInputForwarder?style=flat-square) ![release](https://img.shields.io/github/v/release/BlueScorpioVR/androidInputForwarder?include_prereleases&style=flat-square&label=release) | Root-only app forwarding a Bluetooth controller, keyboard and mouse to an Apollo PC. |
 | **[DienerTech/vectorxr](https://github.com/DienerTech/vectorxr)**<br>![stars](https://img.shields.io/github/stars/DienerTech/vectorxr?style=flat-square) ![release](https://img.shields.io/github/v/release/DienerTech/vectorxr?include_prereleases&style=flat-square&label=release) | Windows OpenXR layer and app for stereo depth, pivot and foveated-rendering tuning. |
+| **[djules75/OFXR-Bridge](https://github.com/djules75/OFXR-Bridge)**<br>![stars](https://img.shields.io/github/stars/djules75/OFXR-Bridge?style=flat-square) ![release](https://img.shields.io/github/v/release/djules75/OFXR-Bridge?include_prereleases&style=flat-square&label=release) | OFXR fork adding 2X/3X frame generation, DLSS Hybrid, D3D11/Vulkan and Linux support. |
+| **[elliotttate/OFXR-Bridge](https://github.com/elliotttate/OFXR-Bridge)**<br>![stars](https://img.shields.io/github/stars/elliotttate/OFXR-Bridge?style=flat-square) ![release](https://img.shields.io/github/v/release/elliotttate/OFXR-Bridge?include_prereleases&style=flat-square&label=release) | OFXR fork adding native DLSS-G frame generation, adaptive presenter pacing and per-game controls. |
 | **[Gilleece/moonlight-android-xr](https://github.com/Gilleece/moonlight-android-xr)**<br>![stars](https://img.shields.io/github/stars/Gilleece/moonlight-android-xr?style=flat-square) ![release](https://img.shields.io/github/v/release/Gilleece/moonlight-android-xr?include_prereleases&style=flat-square&label=release) | Moonlight fork: native OpenXR client with on-headset 2D-to-3D conversion. |
 | **[mbucchia/PimaxMagic4All](https://github.com/mbucchia/PimaxMagic4All)**<br>![stars](https://img.shields.io/github/stars/mbucchia/PimaxMagic4All?style=flat-square) ![release](https://img.shields.io/github/v/release/mbucchia/PimaxMagic4All?include_prereleases&style=flat-square&label=release) | Brings Pimax dynamic foveated rendering to non-Pimax headsets in SteamVR apps. |
 | **[Mr-Nlce/PCVR-Mods-Installer-Hub](https://github.com/Mr-Nlce/PCVR-Mods-Installer-Hub)**<br>![stars](https://img.shields.io/github/stars/Mr-Nlce/PCVR-Mods-Installer-Hub?style=flat-square) ![release](https://img.shields.io/github/v/release/Mr-Nlce/PCVR-Mods-Installer-Hub?include_prereleases&style=flat-square&label=release) | Portable installer and launcher for publicly available PC VR game mods. |
 | **[Nyabsi/OpenVR-SpaceOverride](https://github.com/Nyabsi/OpenVR-SpaceOverride)**<br>![stars](https://img.shields.io/github/stars/Nyabsi/OpenVR-SpaceOverride?style=flat-square) | Uses Lighthouse devices on non-Lighthouse headsets like the Galaxy XR. |
+| **[ReverVR/OFXR-Bridge-Rever](https://github.com/ReverVR/OFXR-Bridge-Rever)**<br>![stars](https://img.shields.io/github/stars/ReverVR/OFXR-Bridge-Rever?style=flat-square) | Rever VR OFXR fork adding an opt-in binding queue for DLSS-NR layers on every OpenXR runtime. |
 | **[shinyflvre/OpenVR-SpaceSync](https://github.com/shinyflvre/OpenVR-SpaceSync)**<br>![stars](https://img.shields.io/github/stars/shinyflvre/OpenVR-SpaceSync?style=flat-square) | Syncs Lighthouse devices to an SLAM headset's pose in SteamVR (Follow SLAM HMD mode). |
 | **[Terminal-ennui/galaxy-xr-alvr-pyrowave-444](https://github.com/Terminal-ennui/galaxy-xr-alvr-pyrowave-444)**<br>![stars](https://img.shields.io/github/stars/Terminal-ennui/galaxy-xr-alvr-pyrowave-444?style=flat-square) | Full-chroma 4:4:4 wireless PC VR streaming via patched ALVR and the PyroWave codec. |
 | **[Terminal-ennui/Galaxy_XR_ALVR_USB](https://github.com/Terminal-ennui/Galaxy_XR_ALVR_USB)**<br>![stars](https://img.shields.io/github/stars/Terminal-ennui/Galaxy_XR_ALVR_USB?style=flat-square) ![release](https://img.shields.io/github/v/release/Terminal-ennui/Galaxy_XR_ALVR_USB?include_prereleases&style=flat-square&label=release) | Streams SteamVR over USB 3 using stock ALVR 20.14.1 with a patched headset client. |
+| **[tig3rmast3r/OFXR-Bridge](https://github.com/tig3rmast3r/OFXR-Bridge)**<br>![stars](https://img.shields.io/github/stars/tig3rmast3r/OFXR-Bridge?style=flat-square) ![release](https://img.shields.io/github/v/release/tig3rmast3r/OFXR-Bridge?include_prereleases&style=flat-square&label=release) | Original OFXR Bridge: experimental OpenXR layer inserting optical-flow frames between rendered VR frames. |
 | **[timkhronos/CustomHeadsetOpenVrGxR](https://github.com/timkhronos/CustomHeadsetOpenVrGxR)**<br>![stars](https://img.shields.io/github/stars/timkhronos/CustomHeadsetOpenVrGxR?style=flat-square) ![release](https://img.shields.io/github/v/release/timkhronos/CustomHeadsetOpenVrGxR?include_prereleases&style=flat-square&label=release) | Original Galaxy XR SteamVR driver fork: pose fixes, colour pipeline, distortion tuner. |
 
 <a id="app-patches"></a>
@@ -187,12 +191,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-23` — OFXR Bridge family added
 - `2026-10-22` — steamvr-addon-manager added
 - `2026-10-22` — gxr-ghostlock added
 - `2026-10-22` — CreoleVR QuestLHSync added
 - `2026-10-21` — steamlink-androidxr-patched added
 - `2026-10-19` — Star link on the site and in the README
-- `2026-10-19` — ScreenStreamerXR added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -202,4 +206,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-22 · 61 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-23 · 65 repos</sub></div>

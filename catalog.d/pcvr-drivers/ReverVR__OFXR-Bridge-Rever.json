@@ -1,0 +1,9 @@
+{
+  "repo": "ReverVR/OFXR-Bridge-Rever",
+  "url": "https://github.com/ReverVR/OFXR-Bridge-Rever",
+  "about": "Rever VR OFXR fork adding an opt-in binding queue for DLSS-NR layers on every OpenXR runtime.",
+  "license": "LGPL-3.0",
+  "release": null,
+  "added": "2026-10-23",
+  "tags": ["openxr", "frame generation", "dlss", "layers"]
+}

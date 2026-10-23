@@ -1,0 +1,9 @@
+{
+  "repo": "elliotttate/OFXR-Bridge",
+  "url": "https://github.com/elliotttate/OFXR-Bridge",
+  "about": "OFXR fork adding native DLSS-G frame generation, adaptive presenter pacing and per-game controls.",
+  "license": "LGPL-3.0",
+  "release": "0.2.13.38-dlssg-V439",
+  "added": "2026-10-23",
+  "tags": ["openxr", "frame generation", "dlss", "frame pacing"]
+}

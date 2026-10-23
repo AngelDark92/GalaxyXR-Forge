@@ -2,6 +2,13 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-23 — OFXR Bridge family added
+
+- Added tig3rmast3r/OFXR-Bridge, the original optical-flow frame-generation OpenXR layer, to PC VR & Streaming.
+- Added djules75/OFXR-Bridge, its 2X/3X and DLSS Hybrid fork, to PC VR & Streaming.
+- Added elliotttate/OFXR-Bridge, its native DLSS-G build line, to PC VR & Streaming.
+- Added ReverVR/OFXR-Bridge-Rever, an independent binding-queue fork, to PC VR & Streaming.
+
 ## 2026-10-22 — steamvr-addon-manager added
 
 - Added aali195/steamvr-addon-manager to Tools & Diagnostics (issue #11).

@@ -1,0 +1,9 @@
+{
+  "repo": "djules75/OFXR-Bridge",
+  "url": "https://github.com/djules75/OFXR-Bridge",
+  "about": "OFXR fork adding 2X/3X frame generation, DLSS Hybrid, D3D11/Vulkan and Linux support.",
+  "license": "LGPL-3.0",
+  "release": "0.2.14.2",
+  "added": "2026-10-23",
+  "tags": ["openxr", "frame generation", "dlss", "vulkan"]
+}

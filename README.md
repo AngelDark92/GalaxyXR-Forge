@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-65-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-64-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
@@ -17,7 +17,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-23` — 65 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-23` — 64 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -162,7 +162,6 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[ovrport/app](https://github.com/ovrport/app)**<br>![stars](https://img.shields.io/github/stars/ovrport/app?style=flat-square) ![release](https://img.shields.io/github/v/release/ovrport/app?include_prereleases&style=flat-square&label=release) | Upstream Overport: patches Quest-targeting Android games; base of the Galaxy XR fork. |
 | **[sboys3/CustomHeadsetOpenVR](https://github.com/sboys3/CustomHeadsetOpenVR)**<br>![stars](https://img.shields.io/github/stars/sboys3/CustomHeadsetOpenVR?style=flat-square) ![release](https://img.shields.io/github/v/release/sboys3/CustomHeadsetOpenVR?include_prereleases&style=flat-square&label=release) | Base custom-headset SteamVR driver framework; both Galaxy XR drivers fork from it. |
 | **[shadps4-emu/shadPS4](https://github.com/shadps4-emu/shadPS4)**<br>![stars](https://img.shields.io/github/stars/shadps4-emu/shadPS4?style=flat-square) ![release](https://img.shields.io/github/v/release/shadps4-emu/shadPS4?include_prereleases&style=flat-square&label=release) | PlayStation 4 emulator; the base the headset PS4 porting projects build on. |
-| **[stearnsbq/QuestLHSync](https://github.com/stearnsbq/QuestLHSync)**<br>![stars](https://img.shields.io/github/stars/stearnsbq/QuestLHSync?style=flat-square) | QuestLHSync fork with the galaxy-xr-support branch, to be used with the CreoleVR project. |
 | **[Terminal-ennui/pyrowave](https://github.com/Terminal-ennui/pyrowave)**<br>![stars](https://img.shields.io/github/stars/Terminal-ennui/pyrowave?style=flat-square) | PyroWave wavelet codec fork used by the headset's ALVR 4:4:4 streaming builds. |
 | **[Vauzi-17/mesa-tu8](https://github.com/Vauzi-17/mesa-tu8)**<br>![stars](https://img.shields.io/github/stars/Vauzi-17/mesa-tu8?style=flat-square) | Turnip (Mesa) Vulkan driver build used by the headset emulation stack. |
 | **[zenithblue-oss/shadps4-arm64](https://github.com/zenithblue-oss/shadps4-arm64)**<br>![stars](https://img.shields.io/github/stars/zenithblue-oss/shadps4-arm64?style=flat-square) | ARM64 shadPS4 build with FEX integration that runs on the headset itself. |
@@ -191,12 +190,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-23` — Duplicate stearnsbq/QuestLHSync entry removed
 - `2026-10-23` — OFXR Bridge family added
 - `2026-10-22` — steamvr-addon-manager added
 - `2026-10-22` — gxr-ghostlock added
 - `2026-10-22` — CreoleVR QuestLHSync added
 - `2026-10-21` — steamlink-androidxr-patched added
-- `2026-10-19` — Star link on the site and in the README
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -206,4 +205,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-23 · 65 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-23 · 64 repos</sub></div>

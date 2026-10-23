@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-23 — Duplicate stearnsbq/QuestLHSync entry removed
+
+- Removed stearnsbq/QuestLHSync from Foundations & Upstreams; its Galaxy XR work is already covered by stearnsbq/questlhsync-galaxy-xr in KernelSU Modules and by CreoleVR/QuestLHSync upstream.
+
 ## 2026-10-23 — OFXR Bridge family added
 
 - Added tig3rmast3r/OFXR-Bridge, the original optical-flow frame-generation OpenXR layer, to PC VR & Streaming.

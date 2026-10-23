@@ -1,9 +1,0 @@
-{
-  "repo": "stearnsbq/QuestLHSync",
-  "url": "https://github.com/stearnsbq/QuestLHSync",
-  "about": "QuestLHSync fork with the galaxy-xr-support branch, to be used with the CreoleVR project.",
-  "license": "MIT",
-  "release": null,
-  "added": "2026-10-13",
-  "tags": ["lighthouse", "tracking", "base project"]
-}

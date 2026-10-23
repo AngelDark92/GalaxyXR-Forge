@@ -1,0 +1,7 @@
+{
+  "date": "2026-10-23",
+  "title": "Duplicate stearnsbq/QuestLHSync entry removed",
+  "items": [
+    "Removed stearnsbq/QuestLHSync from Foundations & Upstreams; its Galaxy XR work is already covered by stearnsbq/questlhsync-galaxy-xr in KernelSU Modules and by CreoleVR/QuestLHSync upstream."
+  ]
+}

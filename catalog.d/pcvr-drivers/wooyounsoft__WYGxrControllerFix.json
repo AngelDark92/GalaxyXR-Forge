@@ -1,0 +1,9 @@
+{
+  "repo": "wooyounsoft/WYGxrControllerFix",
+  "url": "https://github.com/wooyounsoft/WYGxrControllerFix",
+  "about": "SteamVR add-on that tunes Samsung Galaxy XR controllers for PCVR through Virtual Desktop.",
+  "license": "MIT",
+  "release": "v0.3.2",
+  "added": "2026-10-25",
+  "tags": ["galaxy-xr", "openvr-driver", "pcvr", "steamvr"]
+}

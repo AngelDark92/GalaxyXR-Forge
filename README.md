@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-64-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-65-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
@@ -17,7 +17,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-23` — 64 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-25` — 65 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -86,6 +86,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | **[Terminal-ennui/Galaxy_XR_ALVR_USB](https://github.com/Terminal-ennui/Galaxy_XR_ALVR_USB)**<br>![stars](https://img.shields.io/github/stars/Terminal-ennui/Galaxy_XR_ALVR_USB?style=flat-square) ![release](https://img.shields.io/github/v/release/Terminal-ennui/Galaxy_XR_ALVR_USB?include_prereleases&style=flat-square&label=release) | Streams SteamVR over USB 3 using stock ALVR 20.14.1 with a patched headset client. |
 | **[tig3rmast3r/OFXR-Bridge](https://github.com/tig3rmast3r/OFXR-Bridge)**<br>![stars](https://img.shields.io/github/stars/tig3rmast3r/OFXR-Bridge?style=flat-square) ![release](https://img.shields.io/github/v/release/tig3rmast3r/OFXR-Bridge?include_prereleases&style=flat-square&label=release) | Original OFXR Bridge: experimental OpenXR layer inserting optical-flow frames between rendered VR frames. |
 | **[timkhronos/CustomHeadsetOpenVrGxR](https://github.com/timkhronos/CustomHeadsetOpenVrGxR)**<br>![stars](https://img.shields.io/github/stars/timkhronos/CustomHeadsetOpenVrGxR?style=flat-square) ![release](https://img.shields.io/github/v/release/timkhronos/CustomHeadsetOpenVrGxR?include_prereleases&style=flat-square&label=release) | Original Galaxy XR SteamVR driver fork: pose fixes, colour pipeline, distortion tuner. |
+| **[wooyounsoft/WYGxrControllerFix](https://github.com/wooyounsoft/WYGxrControllerFix)**<br>![stars](https://img.shields.io/github/stars/wooyounsoft/WYGxrControllerFix?style=flat-square) ![release](https://img.shields.io/github/v/release/wooyounsoft/WYGxrControllerFix?include_prereleases&style=flat-square&label=release) | SteamVR add-on that tunes Samsung Galaxy XR controllers for PCVR through Virtual Desktop. |
 
 <a id="app-patches"></a>
 
@@ -190,12 +191,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-25` — WYGxrControllerFix added
 - `2026-10-23` — Duplicate stearnsbq/QuestLHSync entry removed
 - `2026-10-23` — OFXR Bridge family added
 - `2026-10-22` — steamvr-addon-manager added
 - `2026-10-22` — gxr-ghostlock added
 - `2026-10-22` — CreoleVR QuestLHSync added
-- `2026-10-21` — steamlink-androidxr-patched added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -205,4 +206,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-23 · 64 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-25 · 65 repos</sub></div>

@@ -1,0 +1,13 @@
+{
+  "repo": "compdoge/gxr-ksu-modules",
+  "checked": "2026-10-26",
+  "note": "Also mirrors gxr-alvr from compdoge/gxr-root-ft, where its source and releases live.",
+  "modules": [
+    {
+      "id": "gxr-display-off",
+      "name": "Galaxy XR display-off on eye loss",
+      "about": "Blanks both panels or sleeps after eye loss and restores them when eyes return.",
+      "status": "stable"
+    }
+  ]
+}

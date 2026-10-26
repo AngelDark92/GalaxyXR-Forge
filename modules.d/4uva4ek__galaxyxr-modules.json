@@ -1,0 +1,120 @@
+{
+  "repo": "4uva4ek/galaxyxr-modules",
+  "checked": "2026-10-26",
+  "modules": [
+    {
+      "id": "gxr_logging_warning",
+      "name": "Logging Warning",
+      "about": "Raises Android's logging threshold to WARNING with reversible RAM-only properties.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr_wifi_adb",
+      "name": "Wi-Fi ADB",
+      "about": "Starts authenticated ADB over TCP on port 5555; installs disabled.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr_haptic_main",
+      "name": "Galaxy XR Haptics MAIN",
+      "about": "Routes controller haptics to the grip motor with retuned pulse timing.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr_openxr_quality",
+      "name": "GXR OpenXR QUALITY",
+      "about": "Holds the camera QUALITY request during visible OpenXR sessions with thermal guards.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_ota_control",
+      "name": "Galaxy XR OTA Control",
+      "about": "Blocks Samsung firmware updates and restores the saved package baseline.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr_mvhevc_eye_fix",
+      "name": "Galaxy XR MV-HEVC Eye Fix",
+      "about": "Fixes left/right eye inversion in Samsung Gallery MV-HEVC spatial video.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr_controller_suite",
+      "name": "Galaxy XR Controller Suite",
+      "about": "Whitening, timestamp precision, HAL cache bypass, tail velocity and HAL log control in one WebUI.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr_framebuffer10",
+      "name": "Galaxy XR Framebuffer10",
+      "about": "Experimental 10-bit SDR compositor output with corrected colour; AZF3 only.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_systemui_optimization",
+      "name": "Galaxy XR SystemUI Optimization",
+      "about": "Experimental duplicate-wait, selected-depth and hidden-panel fixes for SystemUI.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_steamlink_suite",
+      "name": "Galaxy XR Steam Link Suite",
+      "about": "Deprecated suite that bundled Velocity Frame, Pose Time, OpenXR priority profiles and Controller Extrapolation.",
+      "status": "deprecated"
+    },
+    {
+      "id": "gxr_controller_extrapolation",
+      "name": "Galaxy XR Controller Extrapolation",
+      "about": "Stock consumer-side controller extrapolation inside Steam Link; retired.",
+      "status": "deprecated"
+    },
+    {
+      "id": "gxr_controller_timestamp_precision",
+      "name": "Galaxy XR Controller Timestamp Precision",
+      "about": "Kept controller pose timestamps at integer precision; now in Controller Suite.",
+      "status": "deprecated"
+    },
+    {
+      "id": "gxr_controller_whitening",
+      "name": "Galaxy XR Controller Whitening",
+      "about": "Corrected process-covariance whitening in Samsung's controller service; now in Controller Suite.",
+      "status": "deprecated"
+    },
+    {
+      "id": "gxr_hal_cache_bypass",
+      "name": "Galaxy XR HAL Cache Bypass",
+      "about": "Recomputed controller poses instead of using the HAL predictor cache; now in Controller Suite.",
+      "status": "deprecated"
+    },
+    {
+      "id": "gxr_openxr_velocity_frame",
+      "name": "Galaxy XR OpenXR Velocity Frame",
+      "about": "Corrected controller velocity coordinates for OpenXR apps; was in the deprecated Steam Link Suite.",
+      "status": "deprecated"
+    },
+    {
+      "id": "gxr_steamlink_pose_time",
+      "name": "Galaxy XR Steam Link Pose Time",
+      "about": "Forwarded real controller pose timestamps to Steam Link; was in the deprecated Steam Link Suite.",
+      "status": "deprecated"
+    },
+    {
+      "id": "gxr_stream_cpu_relief",
+      "name": "Galaxy XR Stream CPU Relief",
+      "about": "HAL log level and Steam Link thread-priority relief; folded into the deprecated Steam Link Suite.",
+      "status": "deprecated"
+    },
+    {
+      "id": "gxr_controller_log_relief",
+      "name": "Controller HAL Log Relief",
+      "about": "Internal Controller Suite component: HAL log level zero in private memory.",
+      "status": "internal"
+    },
+    {
+      "id": "gxr_openxr_priority",
+      "name": "OpenXR App Priority",
+      "about": "Internal Controller Suite component: profile-based OpenXR thread priorities.",
+      "status": "internal"
+    }
+  ]
+}

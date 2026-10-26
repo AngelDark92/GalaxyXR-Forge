@@ -1,0 +1,12 @@
+{
+  "repo": "compdoge/gxr-root-ft",
+  "checked": "2026-10-26",
+  "modules": [
+    {
+      "id": "gxr-alvr",
+      "name": "Galaxy XR face tracking relay",
+      "about": "Streams the full face and eye parameter set to VRCFaceTracking over UDP 41463.",
+      "status": "stable"
+    }
+  ]
+}

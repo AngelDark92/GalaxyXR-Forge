@@ -8,7 +8,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 
 ## Golden rules
 
-1. `catalog.json` (group metadata), `catalog.d/` (one file per repo) and `changelog.d/` (one file per change) are the single sources of truth. Never hand-edit `README.md`, `CHANGELOG.md`, `docs/index.html` or `docs/catalog-index.json` — they are generated.
+1. `catalog.json` (group metadata), `catalog.d/` (one file per repo), `modules.d/` (one file per module-publishing repo) and `changelog.d/` (one file per change) are the single sources of truth. Never hand-edit `README.md`, `CHANGELOG.md`, `docs/index.html` or `docs/catalog-index.json` — they are generated.
 2. After every catalog change run `python tools/build.py` (regenerates README, changelog and site) and review the git diff before committing.
 3. Keep descriptions to one factual line (build enforces ≤160 chars; target ~14 words). No marketing.
 4. Every catalog change needs an entry in `changelog.d/` (date, title, one item per repo added, moved or removed). `build.py` renders `CHANGELOG.md` and the site's Changelog tab from it — a catalog edit without a changelog entry is an incomplete change. Set `"added": "YYYY-MM-DD"` on every new entry: the site's NEW badge and New filter derive from it, computed client-side because Pages is static: one rule for both the badge and the New filter — an entry is NEW while its `added` date is inside the 5-day window.
@@ -29,8 +29,9 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | --- | --- |
 | `catalog.json` | Group metadata (id, title, icon, hue, blurb); entries live in `catalog.d/` |
 | `catalog.d/<group>/<owner>__<name>.json` | One repo entry per file — an add touches exactly one file |
+| `modules.d/<owner>__<name>.json` | Module list per module-publishing repo, grouped by repo in the site's Kernel modules tab |
 | `changelog.d/<date>-<slug>.json` | One changelog entry per file; `build.py` sorts newest first |
-| `tools/build.py` | Merges `catalog.d/` + `changelog.d/` into `README.md`, `CHANGELOG.md`, `docs/index.html`, `docs/catalog-index.json` |
+| `tools/build.py` | Merges `catalog.d/` + `modules.d/` + `changelog.d/` into `README.md`, `CHANGELOG.md`, `docs/index.html`, `docs/catalog-index.json` |
 | `CHANGELOG.md` | Generated changelog (the GitHub view of `changelog.d/`) |
 | `tools/check-links.py` | Checks that every catalog URL answers |
 | `tools/check-repos.py` | Reads each repo back: renamed, transferred, archived or gone |
@@ -71,6 +72,7 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 | A visitor proposed a repo (issue labelled `add-repo`) | `add-repo.yml` already ran `tools/add-repo.py` and opened a PR; review and merge it |
 | Find where a repo or project lives; which repo to touch | `.opencode/skills/galaxyxr-forge-map/SKILL.md` |
 | Adjust README or site layout | Edit the templates inside `tools/build.py`, rerun it |
+| Add or update the Kernel modules tab | Edit `modules.d/<owner>__<name>.json`, rerun `python tools/build.py` |
 | Confirm catalogued repos still exist and are not renamed, transferred or archived | `python tools/check-repos.py` |
 | Bug in a driver, module, patch or app itself | Go to that project's checkout — do not fix it here |
 
@@ -87,7 +89,8 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 
 ## Verification
 
-- `python tools/build.py` exits 0 and prints repo, group and changelog counts; `python tools/build.py --check` validates without writing.
+- `python tools/build.py` exits 0 and prints repo, group, module and changelog counts; `python tools/build.py --check` validates without writing.
+- Every `modules.d/` file names a catalogued repo and a valid module status; a `kernelsu-modules` repo without module records produces a warning.
 - Every catalog edit carries a matching `changelog.json` entry, appended newest first, and a new entry carries its `added` date.
 - The NEW badge is browser-side logic over `data-added`; it expires on its own after 5 days with no rebuild. Do not freeze "new" into the generated README or the site HTML.
 - Star counts and latest releases on the site cards are fetched in the visitor's browser (shields.io JSON + `localStorage` cache; the badge image is the no-JS/failure fallback). Live values are never baked into the README, the site HTML or the changelog.

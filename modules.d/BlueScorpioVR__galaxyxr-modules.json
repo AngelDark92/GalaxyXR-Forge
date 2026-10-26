@@ -1,0 +1,36 @@
+{
+  "repo": "BlueScorpioVR/galaxyxr-modules",
+  "checked": "2026-10-26",
+  "modules": [
+    {
+      "id": "gxr_window_curvature",
+      "name": "Galaxy XR Home Space Window Curvature",
+      "about": "Adds curve and flatten controls plus a strength slider to Home Space app windows.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_bsvr_auto_spatialization",
+      "name": "Auto-spatialization Default ON",
+      "about": "Enables the auto-spatialization Labs preference at rooted service startup.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr_bsvr_xbox_unknown_key",
+      "name": "Bluetooth Xbox Unknown-Key Recovery",
+      "about": "Releases a stuck unknown key on Bluetooth Xbox controllers so hand navigation recovers.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_bsvr_adb_port_publisher",
+      "name": "ADB Port Publisher",
+      "about": "Reports the wireless ADB port to a PC receiver whenever the framework assigns it.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr-usb-compat",
+      "name": "Galaxy XR USB NCM + AOA",
+      "about": "Adds missing USB NCM networking and Android accessory support; AOA tested with DJI Fly.",
+      "status": "experimental"
+    }
+  ]
+}

@@ -2,6 +2,11 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-26 — Kernel modules tab
+
+- Added a Kernel modules tab listing 32 KernelSU modules from 6 repositories, grouped by repo and including compdoge/gxr-root-ft outside the KernelSU Modules group.
+- Added module-level metadata under modules.d/, one file per module-publishing repository.
+
 ## 2026-10-25 — WYGxrControllerFix added
 
 - Added wooyounsoft/WYGxrControllerFix to PC VR & Streaming (issue #14).

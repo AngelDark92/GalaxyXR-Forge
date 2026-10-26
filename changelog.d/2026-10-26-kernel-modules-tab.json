@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-26",
+  "title": "Kernel modules tab",
+  "items": [
+    "Added a Kernel modules tab listing 32 KernelSU modules from 6 repositories, grouped by repo and including compdoge/gxr-root-ft outside the KernelSU Modules group.",
+    "Added module-level metadata under modules.d/, one file per module-publishing repository."
+  ]
+}

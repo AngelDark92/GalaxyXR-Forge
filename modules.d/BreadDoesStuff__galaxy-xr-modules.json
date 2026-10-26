@@ -1,0 +1,36 @@
+{
+  "repo": "BreadDoesStuff/galaxy-xr-modules",
+  "checked": "2026-10-26",
+  "modules": [
+    {
+      "id": "gxr-fanctl",
+      "name": "Galaxy XR Fan Control",
+      "about": "Overrides the system fan speed, with WebUI steps or a temperature-based curve.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr-no-lowlight-toast",
+      "name": "Galaxy XR No Low-Light Toast",
+      "about": "Disables the ambient-light pipeline so the low-light popup never appears.",
+      "status": "stable"
+    },
+    {
+      "id": "gxr-passthrough-anywhere",
+      "name": "Galaxy XR Passthrough Anywhere",
+      "about": "Toggles passthrough in any XR app with a double-tap, without minimizing.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr-xrcam",
+      "name": "Galaxy XR Camera Debug WebStream",
+      "about": "Streams all 13 headset cameras as MJPEG on port 8080 at native sensor rates.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr-mic-gain-boost",
+      "name": "Galaxy XR Mic Gain Boost",
+      "about": "+15 dB mic gain while Virtual Desktop records; event-driven, no polling.",
+      "status": "experimental"
+    }
+  ]
+}

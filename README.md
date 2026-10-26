@@ -17,7 +17,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-25` — 65 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-26` — 65 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -191,12 +191,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-26` — Kernel modules tab
 - `2026-10-25` — WYGxrControllerFix added
 - `2026-10-23` — Duplicate stearnsbq/QuestLHSync entry removed
 - `2026-10-23` — OFXR Bridge family added
 - `2026-10-22` — steamvr-addon-manager added
 - `2026-10-22` — gxr-ghostlock added
-- `2026-10-22` — CreoleVR QuestLHSync added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -206,4 +206,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-25 · 65 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-26 · 65 repos</sub></div>

@@ -2,6 +2,7 @@
 """Build the Galaxy XR Forge index.
 
     catalog.json (groups) + catalog.d/ (one file per repo)
+    + modules.d/ (one file per module-publishing repo)
     + changelog.d/ (one file per change)
         ->  README.md + CHANGELOG.md + docs/index.html + docs/catalog-index.json
 
@@ -10,7 +11,8 @@ Usage:
     python tools/build.py --check   validate the inputs only
 
 Rules:
-    - catalog.json is the single source of truth for the repo list; changelog.json
+    - catalog.json is the single source of truth for the repo list; modules.d/
+      holds the module detail used by the Kernel modules tab; changelog.json
       holds the change history. Never hand-edit README.md, CHANGELOG.md or
       docs/index.html: edit the inputs and rerun this script.
     - Dependency-free: Python 3.10+, stdlib only, runs on any host.
@@ -26,6 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG_PATH = ROOT / "catalog.json"
 CATALOG_DIR = ROOT / "catalog.d"
+MODULES_DIR = ROOT / "modules.d"
 CHANGELOG_PATH = ROOT / "changelog.json"
 CHANGELOG_DIR = ROOT / "changelog.d"
 README_PATH = ROOT / "README.md"
@@ -80,6 +83,143 @@ def load_catalog():
     if errors:
         raise SystemExit("catalog.d is inconsistent:\n  " + "\n  ".join(errors))
     return cat
+
+
+MODULE_STATUSES = ("stable", "experimental", "deprecated", "internal")
+MODULE_STATUS_LABEL = {
+    "experimental": "Experimental",
+    "deprecated": "Deprecated",
+    "internal": "Internal",
+}
+
+
+def load_modules(cat):
+    """Module records from modules.d/<owner>__<name>.json, one file per repo.
+
+    Kept beside the catalog instead of inside a card entry: a repo can list 19
+    modules without bloating its catalog file, and repairing a catalog entry
+    cannot drop them. Sorted by catalog group, then repo name, so the site order
+    is stable on every host.
+    """
+    if not MODULES_DIR.is_dir():
+        return []
+    group_order = {g["id"]: i for i, g in enumerate(cat.get("groups", []))}
+    repo_group = {
+        r["repo"].lower(): g["id"]
+        for g in cat.get("groups", [])
+        for r in g.get("repos", [])
+    }
+    entries = []
+    for path in sorted(MODULES_DIR.glob("*.json"), key=lambda f: (f.name.lower(), f.name)):
+        with path.open(encoding="utf-8") as f:
+            entry = json.load(f)
+        entry["_file"] = path.name
+        entry["_group"] = repo_group.get(str(entry.get("repo", "")).lower(), "")
+        entries.append(entry)
+    entries.sort(
+        key=lambda e: (
+            group_order.get(e.get("_group", ""), 999),
+            str(e.get("repo", "")).lower(),
+        )
+    )
+    return entries
+
+
+def is_date(value):
+    """True for a YYYY-MM-DD string; catalog and module files share the shape."""
+    return (
+        isinstance(value, str)
+        and len(value) == 10
+        and value[4] == "-"
+        and value[7] == "-"
+        and value[:4].isdigit()
+        and value[5:7].isdigit()
+        and value[8:].isdigit()
+    )
+
+
+def validate_modules(cat, module_index):
+    """Validate modules.d against the catalog. Returns (errors, warnings)."""
+    errors = []
+    warnings = []
+    catalog = {
+        r["repo"].lower()
+        for g in cat.get("groups", [])
+        for r in g.get("repos", [])
+    }
+    seen_repos = set()
+    for entry in module_index:
+        path = entry.get("_file", "?")
+        repo = str(entry.get("repo", ""))
+        if repo.count("/") != 1:
+            errors.append(f"modules.d/{path}: bad repo field {repo!r}")
+            continue
+        owner, name = repo.split("/", 1)
+        want = f"{owner}__{name}.json"
+        if path.lower() != want.lower():
+            errors.append(
+                f"modules.d/{path}: file name does not match repo {repo} (want {want})"
+            )
+        if repo.lower() not in catalog:
+            errors.append(f"modules.d/{path}: repo {repo} is not in the catalog")
+        if repo.lower() in seen_repos:
+            errors.append(f"modules.d/{path}: duplicate repo {repo}")
+        seen_repos.add(repo.lower())
+
+        if not is_date(entry.get("checked")):
+            errors.append(
+                f"modules.d/{path}: bad checked date {entry.get('checked')!r} "
+                "(want YYYY-MM-DD)"
+            )
+        note = entry.get("note")
+        if note is not None and (not isinstance(note, str) or len(note) > 240):
+            errors.append(
+                f"modules.d/{path}: note must be a string of at most 240 chars"
+            )
+
+        mods = entry.get("modules")
+        if not isinstance(mods, list) or not mods:
+            errors.append(f"modules.d/{path}: modules must be a non-empty list")
+            continue
+        seen_ids = set()
+        for m in mods:
+            if not isinstance(m, dict):
+                errors.append(f"modules.d/{path}: module records must be objects")
+                continue
+            mid = str(m.get("id", "")).strip()
+            mname = str(m.get("name", "")).strip()
+            about = str(m.get("about", "")).strip()
+            status = m.get("status", "stable")
+            if not mid:
+                errors.append(f"modules.d/{path}: module without id")
+            elif mid in seen_ids:
+                errors.append(f"modules.d/{path}: duplicate module id {mid}")
+            seen_ids.add(mid)
+            if not mname:
+                errors.append(f"modules.d/{path}: {mid or '?'} has no name")
+            if not about:
+                errors.append(f"modules.d/{path}: {mid or '?'} has no about")
+            elif len(about) > 160:
+                errors.append(
+                    f"modules.d/{path}: {mid or '?'} about too long ({len(about)} chars)"
+                )
+            if status not in MODULE_STATUSES:
+                errors.append(
+                    f"modules.d/{path}: {mid or '?'} bad status {status!r} "
+                    f"(want one of {', '.join(MODULE_STATUSES)})"
+                )
+
+    module_group = next(
+        (g for g in cat.get("groups", []) if g["id"] == "kernelsu-modules"), None
+    )
+    if module_group:
+        for r in module_group.get("repos", []):
+            if r["repo"].lower() not in seen_repos:
+                warnings.append(
+                    f"modules.d: {r['repo']} is in kernelsu-modules "
+                    "but has no module records"
+                )
+    return errors, warnings
 
 
 def dump_json(value):
@@ -167,9 +307,7 @@ def validate(cat):
             elif len(about) > 160:
                 errors.append(f"{repo}: about too long ({len(about)} chars)")
             added = r.get("added")
-            if added is not None and (
-                len(str(added)) != 10 or str(added)[4] != "-" or str(added)[7] != "-"
-            ):
+            if added is not None and not is_date(added):
                 errors.append(f"{repo}: bad added date {added!r} (want YYYY-MM-DD)")
     return errors, seen_repos
 
@@ -603,7 +741,7 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .side-done:hover{background:rgba(249,115,22,.24)}
 .side-done b{color:var(--accent-2);font-weight:600}
 .backdrop{display:none}
-#catalog,#changelog{scroll-margin-top:74px}
+#catalog,#modules,#changelog{scroll-margin-top:74px}
 body.view-changelog .side,body.view-changelog .menu-btn{display:none}
 body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
 @media (min-width:1001px){
@@ -648,6 +786,35 @@ body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
 .entry-head h3{font:600 16px var(--font-disp);margin:0}
 .entry ul{margin:8px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
 .entry li{margin:4px 0}
+.mods{padding:6px 0 10px}
+.mods h2{font:600 1.35rem var(--font-disp);margin:0 0 6px}
+.mod-repo{margin:0 0 34px}
+.mod-head{display:flex;align-items:baseline;gap:10px 12px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.mod-head h3{display:flex;align-items:center;gap:9px;font:600 18px/1.3 var(--font-disp);margin:0;min-width:0;overflow-wrap:anywhere}
+.mod-head h3 .dot{width:9px;height:9px;border-radius:3px;background:var(--hue);flex:none}
+.mod-head h3 .owner{font:400 13px var(--font-mono);color:var(--dim)}
+.mod-head h3 a{min-width:0;overflow-wrap:anywhere}
+.mod-head h3 a:hover{color:var(--accent-2)}
+.grp{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border:1px solid var(--line-2);border-radius:999px;font:500 10.5px var(--font-mono);color:var(--muted);white-space:nowrap}
+.mod-meta{margin-left:auto;display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap;font:11.5px var(--font-mono);color:var(--dim)}
+.mod-meta a{color:var(--muted)}
+.mod-meta a:hover{color:var(--accent)}
+.mod-note{margin:10px 0 0;color:var(--dim);font-size:13px}
+.mod-list{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px}
+.mod-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.mod-row h4{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin:0;font:600 14.5px var(--font-disp);min-width:0;overflow-wrap:anywhere}
+.mod-row h4 code{font-size:11.5px;color:var(--dim);background:transparent;border:0;padding:0;overflow-wrap:anywhere}
+.mod-row p{grid-column:1/-1;margin:0;color:var(--muted);font-size:13.5px;overflow-wrap:anywhere}
+.mod-tag{justify-self:end;padding:2px 8px;border:1px solid var(--line-2);border-radius:999px;font:600 10px/1.7 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.mod-tag.experimental{color:#fbbf24;border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.10)}
+.mod-tag.deprecated{color:#fb7185;border-color:rgba(251,113,133,.45);background:rgba(251,113,133,.10)}
+.mod-tag.internal{color:#94a3b8;border-color:rgba(148,163,184,.35);background:rgba(148,163,184,.08)}
+@media (max-width:620px){
+  .mod-head h3{font-size:16px}
+  .mod-meta{margin-left:0;width:100%}
+  .mod-row{grid-template-columns:minmax(0,1fr)}
+  .mod-tag{justify-self:start}
+}
 main{padding:0 0 6px}
 .group{margin:0 0 42px}
 .group-head h2{display:flex;align-items:center;gap:10px;font:600 1.35rem var(--font-disp);margin:0 0 6px}
@@ -752,6 +919,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     <div class="stats">
       <div class="stat"><b id="count">__TOTAL__</b><span>repos shown</span></div>
       <div class="stat"><b>__GROUPS__</b><span>groups</span></div>
+      <div class="stat"><b>__MODULE_TOTAL__</b><span>modules</span></div>
       <div class="stat"><b>__DATE__</b><span>curated</span></div>
     </div>
   </div>
@@ -764,6 +932,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     </button>
     <div class="tabs" role="tablist" aria-label="Views">
       <button type="button" class="tab is-active" data-view="catalog" role="tab" aria-selected="true">Catalog <b>__TOTAL__</b></button>
+      <button type="button" class="tab" data-view="modules" role="tab" aria-selected="false">Kernel modules <b>__MODULE_TOTAL__</b></button>
       <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>__CHANGELOG_COUNT__</b></button>
     </div>
     <a class="star-btn" href="__REPO_URL__" target="_blank" rel="noopener" title="Star GalaxyXR-Forge on GitHub"><span class="s" aria-hidden="true">★</span> Star on GitHub</a>
@@ -801,6 +970,9 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       __SECTIONS__
       <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
     </main>
+    <div id="modules" hidden>
+      __MODULES__
+    </div>
     <div id="changelog" hidden>
       __CHANGELOG__
     </div>
@@ -1023,8 +1195,8 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 // Filters rail. Desktop: a sticky rail left of the catalog, collapsed and expanded
 // with the Filters button, choice remembered in localStorage. Narrow screens: the
 // same rail becomes an off-canvas drawer with a backdrop, closed on load and closed
-// again by the X, the backdrop, Escape or the Show-N button. The Changelog view
-// hides it (body.view-changelog).
+// again by the X, the backdrop, Escape or the Show-N button. The Changelog and
+// Kernel modules views hide it (body.view-changelog).
 (function () {
   var KEY = 'gxrforge.sidebar';
   var btn = document.getElementById('menu-btn');
@@ -1074,11 +1246,15 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   else if (mq.addListener) mq.addListener(onBreak);
 })();
 
-// Catalog / Changelog views. The active view is mirrored in the URL hash, so a
-// link like #changelog opens the history directly.
+// Catalog / Kernel modules / Changelog views. The active view is mirrored in the
+// URL hash, so links like #modules or #changelog open that view directly.
 (function () {
   var tabs = [].slice.call(document.querySelectorAll('.tab'));
-  var views = { catalog: document.getElementById('catalog'), changelog: document.getElementById('changelog') };
+  var views = {
+    catalog: document.getElementById('catalog'),
+    modules: document.getElementById('modules'),
+    changelog: document.getElementById('changelog')
+  };
   function show(view) {
     tabs.forEach(function (t) {
       var on = t.dataset.view === view;
@@ -1096,7 +1272,12 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   tabs.forEach(function (t) {
     t.addEventListener('click', function () { show(t.dataset.view); });
   });
-  if (window.location.hash === '#changelog') show('changelog');
+  function fromHash() {
+    var view = window.location.hash.replace(/^#/, '');
+    if (views[view]) show(view);
+  }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
 })();
 
 // Live stars and latest release, fetched in the visitor's browser so both stay
@@ -1492,12 +1673,79 @@ def render_changelog_view(changelog):
     )
 
 
-def render_site(cat, changelog):
+def render_modules_view(cat, module_index):
+    """Kernel-module index grouped by repository, including repos outside the group."""
+    repo_meta = {
+        r["repo"].lower(): (g, r)
+        for g in cat.get("groups", [])
+        for r in g.get("repos", [])
+    }
+    sections = []
+    for entry in module_index:
+        repo = entry.get("repo", "")
+        group, card = repo_meta.get(repo.lower(), (None, None))
+        if group is None:
+            continue
+        owner, name = repo.split("/", 1)
+        mods = entry.get("modules", [])
+        rows = []
+        for m in mods:
+            status = m.get("status", "stable")
+            tag = ""
+            if status != "stable":
+                tag = (
+                    f'<span class="mod-tag {html.escape(status, quote=True)}">'
+                    f'{MODULE_STATUS_LABEL.get(status, status.title())}</span>'
+                )
+            rows.append(
+                f'<li class="mod-row">'
+                f'<h4>{html.escape(m["name"])}<code>{html.escape(m["id"])}</code></h4>'
+                f"{tag}"
+                f'<p>{html.escape(m["about"])}</p>'
+                f"</li>"
+            )
+        count = len(mods)
+        meta = [f'{count} module{"s" if count != 1 else ""}']
+        if entry.get("checked"):
+            meta.append(f'checked {html.escape(str(entry["checked"]))}')
+        url = html.escape(card["url"], quote=True)
+        meta.append(f'<a href="{url}" target="_blank" rel="noopener">GitHub</a>')
+        if card.get("release"):
+            meta.append(
+                f'<a href="{url}/releases" target="_blank" rel="noopener">Releases</a>'
+            )
+        note = entry.get("note")
+        note_html = f'<p class="mod-note">{html.escape(note)}</p>' if note else ""
+        sections.append(
+            f'<section class="mod-repo" style="--hue:{html.escape(group["hue"], quote=True)}">'
+            f'<div class="mod-head">'
+            f'<h3><span class="dot"></span><a href="{url}" target="_blank" rel="noopener">'
+            f'<span class="owner">{html.escape(owner)}/</span>{html.escape(name)}</a></h3>'
+            f'<span class="grp">{html.escape(group["icon"])} {html.escape(group["title"])}</span>'
+            f'<span class="mod-meta">{" &middot; ".join(meta)}</span>'
+            f"</div>"
+            f"{note_html}"
+            f'<ul class="mod-list">{"".join(rows)}</ul>'
+            f"</section>"
+        )
+    return (
+        '<section class="mods">'
+        "<h2>Kernel modules</h2>"
+        '<p class="blurb">Every KernelSU module published by a catalogued repository, '
+        "grouped by repo. Repositories outside the KernelSU Modules group are included; "
+        "tags mark experimental, deprecated and internal-only packages.</p>"
+        f'{"".join(sections)}</section>'
+    )
+
+
+def render_site(cat, changelog, module_index):
     total = sum(len(g["repos"]) for g in cat["groups"])
+    module_total = sum(len(e.get("modules", [])) for e in module_index)
     updated = newest_date(cat, changelog)
     page = SITE_TEMPLATE
     page = page.replace("__TAGLINE__", html.escape(TAGLINE, quote=True))
     page = page.replace("__TOTAL__", str(total))
+    page = page.replace("__MODULE_TOTAL__", str(module_total))
     page = page.replace("__GROUPS__", str(len(cat["groups"])))
     page = page.replace("__DATE__", updated)
     page = page.replace("__CHIPS__", render_chips(cat))
@@ -1506,6 +1754,7 @@ def render_site(cat, changelog):
     page = page.replace("__CHANGELOG_COUNT__", str(len(changelog.get("entries", []))))
     page = page.replace("__GROUP_OPTIONS__", render_group_options(cat))
     page = page.replace("__CHANGELOG__", render_changelog_view(changelog))
+    page = page.replace("__MODULES__", render_modules_view(cat, module_index))
     page = page.replace("__REPO_SLUG__", REPO_URL.split("github.com/")[-1])
     page = page.replace("__REPO_URL__", REPO_URL)
     return page
@@ -1519,22 +1768,29 @@ def main():
     check_only = "--check" in args
     cat = load_catalog()
     changelog = load_changelog()
+    module_index = load_modules(cat)
     errors, repos = validate(cat)
+    module_errors, module_warnings = validate_modules(cat, module_index)
+    errors += module_errors
     errors += validate_changelog(changelog)
+    for warning in module_warnings:
+        print("warning:", warning)
     if errors:
         print("input INVALID:")
         for e in errors:
             print("  -", e)
         return 1
+    module_total = sum(len(e.get("modules", [])) for e in module_index)
     if check_only:
         print(
             f"OK: {len(repos)} repos in {len(cat['groups'])} groups; "
+            f"{module_total} modules in {len(module_index)} repos; "
             f"changelog: {len(changelog['entries'])} entries"
         )
         return 0
     readme = render_readme(cat, changelog)
     changelog_md = render_changelog_md(changelog)
-    site = render_site(cat, changelog)
+    site = render_site(cat, changelog, module_index)
     README_PATH.write_text(readme, encoding="utf-8", newline="\n")
     CHANGELOG_MD_PATH.write_text(changelog_md, encoding="utf-8", newline="\n")
     SITE_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -1557,6 +1813,7 @@ def main():
     print(f"wrote docs/index.html ({len(site)} bytes)")
     print(
         f"catalog: {len(repos)} repos in {len(cat['groups'])} groups; "
+        f"modules: {module_total} in {len(module_index)} repos; "
         f"changelog: {len(changelog['entries'])} entries"
     )
     return 0

@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-28 — LinkFT added
+
+- Added compdoge/LinkFT to Face & Eye Tracking (issue #18).
+
 ## 2026-10-26 — Kernel modules tab
 
 - Added a Kernel modules tab listing 32 KernelSU modules from 6 repositories, grouped by repo and including compdoge/gxr-root-ft outside the KernelSU Modules group.

@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-65-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-66-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
@@ -17,7 +17,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-26` — 65 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-28` — 66 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -57,6 +57,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | --- | --- |
 | **[compdoge/gxr-face-bridge](https://github.com/compdoge/gxr-face-bridge)**<br>![stars](https://img.shields.io/github/stars/compdoge/gxr-face-bridge?style=flat-square) ![release](https://img.shields.io/github/v/release/compdoge/gxr-face-bridge?include_prereleases&style=flat-square&label=release) | OpenXR face-tracking bridge for Steam Link VR on the Galaxy XR. |
 | **[compdoge/gxr-root-ft](https://github.com/compdoge/gxr-root-ft)**<br>![stars](https://img.shields.io/github/stars/compdoge/gxr-root-ft?style=flat-square) ![release](https://img.shields.io/github/v/release/compdoge/gxr-root-ft?include_prereleases&style=flat-square&label=release) | Headset-side face and eye relay plus a KernelSU module for PC VR face tracking. |
+| **[compdoge/LinkFT](https://github.com/compdoge/LinkFT)**<br>![stars](https://img.shields.io/github/stars/compdoge/LinkFT?style=flat-square) ![release](https://img.shields.io/github/v/release/compdoge/LinkFT?include_prereleases&style=flat-square&label=release) | Maps the five transported Galaxy XR tongue values to the VRCFT unified expressions TongueOut, TongueLeft, TongueRight, TongueUp, and TongueDown. |
 | **[compdoge/VRCFT-ALVR-UE](https://github.com/compdoge/VRCFT-ALVR-UE)**<br>![stars](https://img.shields.io/github/stars/compdoge/VRCFT-ALVR-UE?style=flat-square) ![release](https://img.shields.io/github/v/release/compdoge/VRCFT-ALVR-UE?include_prereleases&style=flat-square&label=release) | VRCFaceTracking module that receives ALVR eye and face tracking on the PC. |
 | **[SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop](https://github.com/SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop)**<br>![stars](https://img.shields.io/github/stars/SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop?style=flat-square) ![release](https://img.shields.io/github/v/release/SinonVT/GalaxyXR-EyeTracking-Fix-Virtual-Desktop?include_prereleases&style=flat-square&label=release) | Fixes eye-gaze drift on head tilt in Virtual Desktop's VRCFaceTracking module. |
 | **[Tony-Klink/GabbleXR-server](https://github.com/Tony-Klink/GabbleXR-server)**<br>![stars](https://img.shields.io/github/stars/Tony-Klink/GabbleXR-server?style=flat-square) | Bridges Galaxy XR face and eye tracking into Resonite via OSC. |
@@ -191,12 +192,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-28` — LinkFT added
 - `2026-10-26` — Kernel modules tab
 - `2026-10-25` — WYGxrControllerFix added
 - `2026-10-23` — Duplicate stearnsbq/QuestLHSync entry removed
 - `2026-10-23` — OFXR Bridge family added
 - `2026-10-22` — steamvr-addon-manager added
-- `2026-10-22` — gxr-ghostlock added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -206,4 +207,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-26 · 65 repos</sub></div>
+<div align="center"><sub>Curated 2026-10-28 · 66 repos</sub></div>

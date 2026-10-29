@@ -83,7 +83,7 @@ jobs:
           git config user.name "gxr-forge-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B "$BRANCH"
-          git add news.d docs/index.html README.md CHANGELOG.md docs/catalog-index.json
+          git add news.d docs/index.html README.md CHANGELOG.md docs/catalog-index.json docs/news.json
           # The title is untrusted issue text: pass it as a printf argument, never
           # inside the format string, so quotes, $ and backticks stay literal.
           git commit -m "$(printf 'feat: news post %s (issue #%s)' "$TITLE" "$ISSUE")"

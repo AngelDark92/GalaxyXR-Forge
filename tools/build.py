@@ -6,6 +6,7 @@
     + news.d/ (one file per news post)
     + changelog.d/ (one file per change)
         ->  README.md + CHANGELOG.md + docs/index.html + docs/catalog-index.json
+            + docs/news.json (the news archive, loaded on demand)
 
 Usage:
     python tools/build.py           validate, then write the generated files
@@ -38,6 +39,7 @@ README_PATH = ROOT / "README.md"
 CHANGELOG_MD_PATH = ROOT / "CHANGELOG.md"
 SITE_PATH = ROOT / "docs" / "index.html"
 INDEX_PATH = ROOT / "docs" / "catalog-index.json"
+NEWS_INDEX_PATH = ROOT / "docs" / "news.json"
 
 REPO_URL = "https://github.com/AngelDark92/GalaxyXR-Forge"
 SITE_URL = "https://angeldark92.github.io/GalaxyXR-Forge"
@@ -396,6 +398,7 @@ NEWS_MAX_PARAGRAPHS = 8
 NEWS_MAX_PARAGRAPH = 800
 NEWS_MAX_LINKS = 4
 NEWS_MAX_LABEL = 60
+NEWS_PAGE_SIZE = 6
 MONTHS = (
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -847,6 +850,7 @@ SITE_TEMPLATE = """<!doctype html>
   --tab-h:44px; --hero-bleed:1px;
 }
 *,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-sans);-webkit-font-smoothing:antialiased}
@@ -1130,6 +1134,12 @@ main{padding:0 0 6px}
 .news-links{margin:10px 0 0;display:flex;gap:8px;flex-wrap:wrap}
 .news-link{display:inline-flex;align-items:center;border:1px solid var(--line-2);border-radius:8px;padding:5px 12px;font:500 12.5px var(--font-mono);color:var(--muted)}
 .news-link:hover{border-color:var(--accent);color:var(--ink)}
+.news-more{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:10px}
+.news-more-count{display:inline-flex;align-items:center;margin-left:8px;padding:1px 7px;border-radius:999px;background:var(--line);font:500 11px var(--font-mono);color:var(--muted);white-space:nowrap}
+.news-more-status{min-height:16px;font:500 12px var(--font-mono);color:var(--dim);margin:0;text-align:center}
+.news-more-noscript{font:13px var(--font-sans);color:var(--muted);margin:0}
+.news-more-noscript a{color:var(--accent);text-decoration:underline}
+@media (max-width:560px){.news-more .btn{width:100%;justify-content:center}}
 footer{border-top:1px solid var(--line);margin-top:14px;padding:22px 0 42px;color:var(--dim);font-size:13px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
 footer a{color:var(--muted)}
@@ -2088,6 +2098,136 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   if(kindSel) kindSel.addEventListener('change', refresh);
   go.addEventListener('click', function(ev){ if(!issueHref()){ ev.preventDefault(); titleIn.focus(); }});
 })();
+
+// News pagination: fetches docs/news.json on demand
+(function(){
+  var feed = document.getElementById('news-feed');
+  var btn = document.getElementById('news-more');
+  var countEl = document.getElementById('news-more-count');
+  var statusEl = document.getElementById('news-more-status');
+  if(!feed || !btn) return;
+  var pageSize = parseInt(feed.getAttribute('data-page-size'),10) || 6;
+  var archive = null; // {items:[{id,html}]} once fetched
+  var fetching = false;
+  var fetchedOnce = false;
+
+  function getArchive(){
+    if(archive) return Promise.resolve(archive);
+    if(fetching) return fetching;
+    var url = 'news.json' + (fetchedOnce ? '' : '?t=' + Date.now());
+    fetchedOnce = true;
+    fetching = fetch(url).then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    }).then(function(data){
+      archive = data;
+      fetching = false;
+      return data;
+    }).catch(function(err){
+      fetching = false;
+      throw err;
+    });
+    return fetching;
+  }
+
+  function prefetch(){
+    if(archive || fetching) return;
+    if(!window.fetch) return;
+    getArchive().catch(function(){});
+  }
+
+  function appendNext(){
+    var current = feed.querySelectorAll('.news-item').length;
+    if(!archive) return 0;
+    var total = archive.items ? archive.items.length : (parseInt(archive.total,10) || current);
+    var remain = total - current;
+    if(remain <= 0) return 0;
+    var take = Math.min(pageSize, remain);
+    var frag = document.createDocumentFragment();
+    var tmp = document.createElement('div');
+    for(var i=current; i<current+take; i++){
+      var item = archive.items[i];
+      if(!item) break;
+      tmp.innerHTML = item.html;
+      while(tmp.firstChild) frag.appendChild(tmp.firstChild);
+    }
+    feed.appendChild(frag);
+    return take;
+  }
+
+  function updateUI(){
+    var current = feed.querySelectorAll('.news-item').length;
+    var total = archive ? (archive.items ? archive.items.length : parseInt(archive.total,10)) : parseInt(feed.getAttribute('data-total'),10) || current;
+    var remain = total - current;
+    if(remain <= 0){
+      btn.hidden = true;
+      if(statusEl) statusEl.textContent = 'All ' + total + ' posts shown.';
+    } else {
+      if(countEl) countEl.textContent = remain + ' more';
+    }
+  }
+
+  function loadMore(){
+    if(btn.disabled) return;
+    if(!window.fetch){
+      if(statusEl) statusEl.textContent = 'This browser cannot load older posts.';
+      return;
+    }
+    if(!archive){
+      btn.disabled = true;
+      feed.setAttribute('aria-busy','true');
+      getArchive().then(function(data){
+        appendNext();
+        updateUI();
+        btn.disabled = false;
+        feed.removeAttribute('aria-busy');
+      }).catch(function(){
+        btn.disabled = false;
+        feed.removeAttribute('aria-busy');
+        if(statusEl) statusEl.textContent = 'Could not load older posts.';
+      });
+    } else {
+      appendNext();
+      updateUI();
+    }
+  }
+
+  btn.addEventListener('click', loadMore);
+
+  // Prefetch when News tab is shown
+  var newsTab = document.getElementById('tab-news');
+  if(newsTab) newsTab.addEventListener('click', prefetch);
+  window.addEventListener('hashchange', function(){
+    if(window.location.hash.indexOf('#news') === 0) prefetch();
+  });
+  if(window.location.hash.indexOf('#news') === 0) prefetch();
+
+  // Deep-link: if hash targets an item beyond the first page, load until it exists
+  function ensureDeepLink(){
+    var hash = window.location.hash.replace(/^#/,'');
+    if(!hash || hash.indexOf('news-') !== 0) return;
+    if(document.getElementById(hash)) return;
+    // Need to fetch archive and append pages until item appears
+    getArchive().then(function(){
+      var pages = Math.ceil((archive.items ? archive.items.length : 0) / pageSize) + 1;
+      while(!document.getElementById(hash) && pages-- > 0){
+        var n = appendNext();
+        if(n === 0) break;
+      }
+      updateUI();
+      var el = document.getElementById(hash);
+      if(el){
+        var margin = parseFloat(window.getComputedStyle(el).scrollMarginTop) || 0;
+        var top = el.getBoundingClientRect().top + window.pageYOffset - margin;
+        try { window.scrollTo({top: Math.max(0, top), behavior:'instant'}); }
+        catch(e) { window.scrollTo(0, Math.max(0, top)); }
+      }
+    }).catch(function(){});
+  }
+  // Run on initial load (news tab already shown by tab script's fromHash)
+  ensureDeepLink();
+  window.addEventListener('hashchange', ensureDeepLink);
+})();
 </script>
 </body>
 </html>
@@ -2210,8 +2350,86 @@ def news_date_label(value):
     return f"{d.day} {MONTHS[d.month - 1]} {d.year}"
 
 
+def render_news_item(entry, repo_meta):
+    """One post as an <li>. Shared by the first page and the on-demand archive."""
+    stem = html.escape(str(entry.get("_file", "news"))[:-5], quote=True)
+    kind = entry.get("kind") or "community"
+    meta = [
+        f'<time datetime="{html.escape(str(entry.get("date")), quote=True)}">'
+        f'{news_date_label(entry.get("date"))}</time>'
+    ]
+    meta.append(
+        f'<span class="news-kind" data-kind="{html.escape(kind, quote=True)}">'
+        f'{html.escape(NEWS_KIND_LABEL.get(kind, kind.title()))}</span>'
+    )
+    author = entry.get("author")
+    if author:
+        handle = html.escape(str(author))
+        meta.append(
+            f'<a class="news-author" href="https://github.com/{handle}" '
+            f'target="_blank" rel="noopener">@{handle}</a>'
+        )
+
+    summary = entry.get("summary")
+    paras = []
+    for i, para in enumerate(entry.get("body") or []):
+        cls = ' class="lede"' if i == 0 and not summary else ""
+        paras.append(f"<p{cls}>{inline_md(para)}</p>")
+
+    repo_html = ""
+    repo = entry.get("repo")
+    if repo:
+        owner, name = str(repo).split("/", 1)
+        hit = repo_meta.get(str(repo).lower())
+        if hit:
+            group, card = hit
+            repo_html = (
+                f'<p class="news-repo"><a href="{html.escape(card["url"], quote=True)}" '
+                f'target="_blank" rel="noopener"><span class="owner">{html.escape(owner)}/</span>'
+                f'{html.escape(name)}</a><span class="grp">{html.escape(group["icon"])} '
+                f'{html.escape(group["title"])}</span></p>'
+            )
+        else:
+            repo_html = (
+                f'<p class="news-repo"><span class="owner">{html.escape(owner)}/</span>'
+                f"{html.escape(name)}</p>"
+            )
+
+    links_html = ""
+    links = entry.get("links") or []
+    if links:
+        anchors = "".join(
+            f'<a class="news-link" href="{html.escape(str(link["url"]), quote=True)}" '
+            f'target="_blank" rel="noopener">{html.escape(str(link["label"]))}</a>'
+            for link in links
+        )
+        links_html = f'<p class="news-links">{anchors}</p>'
+
+    parts = [
+        f'<li class="news-item" id="news-{stem}" data-kind='
+        f'"{html.escape(kind, quote=True)}">',
+        f'<div class="news-meta">{"".join(meta)}</div>',
+        f'<h3 class="news-title">{inline_md(entry.get("title", ""))}'
+        f'<a class="news-anchor" href="#news-{stem}" '
+        f'aria-label="Link to this post">#</a></h3>',
+    ]
+    if summary:
+        parts.append(f'<p class="news-summary">{inline_md(summary)}</p>')
+    parts.append(f'<div class="news-body">{"".join(paras)}</div>')
+    parts.append(repo_html + links_html)
+    parts.append("</li>")
+    return "".join(parts)
+
+
 def render_news_view(news, cat):
-    """News feed, newest first, with one deep-linkable anchor per post."""
+    """The News tab: the newest page inline, the rest fetched from docs/news.json.
+
+    The page is the same file for the whole site, so an archive that is inlined
+    here is paid for by every visitor, including the ones who never open News.
+    Only NEWS_PAGE_SIZE posts are rendered; the archive lives in docs/news.json
+    and the page's script appends it page by page. Without JS the newest page is
+    still readable and the noscript link reaches the rest.
+    """
     repo_meta = {
         r["repo"].lower(): (g, r)
         for g in cat.get("groups", [])
@@ -2233,85 +2451,62 @@ def render_news_view(news, cat):
         "</div>"
     )
 
-    items = []
-    for e in news.get("entries", []):
-        stem = html.escape(str(e.get("_file", "news"))[:-5], quote=True)
-        kind = e.get("kind") or "community"
-        meta = [
-            f'<time datetime="{html.escape(str(e.get("date")), quote=True)}">'
-            f'{news_date_label(e.get("date"))}</time>'
-        ]
-        meta.append(
-            f'<span class="news-kind" data-kind="{html.escape(kind, quote=True)}">'
-            f'{html.escape(NEWS_KIND_LABEL.get(kind, kind.title()))}</span>'
-        )
-        author = e.get("author")
-        if author:
-            handle = html.escape(str(author))
-            meta.append(
-                f'<a class="news-author" href="https://github.com/{handle}" '
-                f'target="_blank" rel="noopener">@{handle}</a>'
-            )
-
-        summary = e.get("summary")
-        paras = []
-        for i, para in enumerate(e.get("body") or []):
-            cls = ' class="lede"' if i == 0 and not summary else ""
-            paras.append(f"<p{cls}>{inline_md(para)}</p>")
-
-        repo_html = ""
-        repo = e.get("repo")
-        if repo:
-            owner, name = str(repo).split("/", 1)
-            hit = repo_meta.get(str(repo).lower())
-            if hit:
-                group, card = hit
-                repo_html = (
-                    f'<p class="news-repo"><a href="{html.escape(card["url"], quote=True)}" '
-                    f'target="_blank" rel="noopener"><span class="owner">{html.escape(owner)}/</span>'
-                    f'{html.escape(name)}</a><span class="grp">{html.escape(group["icon"])} '
-                    f'{html.escape(group["title"])}</span></p>'
-                )
-            else:
-                repo_html = (
-                    f'<p class="news-repo"><span class="owner">{html.escape(owner)}/</span>'
-                    f"{html.escape(name)}</p>"
-                )
-
-        links_html = ""
-        links = e.get("links") or []
-        if links:
-            anchors = "".join(
-                f'<a class="news-link" href="{html.escape(str(link["url"]), quote=True)}" '
-                f'target="_blank" rel="noopener">{html.escape(str(link["label"]))}</a>'
-                for link in links
-            )
-            links_html = f'<p class="news-links">{anchors}</p>'
-
-        parts = [
-            f'<li class="news-item" id="news-{stem}" data-kind='
-            f'"{html.escape(kind, quote=True)}">',
-            f'<div class="news-meta">{"".join(meta)}</div>',
-            f'<h3 class="news-title">{inline_md(e.get("title", ""))}'
-            f'<a class="news-anchor" href="#news-{stem}" '
-            f'aria-label="Link to this post">#</a></h3>',
-        ]
-        if summary:
-            parts.append(f'<p class="news-summary">{inline_md(summary)}</p>')
-        parts.append(f'<div class="news-body">{"".join(paras)}</div>')
-        parts.append(repo_html + links_html)
-        parts.append("</li>")
-        items.append("".join(parts))
-
-    if items:
-        feed = f'<ol class="news-feed">{"".join(items)}</ol>'
-    else:
+    entries = news.get("entries", [])
+    if not entries:
         feed = (
             '<div class="empty-state"><p class="empty-title">No news yet</p>'
             "<p>Releases, guides and site updates will appear here as they are "
             "posted — the first one could be yours.</p></div>"
         )
+        return f'<section class="news" aria-labelledby="news-title">{head}{feed}</section>'
+
+    first = "".join(render_news_item(e, repo_meta) for e in entries[:NEWS_PAGE_SIZE])
+    feed = (
+        f'<ol class="news-feed" id="news-feed" data-page-size="{NEWS_PAGE_SIZE}" '
+        f'data-total="{len(entries)}">{first}</ol>'
+    )
+    left = len(entries) - NEWS_PAGE_SIZE
+    if left > 0:
+        feed += (
+            '<div class="news-more" id="news-more-wrap">'
+            '<button type="button" class="btn btn-ghost" id="news-more" '
+            'aria-controls="news-feed">Show older posts'
+            f'<span class="news-more-count" id="news-more-count">{left} more</span></button>'
+            '<p class="news-more-status" id="news-more-status" role="status" '
+            'aria-live="polite"></p>'
+            '<noscript><p class="news-more-noscript">The rest of the archive is in '
+            '<a href="news.json">news.json</a>.</p></noscript>'
+            "</div>"
+        )
     return f'<section class="news" aria-labelledby="news-title">{head}{feed}</section>'
+
+
+def render_news_index(news, cat):
+    """The archive as JSON for the on-demand loader.
+
+    Each item carries its already-rendered <li> so the browser and the build share
+    one renderer; nothing in the JSON is user-supplied at runtime.
+    """
+    repo_meta = {
+        r["repo"].lower(): (g, r)
+        for g in cat.get("groups", [])
+        for r in g.get("repos", [])
+    }
+    entries = news.get("entries", [])
+    items = [
+        {
+            "id": f"news-{str(e.get('_file', 'news'))[:-5]}",
+            "html": render_news_item(e, repo_meta),
+        }
+        for e in entries
+    ]
+    payload = {
+        "updated": entries[0].get("date") if entries else None,
+        "pageSize": NEWS_PAGE_SIZE,
+        "total": len(entries),
+        "items": items,
+    }
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n"
 
 
 def render_site(cat, changelog, module_index, news):
@@ -2374,10 +2569,12 @@ def main():
     readme = render_readme(cat, changelog)
     changelog_md = render_changelog_md(changelog)
     site = render_site(cat, changelog, module_index, news)
+    news_index = render_news_index(news, cat)
     README_PATH.write_text(readme, encoding="utf-8", newline="\n")
     CHANGELOG_MD_PATH.write_text(changelog_md, encoding="utf-8", newline="\n")
     SITE_PATH.parent.mkdir(parents=True, exist_ok=True)
     SITE_PATH.write_text(site, encoding="utf-8", newline="\n")
+    NEWS_INDEX_PATH.write_text(news_index, encoding="utf-8", newline="\n")
     index = {
         "updated": newest_date(cat, changelog),
         "repos": [
@@ -2394,6 +2591,7 @@ def main():
     print(f"wrote README.md ({len(readme)} bytes)")
     print(f"wrote CHANGELOG.md ({len(changelog_md)} bytes)")
     print(f"wrote docs/index.html ({len(site)} bytes)")
+    print(f"wrote docs/news.json ({news_total} posts, {len(news_index)} bytes)")
     print(
         f"catalog: {len(repos)} repos in {len(cat['groups'])} groups; "
         f"modules: {module_total} in {len(module_index)} repos; "

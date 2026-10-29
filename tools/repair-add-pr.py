@@ -39,7 +39,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
-GENERATED = ["README.md", "CHANGELOG.md", "docs/index.html", "docs/catalog-index.json"]
+GENERATED = ["README.md", "CHANGELOG.md", "docs/index.html", "docs/catalog-index.json", "docs/news.json"]
 
 
 def load_build():

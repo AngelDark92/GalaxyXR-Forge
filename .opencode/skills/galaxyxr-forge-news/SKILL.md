@@ -65,6 +65,10 @@ Add `--summary "one line"`, `--date YYYY-MM-DD`, `--dry-run`, or `--json payload
 - `links` accepts only absolute `https://` URLs, max 4.
 - `author` renders as an `@handle` link; `issue` ties the post back to its proposal and blocks a second import of the same issue.
 
+## Archive loading
+
+`docs/index.html` ships only the newest `NEWS_PAGE_SIZE` posts (6). The whole feed is written to `docs/news.json` as pre-rendered items, and the page appends one page at a time when someone asks for older posts. A `#news-<stem>` deep link loads pages until that post exists. Nothing else is fetched on a Catalog page load. Do not inline the full archive, and never hand-edit either generated file.
+
 ## Issue body contract
 
 The form and the workflow share these headings:
@@ -86,5 +90,6 @@ The form and the workflow share these headings:
 - One file per post: two pending submissions never touch the same file, so only generated files can conflict.
 - Do not copy headlines into `README.md`. The only news reference there is the generated single News link near the top.
 - Do not add a changelog entry for a post. The changelog is catalog history; the News tab is its own history.
+- Do not make the feed client-side-only or inline the whole archive: the newest page must render and read without JavaScript, and older posts come from `docs/news.json`.
 - The `add-news` label is the intended marker. If the repository has no such label yet, the workflow still accepts an issue whose title starts with `News:`.
 - News links are checked for `https://` shape only, not fetched: a flaky third-party URL must not fail CI.

@@ -197,10 +197,10 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 - `2026-10-29` — Suggest a repo moves into the Catalog tab
 - `2026-10-29` — News tab and a rebuilt site navigation
+- `2026-10-29` — News archive loads on demand
 - `2026-10-29` — gxr-profiler added
 - `2026-10-28` — LinkFT added
 - `2026-10-26` — Kernel modules tab
-- `2026-10-25` — WYGxrControllerFix added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

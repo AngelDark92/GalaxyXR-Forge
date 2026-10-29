@@ -1,0 +1,7 @@
+{
+  "date": "2026-10-29",
+  "title": "News archive loads on demand",
+  "items": [
+    "The News tab now ships the six newest posts in the page and fetches the rest from docs/news.json only when someone asks for them, so the catalog page no longer grows with the news archive. Deep links load the post they point at, and the newest page still works without JavaScript."
+  ]
+}

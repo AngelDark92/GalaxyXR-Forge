@@ -30,7 +30,7 @@ jobs:
       - name: Generated files match their sources
         run: |
           python tools/build.py
-          if ! git diff --exit-code -- README.md CHANGELOG.md docs/index.html docs/catalog-index.json; then
+          if ! git diff --exit-code -- README.md CHANGELOG.md docs/index.html docs/catalog-index.json docs/news.json; then
             echo "::error::Generated files are stale or hand-edited. Run 'python tools/build.py' and commit the result (see AGENTS.md)."
             exit 1
           fi

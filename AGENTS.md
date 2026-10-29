@@ -8,7 +8,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 
 ## Golden rules
 
-1. `catalog.json` (group metadata), `catalog.d/` (one file per repo), `modules.d/` (one file per module-publishing repo), `news.d/` (one file per news post) and `changelog.d/` (one file per change) are the single sources of truth. Never hand-edit `README.md`, `CHANGELOG.md`, `docs/index.html` or `docs/catalog-index.json` — they are generated.
+1. `catalog.json` (group metadata), `catalog.d/` (one file per repo), `modules.d/` (one file per module-publishing repo), `news.d/` (one file per news post) and `changelog.d/` (one file per change) are the single sources of truth. Never hand-edit `README.md`, `CHANGELOG.md`, `docs/index.html`, `docs/catalog-index.json` or `docs/news.json` — they are generated.
 2. After every catalog or news change run `python tools/build.py` (regenerates README, changelog and site) and review the git diff before committing.
 3. Keep descriptions to one factual line (build enforces ≤160 chars; target ~14 words). No marketing.
 4. Every catalog change needs an entry in `changelog.d/` (date, title, one item per repo added, moved or removed). `build.py` renders `CHANGELOG.md` and the site's Changelog tab from it — a catalog edit without a changelog entry is an incomplete change. News posts are not catalog changes: they live in `news.d/` and need no changelog entry. Set `"added": "YYYY-MM-DD"` on every new entry: the site's NEW badge and New filter derive from it, computed client-side because Pages is static: one rule for both the badge and the New filter — an entry is NEW while its `added` date is inside the 5-day window.
@@ -32,7 +32,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | `modules.d/<owner>__<name>.json` | Module list per module-publishing repo, grouped by repo in the site's Kernel modules tab |
 | `news.d/<date>-<slug>.json` | One news post per file; `build.py` sorts newest first and renders the site's News tab |
 | `changelog.d/<date>-<slug>.json` | One changelog entry per file; `build.py` sorts newest first |
-| `tools/build.py` | Merges `catalog.d/` + `modules.d/` + `news.d/` + `changelog.d/` into `README.md`, `CHANGELOG.md`, `docs/index.html`, `docs/catalog-index.json` |
+| `tools/build.py` | Merges `catalog.d/` + `modules.d/` + `news.d/` + `changelog.d/` into `README.md`, `CHANGELOG.md`, `docs/index.html`, `docs/catalog-index.json`, `docs/news.json` |
 | `CHANGELOG.md` | Generated changelog (the GitHub view of `changelog.d/`) |
 | `tools/check-links.py` | Checks that every catalog URL answers |
 | `tools/check-repos.py` | Reads each repo back: renamed, transferred, archived or gone |
@@ -46,6 +46,7 @@ GalaxyXR-Forge is the community index for **Samsung Galaxy XR** (SM-I610, Androi
 | `.github/workflows/rebase-open-prs.yml` | On every `main` push: rebases open PRs, repairs conflicts, re-runs `validate` |
 | `README.md` | Generated GitHub landing page |
 | `docs/` | Generated GitHub Pages site (Pages: branch `main`, folder `/docs`) |
+| `docs/news.json` | Generated news archive (every post as rendered HTML); the News tab fetches it on demand |
 | `docs/.nojekyll` | Disables Jekyll on Pages; keep it |
 | `.opencode/skills/` | Workspace skills; see the host table below |
 | `.research/` | Metadata snapshots and fetch scripts used to build the catalog (safe to publish; token comes from env) |
@@ -96,6 +97,7 @@ Nested checkouts inside `gxr-kernel/` are separate GitHub repos (some private): 
 - `python tools/build.py` exits 0 and prints repo, group, module, news and changelog counts; `python tools/build.py --check` validates without writing.
 - Every `modules.d/` file names a catalogued repo and a valid module status; a `kernelsu-modules` repo without module records produces a warning.
 - Every `news.d/` file matches `YYYY-MM-DD-slug.json`, its `date` equals the file prefix and is not in the future, and its body has 1–8 paragraphs. A post whose `repo` is not catalogued produces a warning.
+- News is paginated: `docs/index.html` carries only the newest `NEWS_PAGE_SIZE` posts; `docs/news.json` holds the whole archive and is fetched on demand. Deep links (`#news-<stem>`) must still reach an older post, and the newest page must read without JS.
 - Every catalog edit carries a matching `changelog.d/` entry, appended newest first, and a new entry carries its `added` date. News posts do not create changelog entries.
 - The NEW badge is browser-side logic over `data-added`; it expires on its own after 5 days with no rebuild. Do not freeze "new" into the generated README or the site HTML.
 - Star counts and latest releases on the site cards are fetched in the visitor's browser (shields.io JSON + `localStorage` cache; the badge image is the no-JS/failure fallback). Live values are never baked into the README, the site HTML or the changelog.

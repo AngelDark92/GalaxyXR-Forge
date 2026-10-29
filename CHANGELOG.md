@@ -11,6 +11,10 @@ Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by 
 - Added a News tab backed by news.d/ — one file per post — with a Post news form, an add-news workflow that opens a pull request, and tools/add-news.py for local posts.
 - Moved Star on GitHub and Suggest a repo out of the navigation into the hero; the views are now a real tab bar, and the catalog Filters button lives in the catalog toolbar beside the search box.
 
+## 2026-10-29 — News archive loads on demand
+
+- The News tab now ships the six newest posts in the page and fetches the rest from docs/news.json only when someone asks for them, so the catalog page no longer grows with the news archive. Deep links load the post they point at, and the newest page still works without JavaScript.
+
 ## 2026-10-29 — gxr-profiler added
 
 - Added aali195/gxr-profiler to Tools & Diagnostics (issue #20).

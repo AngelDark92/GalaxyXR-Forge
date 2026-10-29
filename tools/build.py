@@ -1172,22 +1172,26 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 /* Tab-change entrance. JS adds .is-enter to the incoming panel for 700ms, so the
    stagger runs on a tab switch and never on a filter keystroke. Opacity and
    transform only: no layout, no permanent will-change layers. */
-@keyframes riseIn{from{opacity:0;transform:translateY(var(--rise,8px))}to{opacity:1;transform:none}}
-.is-enter :is(.card,.mod-row,.entry,.news-item){animation:riseIn .26s cubic-bezier(.22,.61,.36,1) backwards;animation-delay:var(--d,0ms)}
-.is-enter :is(.entry,.news-item){--rise:5px}
-:is(.card,.mod-row,.entry,.news-item):nth-child(2){--d:24ms}
-:is(.card,.mod-row,.entry,.news-item):nth-child(3){--d:48ms}
-:is(.card,.mod-row,.entry,.news-item):nth-child(4){--d:72ms}
-:is(.card,.mod-row,.entry,.news-item):nth-child(5){--d:96ms}
-:is(.card,.mod-row,.entry,.news-item):nth-child(6){--d:120ms}
-.is-enter :is(.view-head,.catalog-toolbar,.group-head,.mod-head){animation:riseIn .24s cubic-bezier(.22,.61,.36,1) backwards;--rise:4px;animation-delay:60ms}
-.is-enter .group-head{animation-delay:40ms}
+@keyframes riseIn{from{opacity:0;transform:translateY(var(--rise,14px))}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.is-enter :is(.card,.mod-row,.entry,.news-item){animation:riseIn .36s cubic-bezier(.22,.61,.36,1) backwards;animation-delay:var(--d,0ms)}
+.is-enter :is(.entry,.news-item){--rise:8px}
+:is(.card,.mod-row,.entry,.news-item):nth-child(2){--d:32ms}
+:is(.card,.mod-row,.entry,.news-item):nth-child(3){--d:64ms}
+:is(.card,.mod-row,.entry,.news-item):nth-child(4){--d:96ms}
+:is(.card,.mod-row,.entry,.news-item):nth-child(5){--d:128ms}
+:is(.card,.mod-row,.entry,.news-item):nth-child(6){--d:160ms}
+.is-enter :is(.view-head,.catalog-toolbar,.group-head,.mod-head){animation:riseIn .34s cubic-bezier(.22,.61,.36,1) backwards;--rise:6px;animation-delay:70ms}
+.is-enter .group-head{animation-delay:50ms}
+/* The filter card fades in whenever the Catalog view brings it back on screen. */
+.side{animation:fadeIn .3s ease backwards}
 /* Older news appended from docs/news.json fade in; the loader itself is untouched. */
-.news-item.is-in{animation:riseIn .22s cubic-bezier(.22,.61,.36,1) backwards;--rise:6px}
+.news-item.is-in{animation:riseIn .3s cubic-bezier(.22,.61,.36,1) backwards;--rise:10px}
 @media (prefers-reduced-motion:reduce){
   .is-enter :is(.card,.mod-row,.entry,.news-item),
   .is-enter :is(.view-head,.catalog-toolbar,.group-head,.mod-head),
-  .news-item.is-in{animation:none}
+  .news-item.is-in,
+  .side{animation:none}
   .tab::after{transition:none}
 }
 </style>

@@ -194,12 +194,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-10-29` — Suggest a repo moves into the Catalog tab
 - `2026-10-29` — News tab and a rebuilt site navigation
 - `2026-10-28` — LinkFT added
 - `2026-10-26` — Kernel modules tab
 - `2026-10-25` — WYGxrControllerFix added
 - `2026-10-23` — Duplicate stearnsbq/QuestLHSync entry removed
-- `2026-10-23` — OFXR Bridge family added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

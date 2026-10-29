@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by `tools/build.py` — never edit this file by hand.
 
+## 2026-10-29 — Suggest a repo moves into the Catalog tab
+
+- Moved the Suggest a repo button from the hero into the Catalog header, mirroring Post news on the News tab; Star on GitHub stays in the hero.
+
 ## 2026-10-29 — News tab and a rebuilt site navigation
 
 - Added a News tab backed by news.d/ — one file per post — with a Post news form, an add-news workflow that opens a pull request, and tools/add-news.py for local posts.

@@ -4,7 +4,7 @@
   "kind": "site",
   "body": [
     "The Forge has a News tab. Releases, guides, project milestones and site changes land here, newest first. Every post has its own link, so a headline can be shared without pointing at the whole page.",
-    "The navigation now works like tabs instead of a row of buttons: Catalog, Kernel modules, Changelog and News. Star on GitHub and Suggest a repo left the tab bar and sit in the hero, where an action belongs. The Filters button moved into the catalog toolbar next to the search box, and it shows how many filters are on.",
+    "The navigation now works like tabs instead of a row of buttons: Catalog, Kernel modules, Changelog and News. Each action sits on the tab it belongs to — Star on GitHub in the hero, Suggest a repo in the Catalog header, Post news in the News header. The Filters button moved into the catalog toolbar next to the search box, and it shows how many filters are on.",
     "Anyone can propose a post: use **Post news** on the News tab. It opens a prefilled issue, CI prepares the post and a pull request, and a maintainer reviews it before it appears here."
   ],
   "author": "AngelDark92",

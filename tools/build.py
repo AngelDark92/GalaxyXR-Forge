@@ -1179,7 +1179,6 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
         <p class="tagline">__TAGLINE__</p>
       </div>
       <div class="hero-actions">
-        <a class="btn btn-primary" id="add-repo-btn" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" aria-haspopup="dialog" aria-controls="add-repo-dialog">＋ Suggest a repo</a>
         <a class="btn btn-ghost" href="__REPO_URL__" target="_blank" rel="noopener">★ Star on GitHub</a>
       </div>
     </div>
@@ -1234,6 +1233,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
           <h2>Catalog</h2>
           <p class="blurb">Every community repo for the Galaxy XR, grouped and searchable.</p>
         </div>
+        <a class="btn btn-primary" id="add-repo-btn" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" aria-haspopup="dialog" aria-controls="add-repo-dialog">＋ Suggest a repo</a>
       </div>
       <div class="catalog-toolbar">
         <div class="search-wrap">

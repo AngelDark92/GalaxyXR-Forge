@@ -6,7 +6,7 @@ labels: add-repo
 ---
 
 <!--
-Fill the three sections below. The site's "Suggest a repo" button fills this in for you.
+Fill the three sections below. The site's "Suggest a repo" button on the Catalog tab fills this in for you.
 CI reads the repo URL and the group, adds the card, regenerates README/site, and
 opens a pull request. Nothing is added until a maintainer merges it. One repo per issue.
 -->

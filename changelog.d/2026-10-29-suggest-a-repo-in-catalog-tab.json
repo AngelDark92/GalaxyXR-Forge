@@ -1,0 +1,7 @@
+{
+  "date": "2026-10-29",
+  "title": "Suggest a repo moves into the Catalog tab",
+  "items": [
+    "Moved the Suggest a repo button from the hero into the Catalog header, mirroring Post news on the News tab; Star on GitHub stays in the hero."
+  ]
+}

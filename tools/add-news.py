@@ -53,8 +53,8 @@ def load_json(path):
             return json.load(f)
     except OSError as e:
         raise SystemExit(f"error: cannot read {path}: {e}") from None
-    except json.JSONDecodeError as e:
-        raise SystemExit(f"error: {path} is not valid JSON: {e}") from None
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        raise SystemExit(f"error: {path} is not valid UTF-8 JSON: {e}") from None
 
 
 def load_build():

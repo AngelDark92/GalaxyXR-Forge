@@ -938,7 +938,7 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 /* Shell / sidebar */
 .shell{max-width:1120px;margin:0 auto;padding:26px 22px 0;display:grid;grid-template-columns:308px minmax(0,1fr);gap:26px;align-items:start}
 .content{min-width:0}
-.side{position:sticky;top:calc(var(--tab-h) + 12px);max-height:calc(100vh - var(--tab-h) - 24px);overflow:auto;display:flex;flex-direction:column;gap:0;padding:0;width:308px;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:0 12px 40px -20px rgba(0,0,0,.5);scrollbar-width:thin}
+.side{position:sticky;top:calc(var(--tab-h) + 12px);max-height:calc(100vh - var(--tab-h) - 24px);overflow:auto;display:flex;flex-direction:column;gap:0;padding:0;width:308px;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:0 12px 40px -20px rgba(0,0,0,.5);scrollbar-width:thin;transition:opacity .3s ease}
 .side::-webkit-scrollbar{width:8px}
 .side::-webkit-scrollbar-track{background:transparent}
 .side::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
@@ -979,7 +979,7 @@ body.view-noncatalog .side{display:none}
 body.view-noncatalog .shell{grid-template-columns:minmax(0,1fr)}
 @media (min-width:1001px){
   body.side-closed .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
-  body.side-closed .side{opacity:0;visibility:hidden;pointer-events:none}
+  body.side-closed .side{opacity:0;visibility:hidden;pointer-events:none;transition:none}
 }
 @media (min-width:1840px){
   .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
@@ -987,8 +987,8 @@ body.view-noncatalog .shell{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:1000px){
   .shell{grid-template-columns:minmax(0,1fr);padding-top:20px}
-  .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 16px 16px 0;border-left:0;padding:0;background:var(--card);transform:translateX(-104%);visibility:hidden;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear .24s;overflow:auto}
-  body.side-open .side{transform:none;visibility:visible;box-shadow:0 40px 90px -30px #000;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear 0s}
+  .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 16px 16px 0;border-left:0;padding:0;background:var(--card);opacity:0;transform:translateX(-104%);visibility:hidden;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),opacity .24s ease,visibility 0s linear .24s;overflow:auto}
+  body.side-open .side{opacity:1;transform:none;visibility:visible;box-shadow:0 40px 90px -30px #000;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),opacity .24s ease,visibility 0s linear 0s}
   .side-head{display:flex}
   .side-done{display:flex}
   .side-done-wrap{padding:14px 16px;border-top:1px solid var(--line)}
@@ -1173,7 +1173,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
    stagger runs on a tab switch and never on a filter keystroke. Opacity and
    transform only: no layout, no permanent will-change layers. */
 @keyframes riseIn{from{opacity:0;transform:translateY(var(--rise,14px))}to{opacity:1;transform:none}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes sideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .is-enter :is(.card,.mod-row,.entry,.news-item){animation:riseIn .36s cubic-bezier(.22,.61,.36,1) backwards;animation-delay:var(--d,0ms)}
 .is-enter :is(.entry,.news-item){--rise:8px}
 :is(.card,.mod-row,.entry,.news-item):nth-child(2){--d:32ms}
@@ -1183,15 +1183,19 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 :is(.card,.mod-row,.entry,.news-item):nth-child(6){--d:160ms}
 .is-enter :is(.view-head,.catalog-toolbar,.group-head,.mod-head){animation:riseIn .34s cubic-bezier(.22,.61,.36,1) backwards;--rise:6px;animation-delay:70ms}
 .is-enter .group-head{animation-delay:50ms}
-/* The filter card fades in whenever the Catalog view brings it back on screen. */
-.side{animation:fadeIn .3s ease backwards}
+/* The filter card fades in on every Catalog entry; desktop only, because on
+   phones the same element is the sliding drawer and owns its own transform. */
+@media (min-width:1001px){
+  .side.is-enter{animation:sideIn .45s cubic-bezier(.22,.61,.36,1) backwards}
+}
 /* Older news appended from docs/news.json fade in; the loader itself is untouched. */
 .news-item.is-in{animation:riseIn .3s cubic-bezier(.22,.61,.36,1) backwards;--rise:10px}
 @media (prefers-reduced-motion:reduce){
   .is-enter :is(.card,.mod-row,.entry,.news-item),
   .is-enter :is(.view-head,.catalog-toolbar,.group-head,.mod-head),
   .news-item.is-in,
-  .side{animation:none}
+  .side.is-enter{animation:none}
+  .side{transition:none}
   .tab::after{transition:none}
 }
 </style>
@@ -1652,15 +1656,20 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   // Entrance animation: the class is scoped to one tab switch and pulled again
   // after the longest stagger, so filtering cards never replays it.
   var enterTimer = null, lastPanel = null;
-  function enter(panel) {
+  var sidebar = document.getElementById('sidebar');
+  function enter(panel, withSide) {
     if (!panel) return;
     if (lastPanel && lastPanel !== panel) lastPanel.classList.remove('is-enter');
     lastPanel = panel;
     panel.classList.remove('is-enter');
     void panel.offsetWidth;
     panel.classList.add('is-enter');
+    if (sidebar) sidebar.classList.toggle('is-enter', !!withSide);
     clearTimeout(enterTimer);
-    enterTimer = setTimeout(function () { panel.classList.remove('is-enter'); }, 700);
+    enterTimer = setTimeout(function () {
+      panel.classList.remove('is-enter');
+      if (sidebar) sidebar.classList.remove('is-enter');
+    }, 700);
   }
   function show(view, opts) {
     var noPush = opts && opts.noPush;
@@ -1673,8 +1682,8 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     Object.keys(views).forEach(function (k) {
       if (views[k]) views[k].hidden = k !== view;
     });
-    enter(views[view]);
     document.body.classList.toggle('view-noncatalog', view !== 'catalog');
+    enter(views[view], view === 'catalog');
     if (view !== 'catalog' && typeof window.gxrForgeCloseFilters === 'function') window.gxrForgeCloseFilters();
     if (!noPush && window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + view);
   }

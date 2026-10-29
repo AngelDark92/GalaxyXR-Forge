@@ -1,6 +1,11 @@
 # Changelog
 
-Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) by `tools/build.py` — never edit this file by hand.
+Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by `tools/build.py` — never edit this file by hand.
+
+## 2026-10-29 — News tab and a rebuilt site navigation
+
+- Added a News tab backed by news.d/ — one file per post — with a Post news form, an add-news workflow that opens a pull request, and tools/add-news.py for local posts.
+- Moved Star on GitHub and Suggest a repo out of the navigation into the hero; the views are now a real tab bar, and the catalog Filters button lives in the catalog toolbar beside the search box.
 
 ## 2026-10-28 — LinkFT added
 

@@ -3,6 +3,7 @@
 
     catalog.json (groups) + catalog.d/ (one file per repo)
     + modules.d/ (one file per module-publishing repo)
+    + news.d/ (one file per news post)
     + changelog.d/ (one file per change)
         ->  README.md + CHANGELOG.md + docs/index.html + docs/catalog-index.json
 
@@ -12,9 +13,10 @@ Usage:
 
 Rules:
     - catalog.json is the single source of truth for the repo list; modules.d/
-      holds the module detail used by the Kernel modules tab; changelog.json
-      holds the change history. Never hand-edit README.md, CHANGELOG.md or
-      docs/index.html: edit the inputs and rerun this script.
+      holds the module detail used by the Kernel modules tab; news.d/ holds the
+      posts shown on the News tab; changelog.d/ holds the change history. Never
+      hand-edit README.md, CHANGELOG.md or docs/index.html: edit the inputs and
+      rerun this script.
     - Dependency-free: Python 3.10+, stdlib only, runs on any host.
 """
 
@@ -29,6 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CATALOG_PATH = ROOT / "catalog.json"
 CATALOG_DIR = ROOT / "catalog.d"
 MODULES_DIR = ROOT / "modules.d"
+NEWS_DIR = ROOT / "news.d"
 CHANGELOG_PATH = ROOT / "changelog.json"
 CHANGELOG_DIR = ROOT / "changelog.d"
 README_PATH = ROOT / "README.md"
@@ -361,7 +364,7 @@ def render_changelog_md(changelog):
     L = [
         "# Changelog",
         "",
-        "Catalog changes, newest first. Generated from [`changelog.json`](changelog.json) "
+        "Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) "
         "by `tools/build.py` — never edit this file by hand.",
         "",
     ]
@@ -372,6 +375,198 @@ def render_changelog_md(changelog):
             L.append(f"- {item}")
         L.append("")
     return "\n".join(L)
+
+
+# ---------------------------------------------------------------------------
+# news loading and validation
+# ---------------------------------------------------------------------------
+
+
+NEWS_KINDS = ("site", "release", "community", "guide")
+NEWS_KIND_LABEL = {
+    "site": "Site update",
+    "release": "Release",
+    "community": "Community",
+    "guide": "Guide",
+}
+NEWS_FILE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})-([a-z0-9][a-z0-9-]{0,59})$")
+NEWS_MAX_TITLE = 120
+NEWS_MAX_SUMMARY = 200
+NEWS_MAX_PARAGRAPHS = 8
+NEWS_MAX_PARAGRAPH = 800
+NEWS_MAX_LINKS = 4
+NEWS_MAX_LABEL = 60
+MONTHS = (
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+)
+
+
+def load_news():
+    """Posts from news.d/<YYYY-MM-DD>-<slug>.json, newest first.
+
+    One file per post, like catalog.d/: two pending submissions add different
+    files and cannot conflict. The date is in the file name so the feed order is
+    identical on every host, and a rebase rewrites the file without re-dating it.
+    A string `body` is accepted for hand-written files and split on blank lines.
+    """
+    if not NEWS_DIR.is_dir():
+        return {"entries": []}
+    entries = []
+    for path in sorted(NEWS_DIR.glob("*.json"), key=lambda f: (f.name.lower(), f.name)):
+        with path.open(encoding="utf-8") as f:
+            entry = json.load(f)
+        entry["_file"] = path.name
+        body = entry.get("body")
+        if isinstance(body, str):
+            entry["body"] = [p.strip() for p in re.split(r"\n\s*\n", body) if p.strip()]
+        entries.append(entry)
+    entries.sort(
+        key=lambda e: (str(e.get("date", "")), e["_file"].lower(), e["_file"]), reverse=True
+    )
+    return {"entries": entries}
+
+
+def validate_news(news, cat):
+    """Validate news.d against the schema and the catalog. Returns (errors, warnings)."""
+    errors = []
+    warnings = []
+    catalog = {
+        r["repo"].lower(): g
+        for g in cat.get("groups", [])
+        for r in g.get("repos", [])
+    }
+    seen = set()
+    today = date.today()
+    for entry in news.get("entries", []):
+        name = entry.get("_file", "?")
+        stem = name[:-5] if name.endswith(".json") else name
+        label = f"news.d/{name}"
+        m = NEWS_FILE_RE.match(stem)
+        if not m:
+            errors.append(f"{label}: file name must be YYYY-MM-DD-slug.json")
+            continue
+        file_date, slug = m.group(1), m.group(2)
+        when = entry.get("date")
+        if when != file_date:
+            errors.append(f"{label}: date {when!r} does not match the file name")
+        day = None
+        try:
+            day = date.fromisoformat(str(when))
+        except ValueError:
+            errors.append(f"{label}: bad date {when!r} (want YYYY-MM-DD)")
+        if day and day > today:
+            errors.append(f"{label}: date {when} is in the future")
+        if (when, slug) in seen:
+            errors.append(f"{label}: duplicate post for {when} ({slug})")
+        seen.add((when, slug))
+
+        title = entry.get("title")
+        if not isinstance(title, str) or not title.strip():
+            errors.append(f"{label}: missing title")
+        elif len(title) > NEWS_MAX_TITLE:
+            errors.append(
+                f"{label}: title too long ({len(title)} chars, max {NEWS_MAX_TITLE})"
+            )
+
+        summary = entry.get("summary")
+        if summary is not None:
+            if not isinstance(summary, str) or not summary.strip():
+                errors.append(f"{label}: summary must be a non-empty string or omitted")
+            elif len(summary) > NEWS_MAX_SUMMARY:
+                errors.append(
+                    f"{label}: summary too long ({len(summary)} chars, max {NEWS_MAX_SUMMARY})"
+                )
+
+        kind = entry.get("kind", "community")
+        if kind not in NEWS_KINDS:
+            errors.append(
+                f"{label}: bad kind {kind!r} (want one of {', '.join(NEWS_KINDS)})"
+            )
+
+        body = entry.get("body")
+        if not isinstance(body, list) or not body:
+            errors.append(f"{label}: body must be a non-empty list of paragraphs")
+        else:
+            if len(body) > NEWS_MAX_PARAGRAPHS:
+                errors.append(
+                    f"{label}: body has {len(body)} paragraphs (max {NEWS_MAX_PARAGRAPHS})"
+                )
+            for i, para in enumerate(body, 1):
+                if not isinstance(para, str) or not para.strip():
+                    errors.append(f"{label}: body paragraph {i} is empty")
+                elif len(para) > NEWS_MAX_PARAGRAPH:
+                    errors.append(
+                        f"{label}: body paragraph {i} is too long "
+                        f"({len(para)} chars, max {NEWS_MAX_PARAGRAPH})"
+                    )
+
+        links = entry.get("links") or []
+        if not isinstance(links, list):
+            errors.append(f"{label}: links must be a list")
+        elif len(links) > NEWS_MAX_LINKS:
+            errors.append(f"{label}: {len(links)} links (max {NEWS_MAX_LINKS})")
+        else:
+            for i, link in enumerate(links, 1):
+                if not isinstance(link, dict):
+                    errors.append(f"{label}: link {i} must be an object")
+                    continue
+                text = str(link.get("label", "")).strip()
+                url = str(link.get("url", "")).strip()
+                if not text or len(text) > NEWS_MAX_LABEL:
+                    errors.append(
+                        f"{label}: link {i} needs a label of at most {NEWS_MAX_LABEL} chars"
+                    )
+                if not url.startswith("https://") or " " in url or "." not in url[8:]:
+                    errors.append(f"{label}: link {i} must be an absolute https:// URL")
+
+        repo = entry.get("repo")
+        if repo:
+            if not isinstance(repo, str) or repo.count("/") != 1 or not all(repo.split("/")):
+                errors.append(f"{label}: bad repo field {repo!r} (want owner/name)")
+            elif repo.lower() not in catalog:
+                warnings.append(
+                    f"{label}: repo {repo} is not in the catalog "
+                    "(the post renders it as plain text)"
+                )
+
+        author = entry.get("author")
+        if author is not None and (
+            not isinstance(author, str)
+            or not re.fullmatch(r"[A-Za-z0-9-]{1,39}", author)
+        ):
+            errors.append(f"{label}: author must be a GitHub handle")
+    return errors, warnings
+
+
+def news_slug(title):
+    """File-name slug for a title: lowercase words joined by single dashes."""
+    slug = re.sub(r"[^a-z0-9]+", "-", str(title).lower()).strip("-")[:60].strip("-")
+    return slug or "news"
+
+
+def news_path(day, slug):
+    return NEWS_DIR / f"{day}-{slug}.json"
+
+
+def write_news_entry(entry, slug=None):
+    """Write one news.d file; a same-day slug collision gets a numeric suffix.
+
+    `slug` is not stored in the file: the file name is the identity and the date
+    prefix keeps it sortable. The date itself is data — a rebase rewrites the file
+    with the original date, never today's.
+    """
+    day = str(entry["date"])
+    base = slug or news_slug(entry.get("title", ""))
+    path = news_path(day, base)
+    n = 2
+    while path.exists():
+        path = news_path(day, f"{base}-{n}")
+        n += 1
+    path.parent.mkdir(parents=True, exist_ok=True)
+    clean = {k: v for k, v in entry.items() if k not in ("slug", "_file")}
+    path.write_text(dump_json(clean), encoding="utf-8", newline="\n")
+    return path
 
 
 # ---------------------------------------------------------------------------
@@ -411,6 +606,8 @@ def render_readme(cat, changelog):
     A(f"<sub>{nav}</sub>")
     A("")
     A(f"⭐ **[Star this repo]({REPO_URL})** — it helps other Galaxy XR owners find the index.")
+    A("")
+    A(f"📰 **[News]({SITE_URL}/#news)** — releases, guides and site updates from the community.")
     A("")
     A("</div>")
     A("")
@@ -647,6 +844,7 @@ SITE_TEMPLATE = """<!doctype html>
   --font-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
   --font-mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono',monospace;
   --font-disp:'Space Grotesk',var(--font-sans);
+  --tab-h:44px; --hero-bleed:1px;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -661,7 +859,8 @@ a{color:inherit;text-decoration:none}
 body.glow-on .glow{opacity:1}
 @media (prefers-reduced-motion:reduce){.glow{display:none}}
 .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
-.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+/* Hero */
+.hero{position:relative;overflow:hidden;border-bottom:var(--hero-bleed) solid var(--line);
   background:
     radial-gradient(900px 380px at 12% -10%, rgba(249,115,22,.14), transparent 60%),
     radial-gradient(700px 300px at 88% -20%, rgba(56,189,248,.10), transparent 60%),
@@ -674,7 +873,9 @@ body.glow-on .glow{opacity:1}
   mask-image:linear-gradient(180deg,rgba(0,0,0,.9),transparent 85%);
   -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,.9),transparent 85%);
 }
-.hero .wrap{position:relative;padding-top:64px;padding-bottom:38px}
+.hero .wrap{position:relative;padding-top:48px;padding-bottom:32px}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.hero-brand{flex:1;min-width:0}
 .kicker{font:500 12px var(--font-mono);letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
 h1{font:700 clamp(2.3rem,5.4vw,3.5rem)/1.05 var(--font-disp);letter-spacing:-.02em;margin:0 0 14px}
 h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -684,99 +885,116 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
 .stat:first-child{padding-left:0;border-left:0}
 .stat b{display:block;font:600 22px var(--font-mono);color:var(--ink)}
 .stat span{font:12px var(--font-mono);color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
-.topbar{position:sticky;top:0;z-index:30;background:rgba(10,14,20,.97);border-bottom:1px solid var(--line)}
-.topbar-inner{max-width:1120px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.menu-btn{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:7px 15px 7px 12px;font:500 13px var(--font-mono);cursor:pointer;min-height:36px}
-.menu-btn:hover{border-color:var(--muted);color:var(--ink)}
-.menu-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
-.menu-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.menu-btn svg{width:15px;height:15px;flex:none}
-.tab{border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:8px 16px;font:500 13px var(--font-mono);cursor:pointer;min-height:36px}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
-.tab b{font-weight:500;color:var(--dim)}
-.tab:hover{border-color:var(--muted);color:var(--ink)}
-.tab.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.12)}
-.tab.is-active b{color:var(--accent-2)}
-.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* Hero actions */
+.hero-actions{display:flex;align-items:center;gap:10px;flex:none;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;border-radius:10px;padding:8px 16px;font:600 13px var(--font-mono);cursor:pointer;text-decoration:none;border:1px solid var(--line-2);min-height:36px;white-space:nowrap}
+.btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#180b02;border-color:transparent}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--line-2)}
+.btn-ghost:hover{color:var(--ink);border-color:var(--muted)}
+.btn-sm{padding:6px 12px;font-size:12.5px;min-height:32px}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:760px){
+  .hero-top{flex-direction:column}
+  .hero-actions{width:100%}
+}
+@media (max-width:640px){
+  .hero .wrap{padding-top:38px;padding-bottom:24px}
+  .stat{padding:0 14px}
+  .stat b{font-size:18px}
+}
+/* Tab bar */
+.tabbar{position:sticky;top:0;z-index:29;background:rgba(10,14,20,.96);border-bottom:1px solid var(--line);
+  backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%)}
+.tabbar-inner{max-width:1120px;margin:0 auto;padding:0 22px;display:flex;align-items:stretch;gap:2px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.tabbar-inner::-webkit-scrollbar{display:none}
+.tab{position:relative;display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--muted);padding:0 14px;font:500 13px var(--font-mono);cursor:pointer;min-height:var(--tab-h);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;flex:none}
+.tab svg{width:14px;height:14px;flex:none;opacity:.9}
+.tab b{font-weight:500;color:var(--dim);background:rgba(148,163,184,.14);border-radius:99px;padding:1px 7px;font-size:11.5px}
+.tab:hover{color:var(--ink)}
+.tab.is-active{color:var(--ink);border-bottom-color:var(--accent);background:rgba(249,115,22,.08)}
+.tab.is-active b{color:var(--ink);background:rgba(249,115,22,.18)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:4px}
+.tab .tab-long{ } .tab .tab-short{display:none}
+@media (max-width:700px){
+  .tab .tab-long{display:none} .tab .tab-short{display:inline}
+}
+@media (max-width:560px){
+  .tab b{display:none}
+  .tab svg{display:none}
+  .tab{padding:0 11px;font-size:12.5px;gap:4px}
+}
+.tabbar-inner{
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent 100%);
+  mask-image:linear-gradient(90deg,#000 calc(100% - 18px),transparent 100%);
+}
+/* Shell / sidebar */
 .shell{max-width:1120px;margin:0 auto;padding:26px 22px 0;display:grid;grid-template-columns:308px minmax(0,1fr);gap:26px;align-items:start}
 .content{min-width:0}
-.side{position:sticky;top:74px;max-height:calc(100vh - 96px);overflow:auto;display:flex;flex-direction:column;gap:18px;padding:16px 14px;width:308px;border:1px solid rgba(148,163,184,.20);border-radius:16px;
-  background:linear-gradient(160deg,rgba(30,41,56,.72),rgba(12,18,26,.80));
-  -webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);
-  box-shadow:0 28px 70px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.06);
-  transform-origin:top left;
-  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.9,.3,1.15),visibility 0s linear 0s;scrollbar-width:thin}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .side{background:linear-gradient(160deg,#141d29,#0c121a)}
-}
+.side{position:sticky;top:calc(var(--tab-h) + 12px);max-height:calc(100vh - var(--tab-h) - 24px);overflow:auto;display:flex;flex-direction:column;gap:0;padding:0;width:308px;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:0 12px 40px -20px rgba(0,0,0,.5);scrollbar-width:thin}
 .side::-webkit-scrollbar{width:8px}
 .side::-webkit-scrollbar-track{background:transparent}
 .side::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
 .side::-webkit-scrollbar-thumb:hover{background:var(--muted)}
-.side-head{display:none;align-items:center;justify-content:space-between}
+.side-head{display:none;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
 .side-title{font:600 12px var(--font-disp);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
 .side-close{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:9px;cursor:pointer}
 .side-close:hover{border-color:var(--muted);color:var(--ink)}
 .side-close svg{width:13px;height:13px}
-.side-section{display:flex;flex-direction:column;gap:8px;min-width:0}
-.side-label{font:500 10.5px var(--font-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.side-section{display:flex;flex-direction:column;gap:0;min-width:0;padding:14px 14px 16px;border-bottom:1px solid var(--line)}
+.side-section:last-of-type{border-bottom:0}
+.side-label{font:500 10.5px var(--font-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.side-foot{padding:12px 14px}
+.side-clear{width:100%;border:0;background:transparent;color:var(--muted);font:500 12.5px var(--font-mono);cursor:pointer;padding:8px;text-align:center}
+.side-clear:hover{color:var(--accent)}
 #q{width:100%;background:var(--bg);border:1px solid var(--line-2);color:var(--ink);border-radius:9px;padding:9px 12px;font:13px var(--font-sans);outline:none}
 #q:focus{border-color:var(--accent)}
 #q::placeholder{color:var(--dim)}
 .chips{display:flex;flex-direction:column;gap:6px;min-width:0}
-.chip{display:flex;align-items:center;gap:9px;width:100%;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:9px;padding:8px 11px;font:500 12.5px var(--font-mono);cursor:pointer;min-height:34px;text-align:left}
+.chip{display:flex;align-items:center;gap:9px;width:100%;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:9px;padding:8px 11px;font:500 12.5px var(--font-mono);cursor:pointer;min-height:34px;text-align:left}
 .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--hue,var(--line-2));flex:none}
 .chip .lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chip b{margin-left:auto;flex:none;font-weight:500;color:var(--dim)}
+.chip b{margin-left:auto;flex:none;font-weight:500;color:var(--dim);background:rgba(148,163,184,.12);border-radius:99px;padding:1px 6px;font-size:11px}
 .chip:hover{border-color:var(--muted);color:var(--ink)}
 .chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.chip.is-active{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
-.chip.is-active b{color:var(--ink)}
-.chip[data-group].is-active{border-color:var(--hue)}
-.chip[data-status="new"].is-active{border-color:rgba(249,115,22,.6);background:rgba(249,115,22,.12)}
-.chip[data-status="fav"].is-active{border-color:rgba(251,191,36,.6);background:rgba(251,191,36,.12)}
-.chip[data-status="done"].is-active{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.12)}
+.chip.is-active{color:var(--ink);background:rgba(249,115,22,.10);border-color:var(--hue, var(--accent))}
+.chip.is-active b{color:var(--ink);background:rgba(249,115,22,.18)}
+.chip[data-status="new"].is-active{border-color:rgba(249,115,22,.45);background:rgba(249,115,22,.12)}
+.chip[data-status="fav"].is-active{border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.12)}
+.chip[data-status="done"].is-active{border-color:rgba(52,211,153,.45);background:rgba(52,211,153,.12)}
 .chip[data-status="todo"].is-active{border-color:var(--muted);background:rgba(148,163,184,.10)}
 .side-done{display:none;align-items:center;justify-content:center;gap:8px;width:100%;border:1px solid rgba(249,115,22,.55);background:rgba(249,115,22,.14);color:var(--ink);border-radius:10px;padding:11px 14px;font:500 13px var(--font-mono);cursor:pointer;min-height:42px}
 .side-done:hover{background:rgba(249,115,22,.24)}
 .side-done b{color:var(--accent-2);font-weight:600}
 .backdrop{display:none}
-#catalog,#modules,#changelog{scroll-margin-top:74px}
-body.view-changelog .side,body.view-changelog .menu-btn{display:none}
-body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
+#catalog,#modules,#changelog,#news{scroll-margin-top:calc(var(--tab-h) + 16px)}
+body.view-noncatalog .side{display:none}
+body.view-noncatalog .shell{grid-template-columns:minmax(0,1fr)}
 @media (min-width:1001px){
-  /* Collapsed: keep two tracks and shrink the first to zero. A single-column
-     template would wrap .content into a second row below the (invisible) rail
-     and shove the whole catalog down the page. */
   body.side-closed .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
-  body.side-closed .side{opacity:0;transform:translateY(-10px) scale(.97);visibility:hidden;pointer-events:none;
-    transition:opacity .16s ease,transform .2s ease,visibility 0s linear .2s}
+  body.side-closed .side{opacity:0;visibility:hidden;pointer-events:none}
 }
 @media (min-width:1840px){
-  /* The rail leaves the centered column: its grid track collapses to zero and a
-     negative margin pulls the panel out to the left, a constant 26px from the repo
-     grid, which keeps the freed width (three cards per row). Sticky stays, so the
-     rail still starts below the hero and pins under the top bar on scroll.
-     1840px is where 308px rail + gap + 1120px column fit without crowding the
-     window edge. */
   .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
   .side{width:308px;margin-left:-334px}
 }
 @media (max-width:1000px){
   .shell{grid-template-columns:minmax(0,1fr);padding-top:20px}
-  .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 16px 16px 0;border-left:0;padding:16px 16px 22px;
-    background:linear-gradient(160deg,rgba(24,34,47,.88),rgba(9,13,19,.92));
-    transform:translateX(-104%);visibility:hidden;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear .24s}
+  .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 16px 16px 0;border-left:0;padding:0;background:var(--card);transform:translateX(-104%);visibility:hidden;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear .24s;overflow:auto}
   body.side-open .side{transform:none;visibility:visible;box-shadow:0 40px 90px -30px #000;transition:transform .24s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear 0s}
   .side-head{display:flex}
   .side-done{display:flex}
-  .backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:50;background:rgba(4,7,11,.60);
-    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  .side-done-wrap{padding:14px 16px;border-top:1px solid var(--line)}
+  .backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:50;background:rgba(4,7,11,.60);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 }
-@media (prefers-reduced-motion:reduce){
-  .side{transition:none}
-}
-.changelog{padding:6px 0 10px}
+@media (prefers-reduced-motion:reduce){.side{transition:none}}
+/* View headers */
+.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:8px 0 20px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.view-head-text{flex:1;min-width:0}
+.eyebrow{font:500 11px var(--font-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+.view-head h2{font:600 1.35rem var(--font-disp);margin:0 0 6px}
+.view-head-meta{flex:none;align-self:center;font:500 12px var(--font-mono);color:var(--muted);white-space:nowrap}
+.changelog{max-width:820px;padding:6px 0 10px}
 .changelog h2{font:600 1.35rem var(--font-disp);margin:0 0 6px}
 .entries{list-style:none;margin:0;padding:0}
 .entry{border-top:1px solid var(--line);padding:18px 0}
@@ -786,7 +1004,7 @@ body.view-changelog .shell{grid-template-columns:minmax(0,1fr)}
 .entry-head h3{font:600 16px var(--font-disp);margin:0}
 .entry ul{margin:8px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
 .entry li{margin:4px 0}
-.mods{padding:6px 0 10px}
+.mods{max-width:820px;padding:6px 0 10px}
 .mods h2{font:600 1.35rem var(--font-disp);margin:0 0 6px}
 .mod-repo{margin:0 0 34px}
 .mod-head{display:flex;align-items:baseline;gap:10px 12px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--line)}
@@ -819,7 +1037,7 @@ main{padding:0 0 6px}
 .group{margin:0 0 42px}
 .group-head h2{display:flex;align-items:center;gap:10px;font:600 1.35rem var(--font-disp);margin:0 0 6px}
 .group-head .dot{width:10px;height:10px;border-radius:3px;background:var(--hue);flex:none}
-.blurb{color:var(--muted);margin:0 0 18px;font-size:14.5px}
+.blurb{color:var(--muted);margin:0 0 18px;font-size:14.5px;line-height:1.5}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
 .card{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 12px;transition:border-color .15s ease,transform .15s ease,box-shadow .15s ease}
 .card:hover{border-color:var(--hue);transform:translateY(-2px);box-shadow:0 14px 34px -22px #000}
@@ -858,18 +1076,65 @@ main{padding:0 0 6px}
 .card-foot .links{display:flex;gap:12px;flex:none}
 .card-foot a{color:var(--muted);font:500 12px var(--font-mono)}
 .card-foot a:hover{color:var(--accent)}
+/* Catalog toolbar */
+.catalog-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:200px;max-width:420px}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--dim);pointer-events:none}
+.search-wrap input{width:100%;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:9px 34px 9px 32px;font:13px var(--font-sans);outline:none}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--dim)}
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--dim);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:6px}
+.search-clear:hover{color:var(--ink);background:var(--line)}
+.filter-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:10px;padding:8px 14px;font:500 13px var(--font-mono);cursor:pointer;min-height:36px;white-space:nowrap}
+.filter-btn:hover{border-color:var(--muted);color:var(--ink)}
+.filter-btn[aria-expanded="true"]{border-color:var(--accent);color:var(--ink);background:rgba(249,115,22,.10)}
+.filter-btn svg{width:14px;height:14px;flex:none}
+.filter-badge{display:none;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--accent);color:#fff;font:600 11px var(--font-mono)}
+.filter-badge.has-count{display:inline-flex}
+.toolbar-clear{border:0;background:transparent;color:var(--muted);font:500 13px var(--font-mono);cursor:pointer;padding:6px 8px}
+.toolbar-clear:hover{color:var(--accent)}
 .empty{margin:0;padding:0 0 30px;color:var(--muted);font-style:italic}
+.empty-state{border:1px solid var(--line);border-radius:12px;padding:28px 24px;text-align:center;color:var(--muted);margin-bottom:24px}
+.empty-state .empty-title{font:600 16px var(--font-disp);color:var(--ink);margin:0 0 6px}
+.empty-state p{margin:0 0 14px}
+.empty-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+/* News */
+.news{max-width:820px}
+.news-feed{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.news-item{padding:22px 0;border-top:1px solid var(--line);scroll-margin-top:calc(var(--tab-h) + 20px)}
+.news-item:first-child{border-top:0;padding-top:0}
+.news-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font:11.5px var(--font-mono);color:var(--dim);margin-bottom:8px}
+.news-meta time{color:var(--muted)}
+.news-kind{display:inline-flex;padding:2px 8px;border-radius:99px;font:600 10.5px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line-2);color:var(--muted)}
+.news-kind[data-kind="site"]{color:#38bdf8;border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.08)}
+.news-kind[data-kind="release"]{color:#34d399;border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.08)}
+.news-kind[data-kind="community"]{color:#fbbf24;border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.08)}
+.news-kind[data-kind="guide"]{color:#a78bfa;border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.08)}
+.news-author{color:var(--muted)}
+.news-author:hover{color:var(--accent)}
+.news-title{font:600 18px/1.3 var(--font-disp);margin:0 0 8px;display:flex;align-items:baseline;gap:8px}
+.news-anchor{font:400 14px var(--font-mono);color:var(--dim);opacity:0}
+.news-item:hover .news-anchor{opacity:1}
+.news-anchor:hover{color:var(--accent)}
+.news-summary{font:500 14.5px/1.6 var(--font-sans);color:var(--muted);margin:0 0 10px;border-left:2px solid var(--line-2);padding-left:12px}
+.news-body{color:var(--muted);font-size:14px;line-height:1.65}
+.news-body p{margin:0 0 10px}
+.news-body p:last-child{margin-bottom:0}
+.news-body p.lede{font-size:15px;color:var(--ink)}
+.news-body code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.9em}
+.news-body strong{color:var(--ink)}
+.news-repo{margin:10px 0 0;font:12px var(--font-mono);color:var(--dim);display:flex;align-items:center;gap:8px}
+.news-repo a{color:var(--muted)}
+.news-repo a:hover{color:var(--accent)}
+.news-repo .owner{color:var(--dim)}
+.news-links{margin:10px 0 0;display:flex;gap:8px;flex-wrap:wrap}
+.news-link{display:inline-flex;align-items:center;border:1px solid var(--line-2);border-radius:8px;padding:5px 12px;font:500 12.5px var(--font-mono);color:var(--muted)}
+.news-link:hover{border-color:var(--accent);color:var(--ink)}
 footer{border-top:1px solid var(--line);margin-top:14px;padding:22px 0 42px;color:var(--dim);font-size:13px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
 footer a{color:var(--muted)}
 footer a:hover{color:var(--accent)}
 code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.9em}
-.add-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(249,115,22,.45);background:rgba(249,115,22,.12);color:var(--ink);border-radius:999px;padding:8px 16px;font:600 13px var(--font-mono);cursor:pointer;min-height:36px;text-decoration:none}
-.add-btn:hover{background:rgba(249,115,22,.2);border-color:var(--accent)}
-.add-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.star-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:999px;padding:8px 14px;font:600 12.5px var(--font-mono);text-decoration:none;min-height:36px}
-.star-btn:hover{color:var(--ink);border-color:var(--muted)}
-.star-btn .s{color:var(--accent-2)}
 .add-dialog{border:1px solid var(--line-2);border-radius:16px;background:var(--card);color:var(--ink);padding:0;width:min(540px,calc(100vw - 28px));max-height:min(88vh,720px);overflow:auto;box-shadow:0 30px 80px -30px #000}
 .add-dialog::backdrop{background:rgba(4,7,11,.72)}
 .add-form{display:flex;flex-direction:column;gap:9px;padding:22px 22px 18px}
@@ -877,8 +1142,9 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 .add-form .dlg-lede{margin:0 0 4px;color:var(--muted);font-size:13.5px}
 .add-form label{font:500 11.5px var(--font-mono);color:var(--dim);text-transform:uppercase;letter-spacing:.09em;margin-top:7px}
 .add-form label .opt{text-transform:none;letter-spacing:0;color:var(--dim)}
-.add-form input,.add-form select{background:var(--bg-2);border:1px solid var(--line-2);color:var(--ink);border-radius:10px;padding:10px 12px;font:14px var(--font-sans);outline:none;width:100%}
-.add-form input:focus,.add-form select:focus{border-color:var(--accent)}
+.add-form input,.add-form select,.add-form textarea{background:var(--bg-2);border:1px solid var(--line-2);color:var(--ink);border-radius:10px;padding:10px 12px;font:14px var(--font-sans);outline:none;width:100%}
+.add-form textarea{resize:vertical;min-height:90px}
+.add-form input:focus,.add-form select:focus,.add-form textarea:focus{border-color:var(--accent)}
 .dlg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .dlg-close{border:1px solid var(--line-2);background:transparent;color:var(--muted);border-radius:8px;width:30px;height:30px;cursor:pointer;font:13px/1 var(--font-mono)}
 .dlg-close:hover{color:var(--ink);border-color:var(--muted)}
@@ -890,21 +1156,14 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 .dlg-status{margin:2px 0 0;min-height:16px;font:12px var(--font-mono);color:var(--dim)}
 .dlg-status.ok{color:#4ade80}
 .dlg-status.warn{color:#fbbf24}
-@media (max-width:640px){
-  .hero .wrap{padding-top:44px;padding-bottom:30px}
-  .stat{padding:0 14px}
-  .stat b{font-size:18px}
-  .topbar-inner{padding:9px 14px}
-  .shell{padding:18px 14px 0}
-  .menu-btn span{display:none}
-  .menu-btn{padding:7px 11px}
-}
 </style>
 <noscript><style>
-/* No JS: the drawer cannot open, so show the rail inline on small screens. */
+.tabbar{display:none}
+#catalog,#modules,#changelog,#news{display:block !important}
+#catalog[hidden],#modules[hidden],#changelog[hidden],#news[hidden]{display:block !important}
 @media (max-width:1000px){
-  .side{position:static;transform:none;visibility:visible;max-height:none;width:auto;border-radius:14px;border-left:1px solid var(--line)}
-  .menu-btn,.side-head,.side-done{display:none}
+  .side{position:static;transform:none;visibility:visible;max-height:none;width:auto;border-radius:12px;border-left:1px solid var(--line)}
+  .side-head,.side-done-wrap,.filter-btn{display:none}
 }
 </style></noscript>
 </head>
@@ -913,9 +1172,17 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 <div class="glow" aria-hidden="true"></div>
 <header class="hero">
   <div class="wrap">
-    <p class="kicker">Samsung Galaxy XR · SM-I610 · Android XR</p>
-    <h1>Galaxy XR <span class="accent">Forge</span></h1>
-    <p class="tagline">__TAGLINE__</p>
+    <div class="hero-top">
+      <div class="hero-brand">
+        <p class="kicker">Samsung Galaxy XR · SM-I610 · Android XR</p>
+        <h1>Galaxy XR <span class="accent">Forge</span></h1>
+        <p class="tagline">__TAGLINE__</p>
+      </div>
+      <div class="hero-actions">
+        <a class="btn btn-primary" id="add-repo-btn" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" aria-haspopup="dialog" aria-controls="add-repo-dialog">＋ Suggest a repo</a>
+        <a class="btn btn-ghost" href="__REPO_URL__" target="_blank" rel="noopener">★ Star on GitHub</a>
+      </div>
+    </div>
     <div class="stats">
       <div class="stat"><b id="count">__TOTAL__</b><span>repos shown</span></div>
       <div class="stat"><b>__GROUPS__</b><span>groups</span></div>
@@ -924,19 +1191,12 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     </div>
   </div>
 </header>
-<nav class="topbar" aria-label="Views">
-  <div class="topbar-inner">
-    <button type="button" class="menu-btn" id="menu-btn" aria-expanded="true" aria-controls="sidebar" title="Show or hide the filters">
-      <svg viewBox="0 0 16 16" aria-hidden="true" fill="none"><path d="M2 3.5h12M2 8h12M2 12.5h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      <span>Filters</span>
-    </button>
-    <div class="tabs" role="tablist" aria-label="Views">
-      <button type="button" class="tab is-active" data-view="catalog" role="tab" aria-selected="true">Catalog <b>__TOTAL__</b></button>
-      <button type="button" class="tab" data-view="modules" role="tab" aria-selected="false">Kernel modules <b>__MODULE_TOTAL__</b></button>
-      <button type="button" class="tab" data-view="changelog" role="tab" aria-selected="false">Changelog <b>__CHANGELOG_COUNT__</b></button>
-    </div>
-    <a class="star-btn" href="__REPO_URL__" target="_blank" rel="noopener" title="Star GalaxyXR-Forge on GitHub"><span class="s" aria-hidden="true">★</span> Star on GitHub</a>
-    <a class="add-btn" id="add-repo-btn" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" aria-haspopup="dialog" aria-controls="add-repo-dialog">＋ Suggest a repo</a>
+<nav class="tabbar" aria-label="Views">
+  <div class="tabbar-inner" role="tablist" aria-label="Views">
+    <a class="tab is-active" role="tab" href="#catalog" data-view="catalog" aria-selected="true" aria-controls="catalog" tabindex="0" id="tab-catalog"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3.5h5v5H2zM9 3.5h5v5H9zM2 10.5h5v3H2zM9 10.5h5v3H9z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg> Catalog <b>__TOTAL__</b></a>
+    <a class="tab" role="tab" href="#modules" data-view="modules" aria-selected="false" aria-controls="modules" tabindex="-1" id="tab-modules"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2L2 5.5 8 9l6-3.5zM2 10l6 3.5L14 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> <span class="tab-long">Kernel modules</span><span class="tab-short">Modules</span> <b>__MODULE_TOTAL__</b></a>
+    <a class="tab" role="tab" href="#changelog" data-view="changelog" aria-selected="false" aria-controls="changelog" tabindex="-1" id="tab-changelog"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 2.5h6l2 2V13H4zM8 2.5v2h2" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M6 8.5h4M6 11h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Changelog <b>__CHANGELOG_COUNT__</b></a>
+    <a class="tab" role="tab" href="#news" data-view="news" aria-selected="false" aria-controls="news" tabindex="-1" id="tab-news"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h10v10H2z" stroke="currentColor" stroke-width="1.2"/><path d="M5 5.5h4M5 8h4M5 10.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> News <b>__NEWS_COUNT__</b></a>
   </div>
 </nav>
 <div class="shell" id="shell">
@@ -946,10 +1206,6 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       <button type="button" class="side-close" id="side-close" aria-label="Close filters">
         <svg viewBox="0 0 14 14" aria-hidden="true" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
       </button>
-    </div>
-    <div class="side-section">
-      <label class="side-label" for="q">Search</label>
-      <input id="q" type="search" placeholder="name, tag, description…" aria-label="Filter repositories">
     </div>
     <div class="side-section">
       <span class="side-label" id="lbl-groups">Group</span>
@@ -963,22 +1219,82 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
         __STATUS__
       </div>
     </div>
-    <button type="button" class="side-done" id="side-done">Show <b id="side-count">__TOTAL__</b> repos</button>
+    <div class="side-foot">
+      <button type="button" class="side-clear" id="side-clear">Clear all filters</button>
+    </div>
+    <div class="side-done-wrap">
+      <button type="button" class="side-done" id="side-done">Show <b id="side-count">__TOTAL__</b> repos</button>
+    </div>
   </aside>
   <div class="content">
-    <main id="catalog">
+    <main id="catalog" role="tabpanel" aria-labelledby="tab-catalog">
+      <div class="view-head">
+        <div class="view-head-text">
+          <p class="eyebrow">Community index</p>
+          <h2>Catalog</h2>
+          <p class="blurb">Every community repo for the Galaxy XR, grouped and searchable.</p>
+        </div>
+      </div>
+      <div class="catalog-toolbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <input id="q" type="search" placeholder="Search repos…" aria-label="Filter repositories">
+          <button type="button" class="search-clear" id="q-clear" aria-label="Clear search" hidden>×</button>
+        </div>
+        <button type="button" class="filter-btn" id="menu-btn" aria-expanded="true" aria-controls="sidebar">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Filters <span class="filter-badge" id="filter-count"></span>
+        </button>
+        <button type="button" class="toolbar-clear" id="toolbar-clear" hidden>Clear</button>
+      </div>
       __SECTIONS__
-      <p class="empty" id="empty" style="display:none">No repository matches these filters.</p>
+      <div class="empty-state" id="empty" style="display:none">
+        <p class="empty-title">No repository matches these filters</p>
+        <p>Try adjusting your search or filter selection.</p>
+        <div class="empty-actions">
+          <button type="button" class="btn btn-ghost btn-sm" id="empty-clear">Clear filters</button>
+          <a class="btn btn-primary btn-sm" href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo" target="_blank" rel="noopener">Suggest a repo</a>
+        </div>
+      </div>
     </main>
-    <div id="modules" hidden>
+    <div id="modules" hidden role="tabpanel" aria-labelledby="tab-modules">
       __MODULES__
     </div>
-    <div id="changelog" hidden>
+    <div id="changelog" hidden role="tabpanel" aria-labelledby="tab-changelog">
       __CHANGELOG__
+    </div>
+    <div id="news" hidden role="tabpanel" aria-labelledby="tab-news">
+      __NEWS__
     </div>
   </div>
 </div>
 <div class="backdrop" id="backdrop" hidden></div>
+<dialog id="post-news-dialog" class="add-dialog" aria-labelledby="post-news-title">
+  <div class="add-form">
+    <div class="dlg-head">
+      <h2 id="post-news-title">Post news</h2>
+      <button type="button" class="dlg-close" id="post-news-close" aria-label="Close">✕</button>
+    </div>
+    <p class="dlg-lede">Share a release, guide or site update. This opens a proposal issue — nothing is published until a maintainer merges it.</p>
+    <label for="post-news-title-input">Title</label>
+    <input id="post-news-title-input" maxlength="120" placeholder="News title" autocomplete="off">
+    <label for="post-news-body">News text</label>
+    <textarea id="post-news-body" rows="5" placeholder="Write your news here. Blank line = new paragraph."></textarea>
+    <label for="post-news-summary">Summary <span class="opt">(optional, max 200)</span></label>
+    <input id="post-news-summary" maxlength="200" placeholder="One-line summary" autocomplete="off">
+    <label for="post-news-kind">Category</label>
+    <select id="post-news-kind"><option value="community" selected>Community</option><option value="release">Release</option><option value="guide">Guide</option><option value="site">Site update</option></select>
+    <label for="post-news-repo">Related repo <span class="opt">(optional, owner/name)</span></label>
+    <input id="post-news-repo" placeholder="owner/name" autocomplete="off" spellcheck="false">
+    <label for="post-news-link-label">Link label <span class="opt">(optional)</span></label>
+    <input id="post-news-link-label" placeholder="e.g. Release notes" autocomplete="off">
+    <label for="post-news-link-url">Link URL <span class="opt">(optional, https://)</span></label>
+    <input id="post-news-link-url" type="url" placeholder="https://..." autocomplete="off" spellcheck="false">
+    <p class="dlg-status" id="post-news-status" role="status" aria-live="polite"></p>
+    <div class="dlg-actions">
+      <a class="add-submit" id="post-news-issue" href="#" target="_blank" rel="noopener">Open GitHub issue</a>
+    </div>
+  </div>
+</dialog>
 <dialog id="add-repo-dialog" class="add-dialog" aria-labelledby="add-repo-title">
   <div class="add-form">
     <div class="dlg-head">
@@ -1005,7 +1321,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 <footer>
   <div class="wrap">
     <span>Unofficial community hub — not affiliated with Samsung. Each project keeps its own license.</span>
-    <span>Suggest a repo: <a href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo">file it from the site</a>, or run <code>python tools/add-repo.py</code> · <a href="__REPO_URL__" target="_blank" rel="noopener">★ Star on GitHub</a> · <a href="#changelog">Changelog</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
+    <span>Suggest a repo: <a href="__REPO_URL__/issues/new?template=add-repo.md&labels=add-repo">file it from the site</a>, or run <code>python tools/add-repo.py</code> · <a href="__REPO_URL__" target="_blank" rel="noopener">★ Star on GitHub</a> · <a href="#changelog">Changelog</a> · <a href="#news">News</a> · Agents: <a href="__REPO_URL__/blob/main/AGENTS.md">AGENTS.md</a></span>
   </div>
 </footer>
 <script>
@@ -1153,7 +1469,47 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     if (empty) empty.style.display = shown ? 'none' : '';
   }
 
+  var qClear = document.getElementById('q-clear');
+  var filterCount = document.getElementById('filter-count');
+  var toolbarClear = document.getElementById('toolbar-clear');
+  function updateFilterUI() {
+    var n = 0;
+    if (state.group !== 'all') n++;
+    ['new','fav','done','todo'].forEach(function(k){ if(state.status[k]) n++; });
+    if (filterCount) {
+      filterCount.textContent = n || '';
+      filterCount.classList.toggle('has-count', n > 0);
+    }
+    if (toolbarClear) toolbarClear.hidden = n === 0;
+  }
+  function clearAllFilters() {
+    state.group = 'all';
+    state.status = {};
+    groupChips.forEach(function(c){
+      var on = c.dataset.group === 'all';
+      c.classList.toggle('is-active', on);
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    statusChips.forEach(function(c){
+      c.classList.remove('is-active');
+      c.setAttribute('aria-pressed','false');
+    });
+    if (q) { q.value = ''; state.q = ''; }
+    apply();
+  }
+  var emptyClear = document.getElementById('empty-clear');
+  if (emptyClear) emptyClear.addEventListener('click', clearAllFilters);
+  var sideClear = document.getElementById('side-clear');
+  if (sideClear) sideClear.addEventListener('click', clearAllFilters);
+  if (toolbarClear) toolbarClear.addEventListener('click', clearAllFilters);
+  var _origApply = apply;
+  apply = function() {
+    _origApply();
+    updateFilterUI();
+    if (qClear) qClear.hidden = !state.q.trim();
+  };
   if (q) q.addEventListener('input', function () { state.q = q.value; apply(); });
+  if (qClear) qClear.addEventListener('click', function(){ if(q){ q.value=''; state.q=''; q.focus(); apply(); } });
   groupChips.forEach(function (ch) {
     ch.addEventListener('click', function () {
       groupChips.forEach(function (c) {
@@ -1246,35 +1602,65 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   else if (mq.addListener) mq.addListener(onBreak);
 })();
 
-// Catalog / Kernel modules / Changelog views. The active view is mirrored in the
-// URL hash, so links like #modules or #changelog open that view directly.
+// Tabs: ARIA tablist with keyboard nav, hash routing including #news-<slug>
 (function () {
   var tabs = [].slice.call(document.querySelectorAll('.tab'));
   var views = {
     catalog: document.getElementById('catalog'),
     modules: document.getElementById('modules'),
-    changelog: document.getElementById('changelog')
+    changelog: document.getElementById('changelog'),
+    news: document.getElementById('news')
   };
-  function show(view) {
+  function show(view, opts) {
+    var noPush = opts && opts.noPush;
     tabs.forEach(function (t) {
       var on = t.dataset.view === view;
       t.classList.toggle('is-active', on);
       t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.setAttribute('tabindex', on ? '0' : '-1');
     });
     Object.keys(views).forEach(function (k) {
       if (views[k]) views[k].hidden = k !== view;
     });
-    // The filter rail belongs to the catalog view only; an open drawer also closes.
-    document.body.classList.toggle('view-changelog', view !== 'catalog');
+    document.body.classList.toggle('view-noncatalog', view !== 'catalog');
     if (view !== 'catalog' && typeof window.gxrForgeCloseFilters === 'function') window.gxrForgeCloseFilters();
-    if (window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + view);
+    if (!noPush && window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + view);
   }
   tabs.forEach(function (t) {
-    t.addEventListener('click', function () { show(t.dataset.view); });
+    t.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      show(t.dataset.view);
+    });
   });
+  // Keyboard: Left/Right/Home/End
+  var tablist = document.querySelector('.tabbar-inner');
+  if (tablist) {
+    tablist.addEventListener('keydown', function (ev) {
+      var keys = ['ArrowLeft','ArrowRight','Home','End'];
+      if (keys.indexOf(ev.key) === -1) return;
+      ev.preventDefault();
+      var idx = -1;
+      for (var i = 0; i < tabs.length; i++) if (tabs[i] === document.activeElement) idx = i;
+      if (idx === -1) idx = 0;
+      if (ev.key === 'ArrowLeft') idx = (idx - 1 + tabs.length) % tabs.length;
+      else if (ev.key === 'ArrowRight') idx = (idx + 1) % tabs.length;
+      else if (ev.key === 'Home') idx = 0;
+      else if (ev.key === 'End') idx = tabs.length - 1;
+      tabs[idx].focus();
+      show(tabs[idx].dataset.view);
+    });
+  }
   function fromHash() {
-    var view = window.location.hash.replace(/^#/, '');
-    if (views[view]) show(view);
+    var raw = window.location.hash.replace(/^#/, '');
+    if (!raw) { show('catalog', {noPush:true}); return; }
+    if (views[raw]) { show(raw, {noPush:true}); return; }
+    if (raw.indexOf('news-') === 0) {
+      show('news', {noPush:true});
+      var el = document.getElementById(raw);
+      if (el) setTimeout(function(){ el.scrollIntoView({behavior:'smooth', block:'start'}); }, 80);
+      return;
+    }
+    show('catalog', {noPush:true});
   }
   window.addEventListener('hashchange', fromHash);
   fromHash();
@@ -1637,6 +2023,71 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   });
   if (btn) btn.addEventListener('click', function () { window.setTimeout(check, 60); });
 })();
+
+// Post-news dialog
+(function(){
+  var dlg = document.getElementById('post-news-dialog');
+  if(!dlg) return;
+  var titleIn = document.getElementById('post-news-title-input');
+  var bodyIn = document.getElementById('post-news-body');
+  var summaryIn = document.getElementById('post-news-summary');
+  var kindSel = document.getElementById('post-news-kind');
+  var repoIn = document.getElementById('post-news-repo');
+  var linkLabelIn = document.getElementById('post-news-link-label');
+  var linkUrlIn = document.getElementById('post-news-link-url');
+  var go = document.getElementById('post-news-issue');
+  var status = document.getElementById('post-news-status');
+  var closeBtn = document.getElementById('post-news-close');
+  var BASE = '__REPO_URL__';
+  function openDlg(){
+    if(typeof dlg.showModal==='function') dlg.showModal(); else dlg.setAttribute('open','');
+    refresh();
+    setTimeout(function(){ titleIn.focus(); },40);
+  }
+  function closeDlg(){
+    if(typeof dlg.close==='function') dlg.close(); else dlg.removeAttribute('open');
+  }
+  function issueHref(){
+    var title = (titleIn.value||'').trim();
+    var body = (bodyIn.value||'').trim();
+    if(!title || !body) return null;
+    var parts = [];
+    parts.push('### Title\\n'+title+'\\n');
+    parts.push('### News\\n'+body+'\\n');
+    var summary=(summaryIn.value||'').trim();
+    if(summary) parts.push('### Summary\\n'+summary+'\\n');
+    var kind=kindSel.value||'site';
+    parts.push('### Category\\n'+kind+'\\n');
+    var repo=(repoIn.value||'').trim();
+    if(repo) parts.push('### Related repo\\n'+repo+'\\n');
+    var ll=(linkLabelIn.value||'').trim(), lu=(linkUrlIn.value||'').trim();
+    if(ll||lu) parts.push('### Link\\n'+(ll||'')+' | '+(lu||'')+'\\n');
+    var b=parts.join('\\n');
+    return BASE+'/issues/new?labels='+encodeURIComponent('add-news')+'&title='+encodeURIComponent('News: '+title)+'&body='+encodeURIComponent(b);
+  }
+  function refresh(){
+    var href=issueHref();
+    go.href=href||'#';
+    var ok=!!href;
+    go.classList.toggle('is-disabled', !ok);
+    go.setAttribute('aria-disabled', ok?'false':'true');
+    if(status){
+      if(!titleIn.value.trim()) status.textContent='Enter a title.';
+      else if(!bodyIn.value.trim()) status.textContent='Enter the news text.';
+      else status.textContent='';
+    }
+  }
+  document.addEventListener('click', function(ev){
+    var a=ev.target.closest&&ev.target.closest('#post-news-btn');
+    if(!a) return;
+    if(typeof dlg.showModal==='function'){ ev.preventDefault(); openDlg(); }
+  });
+  if(closeBtn) closeBtn.addEventListener('click', closeDlg);
+  dlg.addEventListener('click', function(ev){ if(ev.target===dlg) closeDlg(); });
+  [titleIn,bodyIn,summaryIn,repoIn,linkLabelIn,linkUrlIn].forEach(function(el){ if(el) el.addEventListener('input', refresh); });
+  if(kindSel) kindSel.addEventListener('change', refresh);
+  go.addEventListener('click', function(ev){ if(!issueHref()){ ev.preventDefault(); titleIn.focus(); }});
+})();
 </script>
 </body>
 </html>
@@ -1667,8 +2118,15 @@ def render_changelog_view(changelog):
             f'<h3>{inline_md(e["title"])}</h3></div><ul>{items}</ul></li>'
         )
     return (
-        '<section class="changelog"><h2>Changelog</h2>'
-        '<p class="blurb">Every catalog change — repos added, moved or removed. Newest first.</p>'
+        '<section class="changelog">'
+        '<div class="view-head">'
+        '<div class="view-head-text">'
+        '<p class="eyebrow">History</p>'
+        '<h2>Changelog</h2>'
+        '<p class="blurb">Every catalog change \u2014 repos added, moved or removed.</p>'
+        '</div>'
+        f'<span class="view-head-meta">{len(entries)} entries \u00b7 newest first</span>'
+        '</div>'
         f'<ol class="entries">{"".join(entries)}</ol></section>'
     )
 
@@ -1730,15 +2188,133 @@ def render_modules_view(cat, module_index):
         )
     return (
         '<section class="mods">'
-        "<h2>Kernel modules</h2>"
-        '<p class="blurb">Every KernelSU module published by a catalogued repository, '
-        "grouped by repo. Repositories outside the KernelSU Modules group are included; "
-        "tags mark experimental, deprecated and internal-only packages.</p>"
+        '<div class="view-head">'
+        '<div class="view-head-text">'
+        '<p class="eyebrow">Module index</p>'
+        '<h2>Kernel modules</h2>'
+        '<p class="blurb">Every KernelSU module published by a catalogued repository \u2014 grouped by repo.</p>'
+        '</div>'
+        f'<span class="view-head-meta">{sum(len(e.get("modules",[])) for e in module_index)} modules \u00b7 {len(sections)} repos</span>'
+        '</div>'
         f'{"".join(sections)}</section>'
     )
 
 
-def render_site(cat, changelog, module_index):
+def news_date_label(value):
+    """`2026-10-29` -> `29 Oct 2026`; the month names are explicit so the output
+    does not depend on the CI host locale."""
+    try:
+        d = date.fromisoformat(str(value))
+    except ValueError:
+        return str(value)
+    return f"{d.day} {MONTHS[d.month - 1]} {d.year}"
+
+
+def render_news_view(news, cat):
+    """News feed, newest first, with one deep-linkable anchor per post."""
+    repo_meta = {
+        r["repo"].lower(): (g, r)
+        for g in cat.get("groups", [])
+        for r in g.get("repos", [])
+    }
+    post_link = (
+        'id="post-news-btn" href="__REPO_URL__/issues/new?'
+        'template=add-news.md&labels=add-news" target="_blank" rel="noopener"'
+    )
+    head = (
+        '<div class="view-head">'
+        '<div class="view-head-text">'
+        '<p class="eyebrow">Community</p>'
+        '<h2 id="news-title">News</h2>'
+        '<p class="blurb">Releases, guides and site updates from the Galaxy XR '
+        "community. Newest first.</p>"
+        "</div>"
+        f'<a class="btn btn-primary" {post_link}>＋ Post news</a>'
+        "</div>"
+    )
+
+    items = []
+    for e in news.get("entries", []):
+        stem = html.escape(str(e.get("_file", "news"))[:-5], quote=True)
+        kind = e.get("kind") or "community"
+        meta = [
+            f'<time datetime="{html.escape(str(e.get("date")), quote=True)}">'
+            f'{news_date_label(e.get("date"))}</time>'
+        ]
+        meta.append(
+            f'<span class="news-kind" data-kind="{html.escape(kind, quote=True)}">'
+            f'{html.escape(NEWS_KIND_LABEL.get(kind, kind.title()))}</span>'
+        )
+        author = e.get("author")
+        if author:
+            handle = html.escape(str(author))
+            meta.append(
+                f'<a class="news-author" href="https://github.com/{handle}" '
+                f'target="_blank" rel="noopener">@{handle}</a>'
+            )
+
+        summary = e.get("summary")
+        paras = []
+        for i, para in enumerate(e.get("body") or []):
+            cls = ' class="lede"' if i == 0 and not summary else ""
+            paras.append(f"<p{cls}>{inline_md(para)}</p>")
+
+        repo_html = ""
+        repo = e.get("repo")
+        if repo:
+            owner, name = str(repo).split("/", 1)
+            hit = repo_meta.get(str(repo).lower())
+            if hit:
+                group, card = hit
+                repo_html = (
+                    f'<p class="news-repo"><a href="{html.escape(card["url"], quote=True)}" '
+                    f'target="_blank" rel="noopener"><span class="owner">{html.escape(owner)}/</span>'
+                    f'{html.escape(name)}</a><span class="grp">{html.escape(group["icon"])} '
+                    f'{html.escape(group["title"])}</span></p>'
+                )
+            else:
+                repo_html = (
+                    f'<p class="news-repo"><span class="owner">{html.escape(owner)}/</span>'
+                    f"{html.escape(name)}</p>"
+                )
+
+        links_html = ""
+        links = e.get("links") or []
+        if links:
+            anchors = "".join(
+                f'<a class="news-link" href="{html.escape(str(link["url"]), quote=True)}" '
+                f'target="_blank" rel="noopener">{html.escape(str(link["label"]))}</a>'
+                for link in links
+            )
+            links_html = f'<p class="news-links">{anchors}</p>'
+
+        parts = [
+            f'<li class="news-item" id="news-{stem}" data-kind='
+            f'"{html.escape(kind, quote=True)}">',
+            f'<div class="news-meta">{"".join(meta)}</div>',
+            f'<h3 class="news-title">{inline_md(e.get("title", ""))}'
+            f'<a class="news-anchor" href="#news-{stem}" '
+            f'aria-label="Link to this post">#</a></h3>',
+        ]
+        if summary:
+            parts.append(f'<p class="news-summary">{inline_md(summary)}</p>')
+        parts.append(f'<div class="news-body">{"".join(paras)}</div>')
+        parts.append(repo_html + links_html)
+        parts.append("</li>")
+        items.append("".join(parts))
+
+    if items:
+        feed = f'<ol class="news-feed">{"".join(items)}</ol>'
+    else:
+        feed = (
+            '<div class="empty-state"><p class="empty-title">No news yet</p>'
+            "<p>Releases, guides and site updates will appear here as they are "
+            "posted — the first one could be yours.</p></div>"
+        )
+    return f'<section class="news" aria-labelledby="news-title">{head}{feed}</section>'
+
+
+def render_site(cat, changelog, module_index, news):
     total = sum(len(g["repos"]) for g in cat["groups"])
     module_total = sum(len(e.get("modules", [])) for e in module_index)
     updated = newest_date(cat, changelog)
@@ -1752,8 +2328,10 @@ def render_site(cat, changelog, module_index):
     page = page.replace("__STATUS__", render_status_chips(cat))
     page = page.replace("__SECTIONS__", render_sections(cat))
     page = page.replace("__CHANGELOG_COUNT__", str(len(changelog.get("entries", []))))
+    page = page.replace("__NEWS_COUNT__", str(len(news.get("entries", []))))
     page = page.replace("__GROUP_OPTIONS__", render_group_options(cat))
     page = page.replace("__CHANGELOG__", render_changelog_view(changelog))
+    page = page.replace("__NEWS__", render_news_view(news, cat))
     page = page.replace("__MODULES__", render_modules_view(cat, module_index))
     page = page.replace("__REPO_SLUG__", REPO_URL.split("github.com/")[-1])
     page = page.replace("__REPO_URL__", REPO_URL)
@@ -1769,11 +2347,14 @@ def main():
     cat = load_catalog()
     changelog = load_changelog()
     module_index = load_modules(cat)
+    news = load_news()
     errors, repos = validate(cat)
     module_errors, module_warnings = validate_modules(cat, module_index)
+    news_errors, news_warnings = validate_news(news, cat)
     errors += module_errors
     errors += validate_changelog(changelog)
-    for warning in module_warnings:
+    errors += news_errors
+    for warning in module_warnings + news_warnings:
         print("warning:", warning)
     if errors:
         print("input INVALID:")
@@ -1781,16 +2362,18 @@ def main():
             print("  -", e)
         return 1
     module_total = sum(len(e.get("modules", [])) for e in module_index)
+    news_total = len(news.get("entries", []))
     if check_only:
         print(
             f"OK: {len(repos)} repos in {len(cat['groups'])} groups; "
             f"{module_total} modules in {len(module_index)} repos; "
+            f"{news_total} news posts; "
             f"changelog: {len(changelog['entries'])} entries"
         )
         return 0
     readme = render_readme(cat, changelog)
     changelog_md = render_changelog_md(changelog)
-    site = render_site(cat, changelog, module_index)
+    site = render_site(cat, changelog, module_index, news)
     README_PATH.write_text(readme, encoding="utf-8", newline="\n")
     CHANGELOG_MD_PATH.write_text(changelog_md, encoding="utf-8", newline="\n")
     SITE_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -1814,6 +2397,7 @@ def main():
     print(
         f"catalog: {len(repos)} repos in {len(cat['groups'])} groups; "
         f"modules: {module_total} in {len(module_index)} repos; "
+        f"news: {news_total} posts; "
         f"changelog: {len(changelog['entries'])} entries"
     )
     return 0

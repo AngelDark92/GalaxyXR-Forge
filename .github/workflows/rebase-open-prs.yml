@@ -82,7 +82,7 @@ jobs:
               if python "$RUNNER_TEMP/repair-add-pr.py" --root "$GITHUB_WORKSPACE" --main origin/main; then
                 git push --force-with-lease origin "HEAD:$BR"
               else
-                gh pr comment "$n" --body "Automatic rebase failed: this PR changes more than one catalog entry or edits a generated file. Rebase locally with 'git fetch origin && git rebase origin/main', then 'python tools/repair-add-pr.py --main origin/main' and 'python tools/build.py'." || true
+                gh pr comment "$n" --body "Automatic rebase failed: this PR changes more than one catalog entry or news post, or edits a generated file. Rebase locally with 'git fetch origin && git rebase origin/main', then 'python tools/repair-add-pr.py --main origin/main' and 'python tools/build.py'." || true
               fi
             fi
 

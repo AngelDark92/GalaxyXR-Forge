@@ -11,6 +11,10 @@ Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by 
 - Added a News tab backed by news.d/ — one file per post — with a Post news form, an add-news workflow that opens a pull request, and tools/add-news.py for local posts.
 - Moved Star on GitHub and Suggest a repo out of the navigation into the hero; the views are now a real tab bar, and the catalog Filters button lives in the catalog toolbar beside the search box.
 
+## 2026-10-29 — gxr-profiler added
+
+- Added aali195/gxr-profiler to Tools & Diagnostics (issue #20).
+
 ## 2026-10-28 — LinkFT added
 
 - Added compdoge/LinkFT to Face & Eye Tracking (issue #18).

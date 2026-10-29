@@ -1,0 +1,9 @@
+{
+  "repo": "aali195/gxr-profiler",
+  "url": "https://github.com/aali195/gxr-profiler",
+  "about": "Read-only thermal / performance profiler for a Samsung Galaxy XR (SM-I610) over wireless ADB.",
+  "license": null,
+  "release": "v1.0.0",
+  "added": "2026-10-29",
+  "tags": ["tool", "profile", "galaxy", "device"]
+}

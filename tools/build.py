@@ -16,8 +16,9 @@ Rules:
     - catalog.json is the single source of truth for the repo list; modules.d/
       holds the module detail used by the Kernel modules tab; news.d/ holds the
       posts shown on the News tab; changelog.d/ holds the change history. Never
-      hand-edit README.md, CHANGELOG.md or docs/index.html: edit the inputs and
-      rerun this script.
+      hand-edit the generated files (README.md, CHANGELOG.md, docs/index.html,
+      docs/catalog-index.json, docs/news.json): edit the inputs and rerun this
+      script.
     - Dependency-free: Python 3.10+, stdlib only, runs on any host.
 """
 

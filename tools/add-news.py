@@ -14,7 +14,8 @@ What it does:
     2. drops empty optionals and checks the entry against the news schema and
        the catalog (tools/build.py owns both)
     3. writes news.d/<date>-<slug>.json (the date is data: a rebase must keep it)
-    4. regenerates README.md, CHANGELOG.md and the site, then re-validates
+    4. regenerates README.md, CHANGELOG.md and the site (including the news
+       archive), then re-validates
 
 News posts are not catalog changes: they add no changelog.d/ entry.
 

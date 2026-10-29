@@ -12,9 +12,9 @@ What it does:
     2. reads license, latest release and topics from the GitHub API
     3. writes a short `about` line (yours, or the repo description trimmed)
     4. inserts the entry in the chosen group with today's `added` date
-    5. appends a changelog.json entry and bumps `updated`
-    6. regenerates README.md, CHANGELOG.md and docs/index.html, then runs the
-       link and repo-state checks
+    5. writes the changelog entry under changelog.d/
+    6. regenerates README.md, CHANGELOG.md, docs/index.html, docs/catalog-index.json
+       and docs/news.json, then runs the link and repo-state checks
 
 Environment:
     GITHUB_TOKEN   optional; lifts the anonymous API rate limit (add-repo in CI

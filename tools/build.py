@@ -912,11 +912,13 @@ h1 .accent{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webk
   backdrop-filter:blur(12px) saturate(140%);-webkit-backdrop-filter:blur(12px) saturate(140%)}
 .tabbar-inner{max-width:1120px;margin:0 auto;padding:0 22px;display:flex;align-items:stretch;gap:2px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
 .tabbar-inner::-webkit-scrollbar{display:none}
-.tab{position:relative;display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--muted);padding:0 14px;font:500 13px var(--font-mono);cursor:pointer;min-height:var(--tab-h);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;flex:none}
+.tab{position:relative;display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--muted);padding:0 14px;font:500 13px var(--font-mono);cursor:pointer;min-height:var(--tab-h);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;flex:none;transition:color .16s ease,background-color .18s ease}
 .tab svg{width:14px;height:14px;flex:none;opacity:.9}
 .tab b{font-weight:500;color:var(--dim);background:rgba(148,163,184,.14);border-radius:99px;padding:1px 7px;font-size:11.5px}
 .tab:hover{color:var(--ink)}
-.tab.is-active{color:var(--ink);border-bottom-color:var(--accent);background:rgba(249,115,22,.08)}
+.tab.is-active{color:var(--ink);border-bottom-color:transparent;background:rgba(249,115,22,.08)}
+.tab::after{content:"";position:absolute;left:10px;right:10px;bottom:-2px;height:2px;border-radius:2px;background:var(--accent);transform:scaleX(0);transform-origin:center;transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.tab.is-active::after{transform:scaleX(1)}
 .tab.is-active b{color:var(--ink);background:rgba(249,115,22,.18)}
 .tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:4px}
 .tab .tab-long{ } .tab .tab-short{display:none}
@@ -1166,6 +1168,27 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
 .dlg-status{margin:2px 0 0;min-height:16px;font:12px var(--font-mono);color:var(--dim)}
 .dlg-status.ok{color:#4ade80}
 .dlg-status.warn{color:#fbbf24}
+/* Tab-change entrance. JS adds .is-enter to the incoming panel for 700ms, so the
+   stagger runs on a tab switch and never on a filter keystroke. Opacity and
+   transform only: no layout, no permanent will-change layers. */
+@keyframes riseIn{from{opacity:0;transform:translateY(var(--rise,8px))}to{opacity:1;transform:none}}
+.is-enter :is(.card,.mod-row,.entry,.news-item){animation:riseIn .26s cubic-bezier(.22,.61,.36,1) backwards;animation-delay:var(--d,0ms)}
+.is-enter :is(.entry,.news-item){--rise:5px}
+:is(.card,.mod-row,.entry,.news-item):nth-child(2){--d:24ms}
+:is(.card,.mod-row,.entry,.news-item):nth-child(3){--d:48ms}
+:is(.card,.mod-row,.entry,.news-item):nth-child(4){--d:72ms}
+:is(.card,.mod-row,.entry,.news-item):nth-child(5){--d:96ms}
+:is(.card,.mod-row,.entry,.news-item):nth-child(6){--d:120ms}
+.is-enter :is(.view-head,.catalog-toolbar,.group-head,.mod-head){animation:riseIn .24s cubic-bezier(.22,.61,.36,1) backwards;--rise:4px;animation-delay:60ms}
+.is-enter .group-head{animation-delay:40ms}
+/* Older news appended from docs/news.json fade in; the loader itself is untouched. */
+.news-item.is-in{animation:riseIn .22s cubic-bezier(.22,.61,.36,1) backwards;--rise:6px}
+@media (prefers-reduced-motion:reduce){
+  .is-enter :is(.card,.mod-row,.entry,.news-item),
+  .is-enter :is(.view-head,.catalog-toolbar,.group-head,.mod-head),
+  .news-item.is-in{animation:none}
+  .tab::after{transition:none}
+}
 </style>
 <noscript><style>
 .tabbar{display:none}
@@ -1621,6 +1644,19 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     changelog: document.getElementById('changelog'),
     news: document.getElementById('news')
   };
+  // Entrance animation: the class is scoped to one tab switch and pulled again
+  // after the longest stagger, so filtering cards never replays it.
+  var enterTimer = null, lastPanel = null;
+  function enter(panel) {
+    if (!panel) return;
+    if (lastPanel && lastPanel !== panel) lastPanel.classList.remove('is-enter');
+    lastPanel = panel;
+    panel.classList.remove('is-enter');
+    void panel.offsetWidth;
+    panel.classList.add('is-enter');
+    clearTimeout(enterTimer);
+    enterTimer = setTimeout(function () { panel.classList.remove('is-enter'); }, 700);
+  }
   function show(view, opts) {
     var noPush = opts && opts.noPush;
     tabs.forEach(function (t) {
@@ -1632,6 +1668,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
     Object.keys(views).forEach(function (k) {
       if (views[k]) views[k].hidden = k !== view;
     });
+    enter(views[view]);
     document.body.classList.toggle('view-noncatalog', view !== 'catalog');
     if (view !== 'catalog' && typeof window.gxrForgeCloseFilters === 'function') window.gxrForgeCloseFilters();
     if (!noPush && window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + view);
@@ -2152,6 +2189,7 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
       while(tmp.firstChild) frag.appendChild(tmp.firstChild);
     }
     feed.appendChild(frag);
+    for (var k = current; k < feed.children.length; k++) feed.children[k].classList.add('is-in');
     return take;
   }
 

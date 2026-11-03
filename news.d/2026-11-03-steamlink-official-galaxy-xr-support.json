@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-03",
+  "title": "SteamLink - Official Galaxy XR Support",
+  "kind": "release",
+  "summary": "High-resolution now triggered on SL with no patches. Some small problems still linger.",
+  "body": [
+    "SteamLink builds 5002395 and 5002527 now trigger high resolution without the aid of any of the patches, they have moved to a four per-eye layer entries, with at least two confirmed as quads, and no separate underside swapchain like on earlier apks.",
+    "Only a few other problems remain: * Editing bandwidth and encoded frame size to anything more than auto starts to throttle the stream so it's very difficult to reach the same quality/performance as 2.0.20 with higher bitrates and resolution * The hand input seems to be at the wrong angle * There is not enough prediction openxr side as to allow for async spacewap trigger, so head movements show the sides of the frame and cause motion sickness on some people as the stream seems to lag behind head movement. * The image is not yet well calibrated for oled screens."
+  ],
+  "author": "AngelDark92",
+  "issue": 22
+}

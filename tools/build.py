@@ -1130,6 +1130,12 @@ main{padding:0 0 6px}
 .news-body p.lede{font-size:15px;color:var(--ink)}
 .news-body code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.9em}
 .news-body strong{color:var(--ink)}
+.news-body ul,.news-body ol{margin:0 0 10px;padding-left:22px}
+.news-body ul{list-style:disc}
+.news-body ol{list-style:decimal}
+.news-body li{margin:3px 0;padding-left:2px}
+.news-body li::marker{color:var(--muted)}
+.news-body :is(ul,ol):last-child{margin-bottom:0}
 .news-repo{margin:10px 0 0;font:12px var(--font-mono);color:var(--dim);display:flex;align-items:center;gap:8px}
 .news-repo a{color:var(--muted)}
 .news-repo a:hover{color:var(--accent)}
@@ -2402,6 +2408,58 @@ def news_date_label(value):
     return f"{d.day} {MONTHS[d.month - 1]} {d.year}"
 
 
+NEWS_LIST_RE = re.compile(r"^(?:([-*+])|(\d{1,9})[.)])[ \t]+(\S.*)$")
+
+
+def render_news_block(block, lede=False):
+    """One body block: prose as <p>, flat Markdown lists as <ul>/<ol>.
+
+    Only line-leading markers followed by whitespace count (`-`, `*`, `+`,
+    `1.`, `1)`); inline asterisks stay emphasis. Everything is escaped.
+    """
+    out = []
+    prose = []
+    items = []
+    kind = None  # "ul:<marker>" or "ol"
+    first = [True]
+
+    def flush_prose():
+        if prose:
+            cls = ' class="lede"' if lede and first[0] else ""
+            out.append(f"<p{cls}>{inline_md(' '.join(prose))}</p>")
+            first[0] = False
+            prose.clear()
+
+    def flush_list():
+        nonlocal kind
+        if items:
+            tag = "ol" if kind == "ol" else "ul"
+            lis = "".join(f"<li>{inline_md(t)}</li>" for t in items)
+            out.append(f"<{tag}>{lis}</{tag}>")
+            first[0] = False
+            items.clear()
+        kind = None
+
+    for raw in str(block).splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        m = NEWS_LIST_RE.match(line)
+        if m:
+            k = "ol" if m.group(2) else "ul:" + m.group(1)
+            flush_prose()
+            if kind is not None and k != kind:
+                flush_list()
+            kind = k
+            items.append(m.group(3))
+        else:
+            flush_list()
+            prose.append(line)
+    flush_prose()
+    flush_list()
+    return "".join(out)
+
+
 def render_news_item(entry, repo_meta):
     """One post as an <li>. Shared by the first page and the on-demand archive."""
     stem = html.escape(str(entry.get("_file", "news"))[:-5], quote=True)
@@ -2425,8 +2483,8 @@ def render_news_item(entry, repo_meta):
     summary = entry.get("summary")
     paras = []
     for i, para in enumerate(entry.get("body") or []):
-        cls = ' class="lede"' if i == 0 and not summary else ""
-        paras.append(f"<p{cls}>{inline_md(para)}</p>")
+        lede = i == 0 and not summary
+        paras.append(render_news_block(para, lede))
 
     repo_html = ""
     repo = entry.get("repo")

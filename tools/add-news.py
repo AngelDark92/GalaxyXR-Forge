@@ -116,7 +116,14 @@ def as_paragraphs(value):
     if value is None:
         return []
     blocks = value if isinstance(value, list) else re.split(r"\n\s*\n", str(value))
-    return [" ".join(str(block).split()) for block in blocks if str(block).strip()]
+    out = []
+    for block in blocks:
+        # Keep line breaks inside a block (Markdown lists); tidy each line.
+        lines = [" ".join(line.split()) for line in str(block).splitlines()]
+        lines = [line for line in lines if line]
+        if lines:
+            out.append("\n".join(lines))
+    return out
 
 
 def parse_date(value):

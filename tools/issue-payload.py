@@ -161,7 +161,14 @@ def field(sec, *names):
 def paragraphs(text):
     """Split section text on blank lines; one paragraph per block."""
     blocks = re.split(r"\n\s*\n", text or "")
-    return [" ".join(block.split()) for block in blocks if block.strip()]
+    out = []
+    for block in blocks:
+        # Keep line breaks inside a block (Markdown lists); tidy each line.
+        lines = [" ".join(line.split()) for line in block.splitlines()]
+        lines = [line for line in lines if line]
+        if lines:
+            out.append("\n".join(lines))
+    return out
 
 
 def news_kind(text):

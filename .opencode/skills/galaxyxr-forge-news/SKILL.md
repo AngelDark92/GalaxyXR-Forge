@@ -62,6 +62,7 @@ Add `--summary "one line"`, `--date YYYY-MM-DD`, `--dry-run`, or `--json payload
 - `body` may be one string for hand-written files (split on blank lines).
 - `kind` defaults to `community` when omitted; the four labels are `Community`, `Release`, `Guide` and `Site update`.
 - Inline `` `code` `` and `**bold**` are honoured in the title, summary and body.
+- Body blocks also support flat Markdown lists: put each `-`, `*`, `+` or numbered (`1.` / `1)`) item on its own line. Blank lines still separate body blocks; nested lists and raw HTML are not supported.
 - `links` accepts only absolute `https://` URLs, max 4.
 - `author` renders as an `@handle` link; `issue` ties the post back to its proposal and blocks a second import of the same issue.
 

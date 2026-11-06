@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-67-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-68-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
@@ -19,7 +19,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-10-29` — 67 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-06` — 68 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -113,6 +113,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | Repository | What it does |
 | --- | --- |
 | **[evertec82/AstroQuest](https://github.com/evertec82/AstroQuest)**<br>![stars](https://img.shields.io/github/stars/evertec82/AstroQuest?style=flat-square) ![release](https://img.shields.io/github/v/release/evertec82/AstroQuest?include_prereleases&style=flat-square&label=release) | ASTRO BOT Rescue Mission via shadPS4 on standalone headsets and PC VR. |
+| **[evertec82/power-moon-vr](https://github.com/evertec82/power-moon-vr)**<br>![stars](https://img.shields.io/github/stars/evertec82/power-moon-vr?style=flat-square) ![release](https://img.shields.io/github/v/release/evertec82/power-moon-vr?include_prereleases&style=flat-square&label=release) | Super Mario Odyssey VR Mod. |
 | **[RJNY/Obtainium-Emulation-Pack](https://github.com/RJNY/Obtainium-Emulation-Pack)**<br>![stars](https://img.shields.io/github/stars/RJNY/Obtainium-Emulation-Pack?style=flat-square) ![release](https://img.shields.io/github/v/release/RJNY/Obtainium-Emulation-Pack?include_prereleases&style=flat-square&label=release) | Obtainium import list bundling Android emulator apps for one-shot install. |
 | **[Shift-Foundry/project-hazard](https://github.com/Shift-Foundry/project-hazard)**<br>![stars](https://img.shields.io/github/stars/Shift-Foundry/project-hazard?style=flat-square) | Room-scale mixed-reality roguelite for Android XR glasses, including Galaxy XR. |
 | **[WinlatorXR/WinlatorXR](https://github.com/WinlatorXR/WinlatorXR)**<br>![stars](https://img.shields.io/github/stars/WinlatorXR/WinlatorXR?style=flat-square) | Windows x86 games and apps emulator for standalone Android XR headsets. |
@@ -195,12 +196,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-11-06` — power-moon-vr added
 - `2026-10-29` — Suggest a repo moves into the Catalog tab
 - `2026-10-29` — News tab and a rebuilt site navigation
 - `2026-10-29` — News archive loads on demand
 - `2026-10-29` — gxr-profiler added
 - `2026-10-28` — LinkFT added
-- `2026-10-26` — Kernel modules tab
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -210,4 +211,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-10-29 · 67 repos</sub></div>
+<div align="center"><sub>Curated 2026-11-06 · 68 repos</sub></div>

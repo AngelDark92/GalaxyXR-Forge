@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by `tools/build.py` — never edit this file by hand.
 
+## 2026-11-06 — power-moon-vr added
+
+- Added evertec82/power-moon-vr to Games & Emulation (issue #24).
+
 ## 2026-10-29 — Suggest a repo moves into the Catalog tab
 
 - Moved the Suggest a repo button from the hero into the Catalog header, mirroring Post news on the News tab; Star on GitHub stays in the hero.

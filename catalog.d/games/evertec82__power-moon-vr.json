@@ -1,0 +1,9 @@
+{
+  "repo": "evertec82/power-moon-vr",
+  "url": "https://github.com/evertec82/power-moon-vr",
+  "about": "Super Mario Odyssey VR Mod.",
+  "license": null,
+  "release": "v0.2.1",
+  "added": "2026-11-06",
+  "tags": ["experimental", "openxr", "steamvr", "runtime"]
+}

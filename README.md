@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-69-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-70-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
@@ -19,7 +19,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-12` — 69 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-12` — 70 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -46,6 +46,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | --- | --- |
 | **[4uva4ek/galaxyxr-modules](https://github.com/4uva4ek/galaxyxr-modules)**<br>![stars](https://img.shields.io/github/stars/4uva4ek/galaxyxr-modules?style=flat-square) | Tracking and haptic fixes: whitening, timestamp precision, OpenXR velocity, OTA control. |
 | **[BlueScorpioVR/galaxyxr-modules](https://github.com/BlueScorpioVR/galaxyxr-modules)**<br>![stars](https://img.shields.io/github/stars/BlueScorpioVR/galaxyxr-modules?style=flat-square) | Experimental personal KernelSU modules for the Galaxy XR. |
+| **[booinspace/galaxyxr-modules](https://github.com/booinspace/galaxyxr-modules)**<br>![stars](https://img.shields.io/github/stars/booinspace/galaxyxr-modules?style=flat-square) | Modules for AZJ2 firmware |
 | **[BreadDoesStuff/galaxy-xr-modules](https://github.com/BreadDoesStuff/galaxy-xr-modules)**<br>![stars](https://img.shields.io/github/stars/BreadDoesStuff/galaxy-xr-modules?style=flat-square) | Fan control, passthrough anywhere, camera debug stream and mic gain modules. |
 | **[compdoge/gxr-ksu-modules](https://github.com/compdoge/gxr-ksu-modules)**<br>![stars](https://img.shields.io/github/stars/compdoge/gxr-ksu-modules?style=flat-square) | KernelSU module source for the Galaxy XR: add it in the manager's Sources screen. |
 | **[stearnsbq/questlhsync-galaxy-xr](https://github.com/stearnsbq/questlhsync-galaxy-xr)**<br>![stars](https://img.shields.io/github/stars/stearnsbq/questlhsync-galaxy-xr?style=flat-square) ![release](https://img.shields.io/github/v/release/stearnsbq/questlhsync-galaxy-xr?include_prereleases&style=flat-square&label=release) | KernelSU module aligning Lighthouse trackers with the XR's camera tracking (QuestLHSync PC side required). |
@@ -198,11 +199,11 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 ## Changelog
 
 - `2026-11-12` — GXR-Distortion-Profile added
+- `2026-11-12` — galaxyxr-modules added
 - `2026-11-06` — power-moon-vr added
 - `2026-10-29` — Suggest a repo moves into the Catalog tab
 - `2026-10-29` — News tab and a rebuilt site navigation
 - `2026-10-29` — News archive loads on demand
-- `2026-10-29` — gxr-profiler added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -212,4 +213,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-11-12 · 69 repos</sub></div>
+<div align="center"><sub>Curated 2026-11-12 · 70 repos</sub></div>

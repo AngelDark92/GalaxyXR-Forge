@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-12",
+  "title": "Galaxy XR Temporary Root Reported Working on October 2026 Firmware",
+  "kind": "community",
+  "summary": "Temporary root reported working on Galaxy XR firmware I610UES3AZJ2 using DirtyFrag and KernelSU GXR. Build instructions are available on GitHub.",
+  "body": [
+    "Developer booinspace has published a method for rooting the Galaxy XR on the newest firmware I610UES3AZJ2.",
+    "The project supposedly combines DirtyFrag with the new addresses targeting the newest firmware and should work with the old KernelSU GXR by 4uva4ek.",
+    "According to booinspace, the method was successfully tested on the new firmware with KernelSU correctly reporting it as working.",
+    "As with DirtyFrag's original method, root access is lost on full reboot, so it still requires the apply on reboot to stay actuve.",
+    "The repository includes build scripts and instructions rather than prebuilt APKs. While the developer reports a successful test, independent verification is still limited.",
+    "Users beware, this is still root we are talking about, everyone should still be aware of potential crashes and Knox-related risks."
+  ],
+  "repo": "booinspace/galaxyxr-root",
+  "links": [
+    {
+      "label": "View on GitHub",
+      "url": "https://github.com/booinspace/galaxyxr-root"
+    }
+  ],
+  "author": "AngelDark92",
+  "issue": 33
+}

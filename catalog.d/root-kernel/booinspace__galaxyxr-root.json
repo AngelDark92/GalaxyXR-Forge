@@ -1,0 +1,9 @@
+{
+  "repo": "booinspace/galaxyxr-root",
+  "url": "https://github.com/booinspace/galaxyxr-root",
+  "about": "Root exploit for AZJ2 firmware using DirtyFrag CVE-2026-43284",
+  "license": "MIT",
+  "release": null,
+  "added": "2026-11-12",
+  "tags": ["root-kernel"]
+}

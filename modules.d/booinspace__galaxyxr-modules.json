@@ -1,0 +1,49 @@
+{
+  "repo": "booinspace/galaxyxr-modules",
+  "checked": "2026-11-12",
+  "note": "Window Controls is an AZJ2 build of BlueScorpioVR's gxr_window_curvature that reuses the same module ID; keep separate Borderless and Rotation modules off when using it.",
+  "modules": [
+    {
+      "id": "gxr_borderless_azj2",
+      "name": "Galaxy XR borderless app windows (AZJ2)",
+      "about": "Hides app window rims and shows the caption pill only while pointing at it. AZJ2 firmware; installs disabled.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_curvature_recovery",
+      "name": "Galaxy XR curvature recovery",
+      "about": "Exports logs and acknowledges curvature or borderless quarantine after a full reboot. Action only; no startup hook.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_mic_gain_azj2",
+      "name": "Galaxy XR mic gain boost (AZJ2)",
+      "about": "Adjusts microphone gain for selected recording modes. AZJ2 port of BreadDoesStuff module; installs disabled.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_no_lowlight_azj2",
+      "name": "Galaxy XR no low-light toast (AZJ2)",
+      "about": "Suppresses the low-light signal while retaining the dim-light pipeline. AZJ2 port; installs disabled.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_passthrough_azj2",
+      "name": "Galaxy XR passthrough anywhere (AZJ2)",
+      "about": "Toggles camera passthrough in an immersive app with a double-tap. AZJ2 port; installs disabled.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_window_curvature",
+      "name": "Galaxy XR Curvature + Borderless + Rotation (AZJ2)",
+      "about": "Combined AZJ2 curvature, borderless rims, hover caption and pitch/yaw/roll controls. Keep separate Borderless and Rotation off; installs disabled.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_window_rotation",
+      "name": "Galaxy XR window rotation (AZJ2)",
+      "about": "Standalone pitch, yaw and roll controls for app windows. Installs disabled; keep off when using the combined window package.",
+      "status": "experimental"
+    }
+  ]
+}

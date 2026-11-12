@@ -14,6 +14,10 @@ Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by 
 
 - Added booinspace/galaxyxr-modules to KernelSU Modules (issue #26).
 
+## 2026-11-12 — booinspace galaxyxr-modules records added
+
+- Added KernelSU module records for booinspace/galaxyxr-modules.
+
 ## 2026-11-06 — power-moon-vr added
 
 - Added evertec82/power-moon-vr to Games & Emulation (issue #24).

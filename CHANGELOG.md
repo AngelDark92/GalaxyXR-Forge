@@ -6,6 +6,10 @@ Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by 
 
 - Added AngelDark92/GXR-Distortion-Profile to Root & Kernel (issue #28).
 
+## 2026-11-12 — galaxyxr-root added
+
+- Added booinspace/galaxyxr-root to Root & Kernel (issue #27).
+
 ## 2026-11-12 — galaxyxr-modules added
 
 - Added booinspace/galaxyxr-modules to KernelSU Modules (issue #26).

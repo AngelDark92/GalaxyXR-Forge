@@ -1,0 +1,9 @@
+{
+  "repo": "AngelDark92/GXR-Distortion-Profile",
+  "url": "https://github.com/AngelDark92/GXR-Distortion-Profile",
+  "about": "Distortion profile pulled from the GXR with tool to visualize points and lattice against a quad.",
+  "license": "GPL-3.0",
+  "release": null,
+  "added": "2026-11-12",
+  "tags": ["distortion", "profile", "pulled", "tool"]
+}

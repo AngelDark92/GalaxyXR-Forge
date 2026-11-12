@@ -202,9 +202,9 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 - `2026-11-12` — GXR-Distortion-Profile added
 - `2026-11-12` — galaxyxr-root added
 - `2026-11-12` — galaxyxr-modules added
+- `2026-11-12` — booinspace galaxyxr-modules records added
 - `2026-11-06` — power-moon-vr added
 - `2026-10-29` — Suggest a repo moves into the Catalog tab
-- `2026-10-29` — News tab and a rebuilt site navigation
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

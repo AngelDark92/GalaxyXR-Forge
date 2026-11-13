@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-13",
+  "title": "Five more AZJ2 modules and a module-tab audit",
+  "items": [
+    "Added Framebuffer10, MV-HEVC eye fix, QuestLHSync, root face tracking and wear-aware dimming to the booinspace/galaxyxr-modules records.",
+    "Added gxr-handtracking-toggle from compdoge/gxr-ksu-modules.",
+    "Re-audited all seven module-publishing repos: BlueScorpioVR, BreadDoesStuff, compdoge/gxr-root-ft and stearnsbq are unchanged upstream.",
+    "4uva4ek retired ten standalone modules from its module registry; the deprecated and internal entries stay listed for history."
+  ]
+}

@@ -2,6 +2,13 @@
 
 Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by `tools/build.py` — never edit this file by hand.
 
+## 2026-11-13 — Five more AZJ2 modules and a module-tab audit
+
+- Added Framebuffer10, MV-HEVC eye fix, QuestLHSync, root face tracking and wear-aware dimming to the booinspace/galaxyxr-modules records.
+- Added gxr-handtracking-toggle from compdoge/gxr-ksu-modules.
+- Re-audited all seven module-publishing repos: BlueScorpioVR, BreadDoesStuff, compdoge/gxr-root-ft and stearnsbq are unchanged upstream.
+- 4uva4ek retired ten standalone modules from its module registry; the deprecated and internal entries stay listed for history.
+
 ## 2026-11-12 — GXR-Distortion-Profile added
 
 - Added AngelDark92/GXR-Distortion-Profile to Root & Kernel (issue #28).

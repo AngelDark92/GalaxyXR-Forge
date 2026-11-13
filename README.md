@@ -19,7 +19,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-12` — 71 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-13` — 71 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -199,12 +199,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-11-13` — Five more AZJ2 modules and a module-tab audit
 - `2026-11-12` — GXR-Distortion-Profile added
 - `2026-11-12` — galaxyxr-root added
 - `2026-11-12` — galaxyxr-modules added
 - `2026-11-12` — booinspace galaxyxr-modules records added
 - `2026-11-06` — power-moon-vr added
-- `2026-10-29` — Suggest a repo moves into the Catalog tab
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -214,4 +214,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-11-12 · 71 repos</sub></div>
+<div align="center"><sub>Curated 2026-11-13 · 71 repos</sub></div>

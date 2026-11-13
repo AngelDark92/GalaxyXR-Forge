@@ -1,7 +1,7 @@
 {
   "repo": "booinspace/galaxyxr-modules",
-  "checked": "2026-11-12",
-  "note": "Window Controls is an AZJ2 build of BlueScorpioVR's gxr_window_curvature that reuses the same module ID; keep separate Borderless and Rotation modules off when using it.",
+  "checked": "2026-11-13",
+  "note": "Window Controls is an AZJ2 build of BlueScorpioVR's gxr_window_curvature that reuses the same module ID; keep separate Borderless and Rotation modules off when using it. Framebuffer10 and MV-HEVC also reuse 4uva4ek module IDs.",
   "modules": [
     {
       "id": "gxr_borderless_azj2",
@@ -16,9 +16,21 @@
       "status": "experimental"
     },
     {
+      "id": "gxr_framebuffer10",
+      "name": "Galaxy XR Framebuffer10 (AZJ2)",
+      "about": "AZJ2 10-bit SDR output with locally generated shader fixes; no HDR and no vendor binaries.",
+      "status": "experimental"
+    },
+    {
       "id": "gxr_mic_gain_azj2",
       "name": "Galaxy XR mic gain boost (AZJ2)",
       "about": "Adjusts microphone gain for selected recording modes. AZJ2 port of BreadDoesStuff module; installs disabled.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_mvhevc_eye_fix",
+      "name": "Galaxy XR MV-HEVC Eye Fix (AZJ2)",
+      "about": "Corrects left-primary MV-HEVC eye order in Gallery XR by generating reviewed library copies locally.",
       "status": "experimental"
     },
     {
@@ -31,6 +43,24 @@
       "id": "gxr_passthrough_azj2",
       "name": "Galaxy XR passthrough anywhere (AZJ2)",
       "about": "Toggles camera passthrough in an immersive app with a double-tap. AZJ2 port; installs disabled.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_questlhsync",
+      "name": "QuestLHSync Lighthouse alignment (AZJ2)",
+      "about": "Factory-calibrated Lighthouse alignment for SteamVR and Virtual Desktop; no native controller input.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_root_ft_azj2",
+      "name": "Galaxy XR root face tracking (AZJ2)",
+      "about": "Read-only vendor probes relay per-eye gaze, pupils, face and tongue to VRCFT-ALVR-UE.",
+      "status": "experimental"
+    },
+    {
+      "id": "gxr_wear_dim_azj2",
+      "name": "Galaxy XR wear-aware display blanking (AZJ2)",
+      "about": "Blanks the panels after 60 seconds without eyes while worn and restores them on eye return.",
       "status": "experimental"
     },
     {

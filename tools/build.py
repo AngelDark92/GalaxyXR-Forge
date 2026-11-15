@@ -2629,7 +2629,7 @@ def render_modules_view(cat, module_index):
         if item["evidence"]:
             extra += (
                 f'<p class="mod-note"><a href="{html.escape(item["evidence"], quote=True)}" '
-                f'target="_blank" rel="noopener">Evidence / release source</a></p>'
+                f'target="_blank" rel="noopener">Firmware evidence</a></p>'
             )
         return (
             f'<li class="mod-row" data-family="{html.escape(item["compare_key"], quote=True)}" '
@@ -2742,7 +2742,7 @@ def render_modules_view(cat, module_index):
         "I610UES3AZJ2 — newest known firmware in these repos", "azj2", "AZJ2", azj2_items, open_default=True
     )
     azf3_group = render_fw_group(
-        "I610UEU2AZF3 — only modules whose source explicitly names AZF3", "azf3", "AZF3", azf3_items, open_default=False
+        "I610UEU2AZF3 — tested modules", "azf3", "AZF3", azf3_items, open_default=False
     )
     unknown_group = render_fw_group(
         "Firmware not documented", "unknown", "Other", unknown_items, open_default=False

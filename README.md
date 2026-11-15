@@ -199,12 +199,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-11-15` — Owner-reported AZF3 coverage for the 32 untargeted module records
 - `2026-11-15` — booinspace AZJ2 modules refreshed to the 2026.11.15 release
 - `2026-11-13` — Five more AZJ2 modules and a module-tab audit
 - `2026-11-12` — GXR-Distortion-Profile added
 - `2026-11-12` — galaxyxr-root added
 - `2026-11-12` — galaxyxr-modules added
-- `2026-11-12` — booinspace galaxyxr-modules records added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 

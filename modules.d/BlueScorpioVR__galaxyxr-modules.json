@@ -1,38 +1,53 @@
 {
   "repo": "BlueScorpioVR/galaxyxr-modules",
   "checked": "2026-11-13",
-  "note": "The original window-curvature module has no stated firmware target. booinspace/galaxyxr-modules ships the AZJ2 Window Controls port.",
+  "note": "booinspace/galaxyxr-modules ships the AZJ2 Window Controls port of this module.",
   "modules": [
     {
       "id": "gxr_window_curvature",
       "name": "Galaxy XR Home Space Window Curvature",
       "about": "Adds curve and flatten controls plus a strength slider to Home Space app windows.",
       "status": "experimental",
-      "family": "window-controls"
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "family": "window-controls",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     },
     {
       "id": "gxr_bsvr_auto_spatialization",
       "name": "Auto-spatialization Default ON",
       "about": "Enables the auto-spatialization Labs preference at rooted service startup.",
-      "status": "stable"
+      "status": "stable",
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     },
     {
       "id": "gxr_bsvr_xbox_unknown_key",
       "name": "Bluetooth Xbox Unknown-Key Recovery",
       "about": "Releases a stuck unknown key on Bluetooth Xbox controllers so hand navigation recovers.",
-      "status": "experimental"
+      "status": "experimental",
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     },
     {
       "id": "gxr_bsvr_adb_port_publisher",
       "name": "ADB Port Publisher",
       "about": "Reports the wireless ADB port to a PC receiver whenever the framework assigns it.",
-      "status": "stable"
+      "status": "stable",
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     },
     {
       "id": "gxr-usb-compat",
       "name": "Galaxy XR USB NCM + AOA",
       "about": "Adds missing USB NCM networking and Android accessory support; AOA tested with DJI Fly.",
-      "status": "experimental"
+      "status": "experimental",
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     }
   ]
 }

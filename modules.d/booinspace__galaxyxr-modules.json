@@ -1,79 +1,125 @@
 {
   "repo": "booinspace/galaxyxr-modules",
-  "checked": "2026-11-13",
-  "note": "Window Controls is an AZJ2 build of BlueScorpioVR's gxr_window_curvature that reuses the same module ID; keep separate Borderless and Rotation modules off when using it. Framebuffer10 and MV-HEVC also reuse 4uva4ek module IDs.",
+  "checked": "2026-11-15",
+  "note": "AZJ2 collection for I610UES3AZJ2, credits 4uva4ek, BlueScorpioVR, BreadDoesStuff, compdoge, AngelDark92, stearnsbq and CreoleVR. Window Controls replaces standalone Borderless, Rotation and recovery; shared IDs are separate packages.",
   "modules": [
     {
-      "id": "gxr_borderless_azj2",
-      "name": "Galaxy XR borderless app windows (AZJ2)",
-      "about": "Hides app window rims and shows the caption pill only while pointing at it. AZJ2 firmware; installs disabled.",
-      "status": "experimental"
+      "id": "gxr_window_curvature",
+      "name": "Galaxy XR Window Controls",
+      "about": "Combined curvature, borderless, rotation and app pins; keep separate window modules off; installs disabled.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "window-controls",
+      "test_note": "0.1.70 core reported working on AZJ2; extended idle/wake unverified."
     },
     {
-      "id": "gxr_curvature_recovery",
-      "name": "Galaxy XR curvature recovery",
-      "about": "Exports logs and acknowledges curvature or borderless quarantine after a full reboot. Action only; no startup hook.",
-      "status": "experimental"
+      "id": "gxr_saved_workspaces",
+      "name": "Galaxy XR Saved Workspaces (AZJ2)",
+      "about": "Native Recents layouts with Follow me and head roll; needs Window Controls 0.1.70+; installs disabled.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "test_note": "0.1.6 confirmed left and right head roll on AZJ2; extended idle/wake still need testing."
+    },
+    {
+      "id": "gxr_wifi_adb",
+      "name": "Wi-Fi ADB",
+      "about": "Starts authenticated ADB over TCP on port 5555; unchanged 4uva4ek 1.0.2 package, installs disabled.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "wifi-adb",
+      "test_note": "Owner confirmed Wi-Fi ADB working on an AZJ2 headset."
     },
     {
       "id": "gxr_framebuffer10",
       "name": "Galaxy XR Framebuffer10 (AZJ2)",
-      "about": "AZJ2 10-bit SDR output with locally generated shader fixes; no HDR and no vendor binaries.",
-      "status": "experimental"
+      "about": "10-bit SDR output with corrected shaders; AZJ2 port of 4uva4ek's module, installs disabled.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "framebuffer10",
+      "test_note": "Native build and host lifecycle checks pass; live activation untested."
     },
     {
       "id": "gxr_mic_gain_azj2",
       "name": "Galaxy XR mic gain boost (AZJ2)",
-      "about": "Adjusts microphone gain for selected recording modes. AZJ2 port of BreadDoesStuff module; installs disabled.",
-      "status": "experimental"
+      "about": "Live 0-40 mic gain with global or Virtual Desktop scope and a 10-second test; AZJ2 port, installs disabled.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "mic-gain",
+      "test_note": "Original VD boost user-tested on AZJ2; 0.2.3 live settings and global scope await a recording test."
     },
     {
       "id": "gxr_mvhevc_eye_fix",
       "name": "Galaxy XR MV-HEVC Eye Fix (AZJ2)",
-      "about": "Corrects left-primary MV-HEVC eye order in Gallery XR by generating reviewed library copies locally.",
-      "status": "experimental"
+      "about": "Fixes left-primary MV-HEVC eye order in Gallery XR by generating reviewed library copies; AZJ2 port.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "mvhevc-eye-fix",
+      "test_note": "Generation checked against AZJ2 libraries; Gallery playback still needs a headset test."
     },
     {
       "id": "gxr_no_lowlight_azj2",
       "name": "Galaxy XR no low-light toast (AZJ2)",
-      "about": "Suppresses the low-light signal while retaining the dim-light pipeline. AZJ2 port; installs disabled.",
-      "status": "experimental"
+      "about": "Suppresses the low-light toast while keeping the dim-light pipeline; AZJ2 BreadDoesStuff port, installs disabled.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "no-lowlight-toast",
+      "test_note": "User tested toast suppression on AZJ2 and reports it working."
+    },
+    {
+      "id": "gxr_openxr_quality",
+      "name": "Galaxy XR OpenXR QUALITY (AZJ2)",
+      "about": "Holds the tracking QUALITY camera request during visible OpenXR sessions with thermal guards; AZJ2 port.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "openxr-quality",
+      "test_note": "Camera rates and any tracking improvement still need device validation."
     },
     {
       "id": "gxr_passthrough_azj2",
       "name": "Galaxy XR passthrough anywhere (AZJ2)",
-      "about": "Toggles camera passthrough in an immersive app with a double-tap. AZJ2 port; installs disabled.",
-      "status": "experimental"
+      "about": "Double-tap toggles passthrough inside an immersive app; AZJ2 BreadDoesStuff port, installs disabled.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "passthrough-anywhere",
+      "test_note": "User tested passthrough on AZJ2 and reports it working."
     },
     {
       "id": "gxr_questlhsync",
       "name": "QuestLHSync Lighthouse alignment (AZJ2)",
-      "about": "Factory-calibrated Lighthouse alignment for SteamVR and Virtual Desktop; no native controller input.",
-      "status": "experimental"
+      "about": "Factory-calibrated Lighthouse alignment for SteamVR and Virtual Desktop; no native controller input; AZJ2.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "questlhsync",
+      "test_note": "Live camera capture and alignment accuracy still need testing."
     },
     {
       "id": "gxr_root_ft_azj2",
       "name": "Galaxy XR root face tracking (AZJ2)",
-      "about": "Read-only vendor probes relay per-eye gaze, pupils, face and tongue to VRCFT-ALVR-UE.",
-      "status": "experimental"
+      "about": "Read-only vendor probes relay gaze, pupils, face and tongue to VRCFT; compdoge AZJ2 port, installs disabled.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "family": "root-face-tracking",
+      "test_note": "Host checks do not establish live data quality."
     },
     {
       "id": "gxr_wear_dim_azj2",
       "name": "Galaxy XR wear-aware display blanking (AZJ2)",
-      "about": "Blanks the panels after 60 seconds without eyes while worn and restores them on eye return.",
-      "status": "experimental"
-    },
-    {
-      "id": "gxr_window_curvature",
-      "name": "Galaxy XR Curvature + Borderless + Rotation (AZJ2)",
-      "about": "Combined AZJ2 curvature, borderless rims, hover caption and pitch/yaw/roll controls. Keep separate Borderless and Rotation off; installs disabled.",
-      "status": "experimental"
-    },
-    {
-      "id": "gxr_window_rotation",
-      "name": "Galaxy XR window rotation (AZJ2)",
-      "about": "Standalone pitch, yaw and roll controls for app windows. Installs disabled; keep off when using the combined window package.",
-      "status": "experimental"
+      "about": "Blanks the panels after 60 seconds without eyes while worn and restores them when eyes return.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
+      "test_note": "Guarded three-second panel-off/restore confirmed on AZJ2; 60-second blanking and latency untested."
     }
   ]
 }

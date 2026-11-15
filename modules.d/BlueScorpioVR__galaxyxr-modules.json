@@ -1,12 +1,14 @@
 {
   "repo": "BlueScorpioVR/galaxyxr-modules",
   "checked": "2026-11-13",
+  "note": "The original window-curvature module has no stated firmware target. booinspace/galaxyxr-modules ships the AZJ2 Window Controls port.",
   "modules": [
     {
       "id": "gxr_window_curvature",
       "name": "Galaxy XR Home Space Window Curvature",
       "about": "Adds curve and flatten controls plus a strength slider to Home Space app windows.",
-      "status": "experimental"
+      "status": "experimental",
+      "family": "window-controls"
     },
     {
       "id": "gxr_bsvr_auto_spatialization",

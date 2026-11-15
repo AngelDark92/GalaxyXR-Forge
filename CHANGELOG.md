@@ -2,6 +2,12 @@
 
 Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by `tools/build.py` — never edit this file by hand.
 
+## 2026-11-15 — booinspace AZJ2 modules refreshed to the 2026.11.15 release
+
+- Replaced the booinspace/galaxyxr-modules list with the 12 modules in the azj2-modules-2026.11.15 release: Window Controls, Saved Workspaces, Wi-Fi ADB, Framebuffer10, mic gain boost, MV-HEVC eye fix, no low-light toast, OpenXR QUALITY, passthrough anywhere, QuestLHSync, root face tracking and wear-aware blanking.
+- Removed the obsolete standalone Borderless, Rotation and curvature recovery records; the combined Window Controls package replaces them, and Saved Workspaces requires Window Controls 0.1.70+.
+- Added AZJ2 target firmware with source links, cross-repo family keys, and the AZF3-only note for 4uva4ek Framebuffer10 0.5.1.
+
 ## 2026-11-13 — Five more AZJ2 modules and a module-tab audit
 
 - Added Framebuffer10, MV-HEVC eye fix, QuestLHSync, root face tracking and wear-aware dimming to the booinspace/galaxyxr-modules records.

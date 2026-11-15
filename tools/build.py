@@ -28,6 +28,7 @@ import re
 import sys
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG_PATH = ROOT / "catalog.json"
@@ -97,6 +98,130 @@ MODULE_STATUS_LABEL = {
     "deprecated": "Deprecated",
     "internal": "Internal",
 }
+FIRMWARE_CHOICES = ("AZJ2", "AZF3")
+FAMILY_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
+
+
+def _is_https(value):
+    """True for a valid HTTPS URL with a real dotted hostname."""
+    if not isinstance(value, str):
+        return False
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return False
+    if parsed.scheme != "https":
+        return False
+    host = parsed.hostname
+    return (
+        isinstance(host, str)
+        and "." in host
+        and not host.startswith(".")
+        and not host.endswith(".")
+    )
+
+
+def _is_valid_family(value):
+    """True for a canonical lowercase slug used as a comparison family."""
+    return isinstance(value, str) and bool(FAMILY_RE.match(value))
+
+
+def _module_compare_key(m, module_id, repo):
+    """Canonical comparison key: explicit family, else repo-qualified module id.
+
+    Same module ids in different repos never auto-merge unless a curator gives
+    them an explicit shared family slug.
+    """
+    family = m.get("family")
+    if isinstance(family, str) and family.strip():
+        return family.strip()
+    return f"{repo}:{module_id}"
+
+
+def _module_compare_label(m, module_id, fallback_name):
+    """Human-readable label for a comparison row."""
+    family = m.get("family")
+    if isinstance(family, str) and family.strip():
+        return " ".join(part.capitalize() for part in family.strip().split("-"))
+    return (fallback_name or module_id).strip()
+
+
+def _module_firmware(m):
+    """Return (firmware_set, evidence, errors) for one module record.
+
+    Rules:
+        - firmware must be an array of strings
+        - entries must be "AZJ2" or "AZF3", no blanks, no duplicates
+        - firmware_source is required whenever firmware is non-empty and must be
+          a valid HTTPS URL with a dotted hostname
+        - firmware_source must not be present when firmware is absent/empty
+    """
+    errors = []
+    firmware = m.get("firmware")
+    evidence = m.get("firmware_source")
+
+    if firmware is None:
+        if evidence is not None:
+            errors.append("firmware_source must not be set when firmware is absent or empty")
+        return set(), None, errors
+
+    if isinstance(firmware, str):
+        errors.append("firmware must be an array of strings")
+        if evidence is not None:
+            errors.append("firmware_source must not be set when firmware is absent or empty")
+        return set(), None, errors
+
+    if not isinstance(firmware, list):
+        errors.append("firmware must be an array of strings")
+        if evidence is not None:
+            errors.append("firmware_source must not be set when firmware is absent or empty")
+        return set(), None, errors
+
+    if not firmware:
+        if evidence is not None:
+            errors.append("firmware_source must not be set when firmware is absent or empty")
+        return set(), None, errors
+
+    seen = set()
+    out = set()
+    for item in firmware:
+        if not isinstance(item, str):
+            errors.append("firmware values must be strings")
+            continue
+        item = item.strip()
+        if not item:
+            errors.append("firmware entries must not be blank")
+            continue
+        if item in seen:
+            errors.append(f"firmware contains duplicate value {item!r}")
+            continue
+        seen.add(item)
+        if item not in FIRMWARE_CHOICES:
+            errors.append(
+                f"unsupported firmware value {item!r} "
+                f"(want one of {', '.join(FIRMWARE_CHOICES)})"
+            )
+            continue
+        out.add(item)
+
+    if out and not _is_https(evidence):
+        errors.append(
+            "firmware_source is required when firmware is set and must be a valid HTTPS URL"
+        )
+    if not out and evidence is not None:
+        errors.append("firmware_source must not be set when firmware is absent or empty")
+    return out, evidence, errors
+
+
+def _module_test_note(m):
+    """Return the validated test_note, or None if absent/invalid."""
+    value = m.get("test_note")
+    if not isinstance(value, str):
+        return None
+    value = value.strip()
+    if not value or len(value) > 240:
+        return None
+    return value
 
 
 def load_modules(cat):
@@ -214,6 +339,37 @@ def validate_modules(cat, module_index):
                     f"modules.d/{path}: {mid or '?'} bad status {status!r} "
                     f"(want one of {', '.join(MODULE_STATUSES)})"
                 )
+            family = m.get("family")
+            if family is not None:
+                if not isinstance(family, str) or not family.strip():
+                    errors.append(
+                        f"modules.d/{path}: {mid or '?'} family must be a non-empty string"
+                    )
+                elif not _is_valid_family(family.strip()):
+                    errors.append(
+                        f"modules.d/{path}: {mid or '?'} family must be a lowercase slug "
+                        "of letters, digits and hyphens"
+                    )
+            fw_set, _, fw_errors = _module_firmware(m)
+            for e in fw_errors:
+                errors.append(f"modules.d/{path}: {mid or '?'} {e}")
+            test_note = m.get("test_note")
+            if test_note is not None:
+                if not isinstance(test_note, str):
+                    errors.append(
+                        f"modules.d/{path}: {mid or '?'} test_note must be a string"
+                    )
+                else:
+                    tn = test_note.strip()
+                    if not tn:
+                        errors.append(
+                            f"modules.d/{path}: {mid or '?'} test_note must not be blank"
+                        )
+                    elif len(tn) > 240:
+                        errors.append(
+                            f"modules.d/{path}: {mid or '?'} test_note too long "
+                            "(max 240 chars)"
+                        )
 
     module_group = next(
         (g for g in cat.get("groups", []) if g["id"] == "kernelsu-modules"), None
@@ -1034,6 +1190,43 @@ body.view-noncatalog .shell{grid-template-columns:minmax(0,1fr)}
 .mod-tag.experimental{color:#fbbf24;border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.10)}
 .mod-tag.deprecated{color:#fb7185;border-color:rgba(251,113,133,.45);background:rgba(251,113,133,.10)}
 .mod-tag.internal{color:#94a3b8;border-color:rgba(148,163,184,.35);background:rgba(148,163,184,.08)}
+.mod-view-switch{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.mod-view-switch .btn{border-color:var(--line-2);background:var(--card);color:var(--muted)}
+.mod-view-switch .btn.is-active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#180b02;border-color:transparent}
+.fw-group{border:1px solid var(--line);border-radius:12px;background:var(--card);margin:0 0 12px;overflow:hidden}
+.fw-group summary{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;list-style:none;font:500 13px var(--font-mono);color:var(--ink)}
+.fw-group summary::-webkit-details-marker{display:none}
+.fw-group summary::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--line-2);transition:transform .2s ease,background-color .2s ease}
+.fw-group[open]>summary::before{transform:rotate(90deg);background:var(--accent)}
+.fw-badge{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font:600 10px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;flex:none}
+.fw-badge.azj2{background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.35)}
+.fw-badge.azf3{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.35)}
+.fw-badge.unknown{background:rgba(148,163,184,.10);color:var(--dim);border:1px solid var(--line-2)}
+.fw-title{flex:1;min-width:0;font:600 15px var(--font-disp)}
+.fw-count{flex:none;font:500 11px var(--font-mono);color:var(--dim)}
+.fw-body{padding:0 14px 14px}
+.mod-compare{margin-top:4px}
+.mod-compare-grid{display:flex;flex-direction:column;gap:12px}
+.mod-compare-row{display:grid;grid-template-columns:160px minmax(0,1fr);gap:14px;align-items:stretch;padding:12px 0;border-bottom:1px solid var(--line)}
+.mod-compare-row:first-child{padding-top:0}
+.mod-compare-row:last-child{border-bottom:0}
+.mod-compare-feature{display:flex;align-items:center;min-width:0}
+.mod-compare-feature span{font:600 14px var(--font-disp);text-transform:capitalize;overflow-wrap:anywhere}
+.mod-compare-cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.mod-compare-cell{display:flex;flex-direction:column;gap:5px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.mod-compare-cell h5{margin:0;font:600 13px var(--font-disp);line-height:1.35;overflow-wrap:anywhere}
+.mod-compare-cell code{font:500 11px var(--font-mono);color:var(--dim);background:transparent;border:0;padding:0;overflow-wrap:anywhere}
+.mod-compare-repo,.mod-compare-repo:link,.mod-compare-repo:visited{font:500 11px var(--font-mono);color:var(--dim);overflow-wrap:anywhere;text-decoration:none}
+.mod-compare-repo:hover{color:var(--accent)}
+.mod-compare-fw{font:500 11px var(--font-mono);color:var(--muted)}
+.mod-compare-test{font:500 11px var(--font-mono);color:var(--dim);line-height:1.45}
+.mod-compare-link{font:500 11px var(--font-mono);color:var(--muted);text-decoration:underline}
+.mod-compare-link:hover{color:var(--accent)}
+.mod-compare-empty{color:var(--muted);font-style:italic;margin:10px 0 0}
+@media (max-width:720px){
+  .mod-compare-row{grid-template-columns:1fr;gap:8px}
+  .mod-compare-feature{padding-bottom:6px;border-bottom:1px solid var(--line)}
+}
 @media (max-width:620px){
   .mod-head h3{font-size:16px}
   .mod-meta{margin-left:0;width:100%}
@@ -2286,6 +2479,42 @@ code{font-family:var(--font-mono);background:var(--bg-2);border:1px solid var(--
   ensureDeepLink();
   window.addEventListener('hashchange', ensureDeepLink);
 })();
+
+// Kernel modules: switch between Group by firmware and Compare
+(function () {
+  var groupBtn = document.getElementById('mod-btn-group');
+  var compareBtn = document.getElementById('mod-btn-compare');
+  var grouped = document.getElementById('mod-grouped');
+  var compare = document.getElementById('mod-compare');
+  if (!groupBtn || !compareBtn || !grouped || !compare) return;
+
+  function setMode(mode) {
+    var isGroup = mode === 'group';
+    groupBtn.classList.toggle('is-active', isGroup);
+    compareBtn.classList.toggle('is-active', !isGroup);
+    groupBtn.setAttribute('aria-selected', isGroup ? 'true' : 'false');
+    compareBtn.setAttribute('aria-selected', isGroup ? 'false' : 'true');
+    groupBtn.setAttribute('tabindex', isGroup ? '0' : '-1');
+    compareBtn.setAttribute('tabindex', isGroup ? '-1' : '0');
+    grouped.hidden = !isGroup;
+    compare.hidden = isGroup;
+  }
+
+  groupBtn.addEventListener('click', function () { setMode('group'); });
+  compareBtn.addEventListener('click', function () { setMode('compare'); });
+
+  var tablist = groupBtn.parentNode;
+  if (tablist) {
+    tablist.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') return;
+      ev.preventDefault();
+      var active = document.activeElement;
+      if (active === groupBtn) setMode('compare'), compareBtn.focus();
+      else if (active === compareBtn) setMode('group'), groupBtn.focus();
+    });
+  }
+})();
+
 </script>
 </body>
 </html>
@@ -2330,71 +2559,226 @@ def render_changelog_view(changelog):
 
 
 def render_modules_view(cat, module_index):
-    """Kernel-module index grouped by repository, including repos outside the group."""
+    """Kernel-module index with firmware collapsibles and a real comparison view.
+
+    Modules are grouped into native <details> sections by firmware target:
+    - AZJ2 (open by default)
+    - AZF3 (closed)
+    - Firmware not documented (closed)
+
+    A separate Compare mode lists canonical functions side-by-side, showing each
+    repo's package separately and never conflating module ids across repos.
+    Missing metadata means "not documented / not listed", never "unsupported".
+    """
     repo_meta = {
         r["repo"].lower(): (g, r)
         for g in cat.get("groups", [])
         for r in g.get("repos", [])
     }
-    sections = []
+
+    flat_modules = []
     for entry in module_index:
         repo = entry.get("repo", "")
         group, card = repo_meta.get(repo.lower(), (None, None))
         if group is None:
             continue
         owner, name = repo.split("/", 1)
-        mods = entry.get("modules", [])
+        url = card["url"]
+        for m in entry.get("modules", []):
+            mid = m.get("id", "").strip()
+            compare_key = _module_compare_key(m, mid, repo)
+            compare_label = _module_compare_label(m, mid, m.get("name"))
+            fw_set, evidence, _ = _module_firmware(m)
+            flat_modules.append({
+                "repo": repo,
+                "owner": owner,
+                "name": name,
+                "url": url,
+                "group": group,
+                "card": card,
+                "entry": entry,
+                "module": m,
+                "id": mid,
+                "compare_key": compare_key,
+                "compare_label": compare_label,
+                "firmware": fw_set,
+                "evidence": evidence,
+            })
+
+    def has_fw(items, fw):
+        return [x for x in items if fw in x["firmware"]]
+
+    def has_no_fw(items):
+        return [x for x in items if not x["firmware"]]
+
+    def render_module_row(item, badge=None):
+        m = item["module"]
+        status = m.get("status", "stable")
+        tag = ""
+        if status != "stable":
+            tag = (
+                f'<span class="mod-tag {html.escape(status, quote=True)}">'
+                f'{MODULE_STATUS_LABEL.get(status, status.title())}</span>'
+            )
+        extra = ""
+        test_note = _module_test_note(m)
+        if test_note:
+            extra += f'<p class="mod-note">{html.escape(test_note)}</p>'
+        if badge:
+            extra += f'<p class="mod-note">{html.escape(badge)}</p>'
+        if item["evidence"]:
+            extra += (
+                f'<p class="mod-note"><a href="{html.escape(item["evidence"], quote=True)}" '
+                f'target="_blank" rel="noopener">Evidence / release source</a></p>'
+            )
+        return (
+            f'<li class="mod-row" data-family="{html.escape(item["compare_key"], quote=True)}" '
+            f'data-repo="{html.escape(item["repo"], quote=True)}">'
+            f'<h4>{html.escape(m["name"])}<code>{html.escape(m["id"])}</code></h4>'
+            f"{tag}"
+            f'<p>{html.escape(m["about"])}</p>'
+            f"{extra}"
+            f'</li>'
+        )
+
+    def render_repo_block(items):
+        """Render repo-level subsections for a firmware group."""
+        by_repo = {}
+        for it in items:
+            by_repo.setdefault(it["repo"], []).append(it)
+        out = []
+        for repo, mods in sorted(by_repo.items(), key=lambda kv: kv[0].lower()):
+            it = mods[0]
+            owner, name = it["owner"], it["name"]
+            url = html.escape(it["url"], quote=True)
+            meta = [f'{len(mods)} module{"s" if len(mods) != 1 else ""}']
+            if it["entry"].get("checked"):
+                meta.append(f'checked {html.escape(str(it["entry"]["checked"]))}')
+            meta.append(f'<a href="{url}" target="_blank" rel="noopener">GitHub</a>')
+            if it["card"].get("release"):
+                meta.append(f'<a href="{url}/releases" target="_blank" rel="noopener">Releases</a>')
+            note = it["entry"].get("note")
+            note_html = f'<p class="mod-note">{html.escape(note)}</p>' if note else ""
+            rows = "".join(render_module_row(m) for m in mods)
+            out.append(
+                f'<section class="mod-repo" style="--hue:{html.escape(it["group"]["hue"], quote=True)}">'
+                f'<div class="mod-head">'
+                f'<h3><span class="dot"></span><a href="{url}" target="_blank" rel="noopener">'
+                f'<span class="owner">{html.escape(owner)}/</span>{html.escape(name)}</a></h3>'
+                f'<span class="grp">{html.escape(it["group"]["icon"])} {html.escape(it["group"]["title"])}</span>'
+                f'<span class="mod-meta">{" &middot; ".join(meta)}</span>'
+                f'</div>'
+                f'{note_html}'
+                f'<ul class="mod-list">{rows}</ul>'
+                f'</section>'
+            )
+        return "".join(out)
+
+    def render_fw_group(title, badge_class, badge_text, items, open_default=False):
+        if not items:
+            return ""
+        open_attr = ' open' if open_default else ''
+        body = render_repo_block(items)
+        count = len(items)
+        return (
+            f'<details class="fw-group"{open_attr}>'
+            f'<summary><span class="fw-badge {badge_class}">{html.escape(badge_text)}</span>'
+            f'<span class="fw-title">{html.escape(title)}</span>'
+            f'<span class="fw-count">{count} module{"s" if count != 1 else ""}</span></summary>'
+            f'<div class="fw-body">{body}</div>'
+            f'</details>'
+        )
+
+    def render_compare_view():
+        """Canonical function comparison: one row per family, each repo listed separately."""
+        compare_groups = {}
+        for it in flat_modules:
+            compare_groups.setdefault(it["compare_key"], []).append(it)
         rows = []
-        for m in mods:
-            status = m.get("status", "stable")
-            tag = ""
-            if status != "stable":
-                tag = (
-                    f'<span class="mod-tag {html.escape(status, quote=True)}">'
-                    f'{MODULE_STATUS_LABEL.get(status, status.title())}</span>'
+        for key in sorted(compare_groups.keys(), key=str.lower):
+            items = compare_groups[key]
+            label = _module_compare_label(items[0]["module"], items[0]["id"], items[0]["module"].get("name"))
+            cells = []
+            for it in sorted(items, key=lambda x: (x["repo"].lower(), x["id"].lower())):
+                fw_label = ", ".join(sorted(it["firmware"])) or "firmware not documented"
+                evidence_link = ""
+                if it["evidence"]:
+                    evidence_link = (
+                        f'<a class="mod-compare-link" href="{html.escape(it["evidence"], quote=True)}" '
+                        f'target="_blank" rel="noopener">source</a>'
+                    )
+                test_note = _module_test_note(it["module"])
+                test_html = f'<span class="mod-compare-test">{html.escape(test_note)}</span>' if test_note else ''
+                status = it["module"].get("status", "stable")
+                status_class = status if status != "stable" else ""
+                repo_url = html.escape(it["url"], quote=True)
+                cells.append(
+                    f'<div class="mod-compare-cell">'
+                    f'<h5>{html.escape(it["module"]["name"])}</h5>'
+                    f'<code>{html.escape(it["id"])}</code>'
+                    f'<a class="mod-compare-repo" href="{repo_url}" target="_blank" rel="noopener">'
+                    f'{html.escape(it["repo"])}</a>'
+                    f'<span class="mod-tag {html.escape(status_class, quote=True)}">{html.escape(status)}</span>'
+                    f'<span class="mod-compare-fw">{html.escape(fw_label)}</span>'
+                    f'{test_html}'
+                    f'{evidence_link}'
+                    f'</div>'
                 )
             rows.append(
-                f'<li class="mod-row">'
-                f'<h4>{html.escape(m["name"])}<code>{html.escape(m["id"])}</code></h4>'
-                f"{tag}"
-                f'<p>{html.escape(m["about"])}</p>'
-                f"</li>"
+                f'<div class="mod-compare-row">'
+                f'<div class="mod-compare-feature"><span>{html.escape(label)}</span></div>'
+                f'<div class="mod-compare-cells">{"".join(cells)}</div>'
+                f'</div>'
             )
-        count = len(mods)
-        meta = [f'{count} module{"s" if count != 1 else ""}']
-        if entry.get("checked"):
-            meta.append(f'checked {html.escape(str(entry["checked"]))}')
-        url = html.escape(card["url"], quote=True)
-        meta.append(f'<a href="{url}" target="_blank" rel="noopener">GitHub</a>')
-        if card.get("release"):
-            meta.append(
-                f'<a href="{url}/releases" target="_blank" rel="noopener">Releases</a>'
-            )
-        note = entry.get("note")
-        note_html = f'<p class="mod-note">{html.escape(note)}</p>' if note else ""
-        sections.append(
-            f'<section class="mod-repo" style="--hue:{html.escape(group["hue"], quote=True)}">'
-            f'<div class="mod-head">'
-            f'<h3><span class="dot"></span><a href="{url}" target="_blank" rel="noopener">'
-            f'<span class="owner">{html.escape(owner)}/</span>{html.escape(name)}</a></h3>'
-            f'<span class="grp">{html.escape(group["icon"])} {html.escape(group["title"])}</span>'
-            f'<span class="mod-meta">{" &middot; ".join(meta)}</span>'
-            f"</div>"
-            f"{note_html}"
-            f'<ul class="mod-list">{"".join(rows)}</ul>'
-            f"</section>"
-        )
+        if not rows:
+            return '<p class="mod-compare-empty">No modules available for comparison.</p>'
+        return f'<div class="mod-compare-grid">{ "".join(rows) }</div>'
+
+    azj2_items = has_fw(flat_modules, "AZJ2")
+    azf3_items = has_fw(flat_modules, "AZF3")
+    unknown_items = has_no_fw(flat_modules)
+
+    azj2_group = render_fw_group(
+        "I610UES3AZJ2 — newest known firmware in these repos", "azj2", "AZJ2", azj2_items, open_default=True
+    )
+    azf3_group = render_fw_group(
+        "I610UEU2AZF3 — only modules whose source explicitly names AZF3", "azf3", "AZF3", azf3_items, open_default=False
+    )
+    unknown_group = render_fw_group(
+        "Firmware not documented", "unknown", "Other", unknown_items, open_default=False
+    )
+
+    total = len(flat_modules)
+
+    grouped_view = (
+        f'<div class="mod-grouped" id="mod-grouped" role="tabpanel" aria-labelledby="mod-btn-group">'
+        f'{azj2_group}{azf3_group}{unknown_group}'
+        f'</div>'
+    )
+    compare_view = (
+        f'<div class="mod-compare" id="mod-compare" role="tabpanel" aria-labelledby="mod-btn-compare" hidden>'
+        f'<p class="mod-note">Compare modules by canonical function. Each cell is a separate repo package; absence means not documented or not listed, not unsupported.</p>'
+        f'{render_compare_view()}'
+        f'</div>'
+    )
+
     return (
         '<section class="mods">'
         '<div class="view-head">'
         '<div class="view-head-text">'
         '<p class="eyebrow">Module index</p>'
         '<h2>Kernel modules</h2>'
-        '<p class="blurb">Every KernelSU module published by a catalogued repository \u2014 grouped by repo.</p>'
+        '<p class="blurb">Every KernelSU module published by a catalogued repository \u2014 grouped by firmware target. Firmware is a build target, not a verified compatibility claim.</p>'
         '</div>'
-        f'<span class="view-head-meta">{sum(len(e.get("modules",[])) for e in module_index)} modules \u00b7 {len(sections)} repos</span>'
+        f'<span class="view-head-meta">{total} modules</span>'
         '</div>'
-        f'{"".join(sections)}</section>'
+        '<div class="mod-view-switch" role="tablist" aria-label="Module view">'
+        '<button class="btn btn-sm is-active" id="mod-btn-group" role="tab" aria-selected="true" aria-controls="mod-grouped" tabindex="0">Group by firmware</button>'
+        '<button class="btn btn-sm" id="mod-btn-compare" role="tab" aria-selected="false" aria-controls="mod-compare" tabindex="-1">Compare</button>'
+        '</div>'
+        '<noscript><p class="mod-note">Compare mode needs JavaScript. The grouped firmware view works without it.</p></noscript>'
+        f'{grouped_view}{compare_view}'
+        '</section>'
     )
 
 

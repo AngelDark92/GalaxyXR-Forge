@@ -7,7 +7,10 @@
       "name": "QuestLHSync for Galaxy XR",
       "about": "Feeds tracking-camera observations to the QuestLHSync PC driver for Lighthouse alignment.",
       "status": "experimental",
-      "family": "questlhsync"
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "family": "questlhsync",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     }
   ]
 }

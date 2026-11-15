@@ -27,6 +27,56 @@ build = importlib.util.module_from_spec(SPEC)
 sys.modules["build"] = build
 SPEC.loader.exec_module(build)
 
+# Records that carried no firmware target before the owner's 2026-11-15 report.
+# They stay pinned here so a later edit cannot silently drop one or move it to
+# AZJ2: identity and target are asserted together.
+FORMERLY_UNDOCUMENTED = {
+    "4uva4ek/galaxyxr-modules": [
+        "gxr_logging_warning",
+        "gxr_wifi_adb",
+        "gxr_haptic_main",
+        "gxr_openxr_quality",
+        "gxr_ota_control",
+        "gxr_mvhevc_eye_fix",
+        "gxr_controller_suite",
+        "gxr_systemui_optimization",
+        "gxr_steamlink_suite",
+        "gxr_controller_extrapolation",
+        "gxr_controller_timestamp_precision",
+        "gxr_controller_whitening",
+        "gxr_hal_cache_bypass",
+        "gxr_openxr_velocity_frame",
+        "gxr_steamlink_pose_time",
+        "gxr_stream_cpu_relief",
+        "gxr_controller_log_relief",
+        "gxr_openxr_priority",
+    ],
+    "BlueScorpioVR/galaxyxr-modules": [
+        "gxr_window_curvature",
+        "gxr_bsvr_auto_spatialization",
+        "gxr_bsvr_xbox_unknown_key",
+        "gxr_bsvr_adb_port_publisher",
+        "gxr-usb-compat",
+    ],
+    "BreadDoesStuff/galaxy-xr-modules": [
+        "gxr-fanctl",
+        "gxr-no-lowlight-toast",
+        "gxr-passthrough-anywhere",
+        "gxr-xrcam",
+        "gxr-mic-gain-boost",
+    ],
+    "compdoge/gxr-ksu-modules": ["gxr-display-off", "gxr-handtracking-toggle"],
+    "compdoge/gxr-root-ft": ["gxr-alvr"],
+    "stearnsbq/questlhsync-galaxy-xr": ["questlhsync_gxr"],
+}
+
+# The source is the owner's own firmware-test report, recorded in this repo.
+OWNER_TEST_NOTE = "Owner reports tested on I610UEU2AZF3."
+OWNER_FIRMWARE_SOURCE = (
+    "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/"
+    "changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json"
+)
+
 
 class TestHttpsValidator(unittest.TestCase):
     def test_valid_https_urls(self):
@@ -269,8 +319,60 @@ class TestRenderAgainstCatalog(unittest.TestCase):
         for _, label, count in groups:
             counts[label] = int(count)
         self.assertEqual(counts.get("AZJ2"), 12)
-        self.assertEqual(counts.get("AZF3"), 1)
-        self.assertEqual(counts.get("Other"), 32)
+        self.assertEqual(counts.get("AZF3"), 33)
+        # Every record now carries a target, so no empty "Firmware not documented" group.
+        self.assertNotIn("Other", counts)
+
+    def _fw_blocks(self):
+        blocks = {}
+        for match in re.finditer(r'<details class="fw-group"[^>]*>(.*?)</details>', self.html, re.S):
+            badge = re.search(r'<span class="fw-badge [^"]*">([^<]+)</span>', match.group(1))
+            if badge:
+                blocks[badge.group(1)] = match.group(1)
+        return blocks
+
+    def test_formerly_undocumented_records_retain_identity(self):
+        records = {}
+        for entry in self.module_index:
+            for m in entry["modules"]:
+                records[(entry["repo"], m["id"])] = m
+
+        expected = {
+            (repo, module_id)
+            for repo, module_ids in FORMERLY_UNDOCUMENTED.items()
+            for module_id in module_ids
+        }
+        self.assertEqual(len(expected), 32)
+        self.assertEqual(sorted(expected - set(records)), [])
+
+        for key in sorted(expected):
+            with self.subTest(module=key):
+                m = records[key]
+                fw_set, source, errors = build._module_firmware(m)
+                self.assertEqual(errors, [])
+                self.assertEqual(fw_set, {"AZF3"})
+                self.assertNotIn("AZJ2", fw_set)
+                self.assertEqual(source, OWNER_FIRMWARE_SOURCE)
+                self.assertEqual(build._module_test_note(m), OWNER_TEST_NOTE)
+                self.assertTrue(build._is_https(source))
+
+    def test_formerly_undocumented_records_render_under_azf3(self):
+        blocks = self._fw_blocks()
+        self.assertIn("AZJ2", blocks)
+        self.assertIn("AZF3", blocks)
+        # No record was recategorised as AZJ2 to make the split look clean.
+        for repo in FORMERLY_UNDOCUMENTED:
+            owner = repo.split("/", 1)[0]
+            marker = f"{owner}/</span>"
+            with self.subTest(repo=repo):
+                self.assertNotIn(marker, blocks["AZJ2"])
+                self.assertIn(marker, blocks["AZF3"])
+
+    def test_owner_report_is_labelled_as_owner_report(self):
+        blocks = self._fw_blocks()
+        self.assertIn(OWNER_TEST_NOTE, blocks["AZF3"])
+        # The evidence link is this repo's changelog entry, not an upstream proof link.
+        self.assertIn(f'href="{OWNER_FIRMWARE_SOURCE}"', blocks["AZF3"])
 
     def test_compare_rows_preserve_package_identity(self):
         compare_groups = {}

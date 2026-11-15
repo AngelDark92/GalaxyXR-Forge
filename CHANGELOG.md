@@ -2,6 +2,13 @@
 
 Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by `tools/build.py` — never edit this file by hand.
 
+## 2026-11-15 — Owner-reported AZF3 coverage for the 32 untargeted module records
+
+- Recorded the owner's statement that every module record previously carrying no firmware target was tested on I610UEU2AZF3, and labelled those 32 records AZF3: 4uva4ek/galaxyxr-modules (18), BlueScorpioVR/galaxyxr-modules (5), BreadDoesStuff/galaxy-xr-modules (5), compdoge/gxr-ksu-modules (2), compdoge/gxr-root-ft (1) and stearnsbq/questlhsync-galaxy-xr (1).
+- The source is the owner's firmware-test confirmation of 2026-11-15, not independent device testing by this catalog, and no upstream release note is cited for these targets. Each reclassified record carries the note `Owner reports tested on I610UEU2AZF3.` and links this entry as its source.
+- The 12 booinspace/galaxyxr-modules AZJ2 records and 4uva4ek Framebuffer10 0.5.1 (AZF3) keep their targets, sources and notes unchanged. Module statuses and comparison families are unchanged; the records now split 12 AZJ2 and 33 AZF3.
+- Corrected the BlueScorpioVR/galaxyxr-modules repository note, which claimed its window-curvature module had no stated firmware target.
+
 ## 2026-11-15 — booinspace AZJ2 modules refreshed to the 2026.11.15 release
 
 - Replaced the booinspace/galaxyxr-modules list with the 12 modules in the azj2-modules-2026.11.15 release: Window Controls, Saved Workspaces, Wi-Fi ADB, Framebuffer10, mic gain boost, MV-HEVC eye fix, no low-light toast, OpenXR QUALITY, passthrough anywhere, QuestLHSync, root face tracking and wear-aware blanking.

@@ -6,34 +6,49 @@
       "id": "gxr-fanctl",
       "name": "Galaxy XR Fan Control",
       "about": "Overrides the system fan speed, with WebUI steps or a temperature-based curve.",
-      "status": "stable"
+      "status": "stable",
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     },
     {
       "id": "gxr-no-lowlight-toast",
       "name": "Galaxy XR No Low-Light Toast",
       "about": "Disables the ambient-light pipeline so the low-light popup never appears.",
       "status": "stable",
-      "family": "no-lowlight-toast"
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "family": "no-lowlight-toast",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     },
     {
       "id": "gxr-passthrough-anywhere",
       "name": "Galaxy XR Passthrough Anywhere",
       "about": "Toggles passthrough in any XR app with a double-tap, without minimizing.",
       "status": "experimental",
-      "family": "passthrough-anywhere"
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "family": "passthrough-anywhere",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     },
     {
       "id": "gxr-xrcam",
       "name": "Galaxy XR Camera Debug WebStream",
       "about": "Streams all 13 headset cameras as MJPEG on port 8080 at native sensor rates.",
-      "status": "experimental"
+      "status": "experimental",
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     },
     {
       "id": "gxr-mic-gain-boost",
       "name": "Galaxy XR Mic Gain Boost",
       "about": "+15 dB mic gain while Virtual Desktop records; event-driven, no polling.",
       "status": "experimental",
-      "family": "mic-gain"
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/changelog.d/2026-11-15-owner-firmware-azf3-confirmation.json",
+      "family": "mic-gain",
+      "test_note": "Owner reports tested on I610UEU2AZF3."
     }
   ]
 }

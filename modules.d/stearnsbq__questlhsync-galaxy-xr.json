@@ -6,7 +6,8 @@
       "id": "questlhsync_gxr",
       "name": "QuestLHSync for Galaxy XR",
       "about": "Feeds tracking-camera observations to the QuestLHSync PC driver for Lighthouse alignment.",
-      "status": "experimental"
+      "status": "experimental",
+      "family": "questlhsync"
     }
   ]
 }

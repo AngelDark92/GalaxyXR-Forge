@@ -12,7 +12,8 @@
       "id": "gxr_wifi_adb",
       "name": "Wi-Fi ADB",
       "about": "Starts authenticated ADB over TCP on port 5555; installs disabled.",
-      "status": "stable"
+      "status": "stable",
+      "family": "wifi-adb"
     },
     {
       "id": "gxr_haptic_main",
@@ -24,7 +25,8 @@
       "id": "gxr_openxr_quality",
       "name": "GXR OpenXR QUALITY",
       "about": "Holds the camera QUALITY request during visible OpenXR sessions with thermal guards.",
-      "status": "experimental"
+      "status": "experimental",
+      "family": "openxr-quality"
     },
     {
       "id": "gxr_ota_control",
@@ -36,7 +38,8 @@
       "id": "gxr_mvhevc_eye_fix",
       "name": "Galaxy XR MV-HEVC Eye Fix",
       "about": "Fixes left/right eye inversion in Samsung Gallery MV-HEVC spatial video.",
-      "status": "stable"
+      "status": "stable",
+      "family": "mvhevc-eye-fix"
     },
     {
       "id": "gxr_controller_suite",
@@ -48,7 +51,10 @@
       "id": "gxr_framebuffer10",
       "name": "Galaxy XR Framebuffer10",
       "about": "Experimental 10-bit SDR compositor output with corrected colour; AZF3 only.",
-      "status": "experimental"
+      "status": "experimental",
+      "firmware": ["AZF3"],
+      "firmware_source": "https://github.com/4uva4ek/galaxyxr-modules/releases/tag/framebuffer10/v0.5.1",
+      "family": "framebuffer10"
     },
     {
       "id": "gxr_systemui_optimization",

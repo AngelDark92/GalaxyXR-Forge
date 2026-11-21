@@ -19,7 +19,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-15` — 71 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-21` — 71 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -45,7 +45,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 
 | Repository | What it does |
 | --- | --- |
-| **[4uva4ek/galaxyxr-modules](https://github.com/4uva4ek/galaxyxr-modules)**<br>![stars](https://img.shields.io/github/stars/4uva4ek/galaxyxr-modules?style=flat-square) | Tracking and haptic fixes: whitening, timestamp precision, OpenXR velocity, OTA control. |
+| **[4uva4ek/galaxyxr-modules](https://github.com/4uva4ek/galaxyxr-modules)**<br>![stars](https://img.shields.io/github/stars/4uva4ek/galaxyxr-modules?style=flat-square) | Controller Suite whitening and timestamp fixes, haptics, OpenXR QUALITY, OTA control and SystemUI optimization modules. |
 | **[BlueScorpioVR/galaxyxr-modules](https://github.com/BlueScorpioVR/galaxyxr-modules)**<br>![stars](https://img.shields.io/github/stars/BlueScorpioVR/galaxyxr-modules?style=flat-square) | Experimental personal KernelSU modules for the Galaxy XR. |
 | **[booinspace/galaxyxr-modules](https://github.com/booinspace/galaxyxr-modules)**<br>![stars](https://img.shields.io/github/stars/booinspace/galaxyxr-modules?style=flat-square) | Modules for AZJ2 firmware |
 | **[BreadDoesStuff/galaxy-xr-modules](https://github.com/BreadDoesStuff/galaxy-xr-modules)**<br>![stars](https://img.shields.io/github/stars/BreadDoesStuff/galaxy-xr-modules?style=flat-square) | Fan control, passthrough anywhere, camera debug stream and mic gain modules. |
@@ -129,7 +129,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 
 | Repository | What it does |
 | --- | --- |
-| **[aali195/gxr-profiler](https://github.com/aali195/gxr-profiler)**<br>![stars](https://img.shields.io/github/stars/aali195/gxr-profiler?style=flat-square) ![release](https://img.shields.io/github/v/release/aali195/gxr-profiler?include_prereleases&style=flat-square&label=release) | Read-only thermal / performance profiler for a Samsung Galaxy XR (SM-I610) over wireless ADB. |
+| **[aali195/gxr-tools](https://github.com/aali195/gxr-tools)**<br>![stars](https://img.shields.io/github/stars/aali195/gxr-tools?style=flat-square) ![release](https://img.shields.io/github/v/release/aali195/gxr-tools?include_prereleases&style=flat-square&label=release) | GXR Profiler telemetry recording, plus GXR Manager diagnostics, apps, files and settings tools with confirmation-gated device changes. |
 | **[aali195/steamvr-addon-manager](https://github.com/aali195/steamvr-addon-manager)**<br>![stars](https://img.shields.io/github/stars/aali195/steamvr-addon-manager?style=flat-square) ![release](https://img.shields.io/github/v/release/aali195/steamvr-addon-manager?include_prereleases&style=flat-square&label=release) | A lightweight Windows tool for managing SteamVR drivers and startup overlays by editing SteamVR's config files (before SteamVR is run). |
 | **[AmeChanRain/MicDotDisabler](https://github.com/AmeChanRain/MicDotDisabler)**<br>![stars](https://img.shields.io/github/stars/AmeChanRain/MicDotDisabler?style=flat-square) | Hides the Android privacy indicator dot, built for Android XR devices. |
 | **[AngelDark92/SteamVRColourLab](https://github.com/AngelDark92/SteamVRColourLab)**<br>![stars](https://img.shields.io/github/stars/AngelDark92/SteamVRColourLab?style=flat-square) ![release](https://img.shields.io/github/v/release/AngelDark92/SteamVRColourLab?include_prereleases&style=flat-square&label=release) | In-headset colour test suite: gradients, dark scenes, 8-bit vs 10-bit comparison. |
@@ -199,12 +199,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-11-21` — GXR Tools catalog refresh and a source-only AZJ2 SystemUI port
 - `2026-11-15` — Owner-reported AZF3 coverage for the 32 untargeted module records
 - `2026-11-15` — booinspace AZJ2 modules refreshed to the 2026.11.15 release
 - `2026-11-13` — Five more AZJ2 modules and a module-tab audit
 - `2026-11-12` — GXR-Distortion-Profile added
 - `2026-11-12` — galaxyxr-root added
-- `2026-11-12` — galaxyxr-modules added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -214,4 +214,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-11-15 · 71 repos</sub></div>
+<div align="center"><sub>Curated 2026-11-21 · 71 repos</sub></div>

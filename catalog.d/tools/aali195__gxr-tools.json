@@ -1,0 +1,9 @@
+{
+  "repo": "aali195/gxr-tools",
+  "url": "https://github.com/aali195/gxr-tools",
+  "about": "GXR Profiler telemetry recording, plus GXR Manager diagnostics, apps, files and settings tools with confirmation-gated device changes.",
+  "license": null,
+  "release": "v2.1.0",
+  "added": "2026-10-29",
+  "tags": ["tool", "profile", "galaxy", "device"]
+}

@@ -1,7 +1,7 @@
 {
   "repo": "4uva4ek/galaxyxr-modules",
   "url": "https://github.com/4uva4ek/galaxyxr-modules",
-  "about": "Tracking and haptic fixes: whitening, timestamp precision, OpenXR velocity, OTA control.",
+  "about": "Controller Suite whitening and timestamp fixes, haptics, OpenXR QUALITY, OTA control and SystemUI optimization modules.",
   "license": null,
   "release": null,
   "added": "2026-10-13",

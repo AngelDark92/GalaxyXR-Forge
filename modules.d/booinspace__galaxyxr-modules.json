@@ -1,6 +1,6 @@
 {
   "repo": "booinspace/galaxyxr-modules",
-  "checked": "2026-11-15",
+  "checked": "2026-11-21",
   "note": "AZJ2 collection for I610UES3AZJ2, credits 4uva4ek, BlueScorpioVR, BreadDoesStuff, compdoge, AngelDark92, stearnsbq and CreoleVR. Window Controls replaces standalone Borderless, Rotation and recovery; shared IDs are separate packages.",
   "modules": [
     {
@@ -120,6 +120,16 @@
       "firmware": ["AZJ2"],
       "firmware_source": "https://github.com/booinspace/galaxyxr-modules/releases/tag/azj2-modules-2026.11.15",
       "test_note": "Guarded three-second panel-off/restore confirmed on AZJ2; 60-second blanking and latency untested."
+    },
+    {
+      "id": "gxr_systemui_optimization_azj2",
+      "name": "Galaxy XR SystemUI Optimization (AZJ2)",
+      "about": "Source-only experimental AZJ2 port of 4uva4ek SystemUI Optimization v0.4.0; duplicate-wait, depth and panel fixes.",
+      "status": "experimental",
+      "firmware": ["AZJ2"],
+      "firmware_source": "https://github.com/booinspace/galaxyxr-modules/blob/main/modules/systemui-optimization/README.md",
+      "family": "systemui-optimization",
+      "test_note": "AZJ2 revision 2 confirmed live activation and STOCK restoration; CPU/GPU saving unmeasured."
     }
   ]
 }

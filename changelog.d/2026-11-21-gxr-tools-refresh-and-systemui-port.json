@@ -1,0 +1,9 @@
+{
+  "date": "2026-11-21",
+  "title": "GXR Tools catalog refresh and a source-only AZJ2 SystemUI port",
+  "items": [
+    "Renamed aali195/gxr-profiler to aali195/gxr-tools and updated its Tools description for GXR Profiler telemetry and GXR Manager diagnostics, apps, files and settings, with release v2.1.0.",
+    "Refreshed 4uva4ek/galaxyxr-modules around Controller Suite whitening and timestamp fixes, haptics, OpenXR QUALITY, OTA control and SystemUI optimization instead of deprecated standalone modules.",
+    "Added gxr_systemui_optimization_azj2 to booinspace/galaxyxr-modules: a source-only experimental AZJ2 port of 4uva4ek SystemUI Optimization v0.4.0, outside the 2026.11.15 release."
+  ]
+}

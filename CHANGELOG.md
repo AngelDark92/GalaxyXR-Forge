@@ -2,6 +2,12 @@
 
 Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by `tools/build.py` — never edit this file by hand.
 
+## 2026-11-21 — GXR Tools catalog refresh and a source-only AZJ2 SystemUI port
+
+- Renamed aali195/gxr-profiler to aali195/gxr-tools and updated its Tools description for GXR Profiler telemetry and GXR Manager diagnostics, apps, files and settings, with release v2.1.0.
+- Refreshed 4uva4ek/galaxyxr-modules around Controller Suite whitening and timestamp fixes, haptics, OpenXR QUALITY, OTA control and SystemUI optimization instead of deprecated standalone modules.
+- Added gxr_systemui_optimization_azj2 to booinspace/galaxyxr-modules: a source-only experimental AZJ2 port of 4uva4ek SystemUI Optimization v0.4.0, outside the 2026.11.15 release.
+
 ## 2026-11-15 — Owner-reported AZF3 coverage for the 32 untargeted module records
 
 - Recorded the owner's statement that every module record previously carrying no firmware target was tested on I610UEU2AZF3, and labelled those 32 records AZF3: 4uva4ek/galaxyxr-modules (18), BlueScorpioVR/galaxyxr-modules (5), BreadDoesStuff/galaxy-xr-modules (5), compdoge/gxr-ksu-modules (2), compdoge/gxr-root-ft (1) and stearnsbq/questlhsync-galaxy-xr (1).

@@ -2,6 +2,10 @@
 
 Catalog changes, newest first. Generated from [`changelog.d/`](changelog.d/) by `tools/build.py` — never edit this file by hand.
 
+## 2026-11-21 — gxr-tools added
+
+- Added aali195/gxr-tools to Tools & Diagnostics (issue #37).
+
 ## 2026-11-15 — Owner-reported AZF3 coverage for the 32 untargeted module records
 
 - Recorded the owner's statement that every module record previously carrying no firmware target was tested on I610UEU2AZF3, and labelled those 32 records AZF3: 4uva4ek/galaxyxr-modules (18), BlueScorpioVR/galaxyxr-modules (5), BreadDoesStuff/galaxy-xr-modules (5), compdoge/gxr-ksu-modules (2), compdoge/gxr-root-ft (1) and stearnsbq/questlhsync-galaxy-xr (1).

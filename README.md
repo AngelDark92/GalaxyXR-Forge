@@ -4,7 +4,7 @@
 
 **Every community repo for the Samsung Galaxy XR (SM-I610) in one place: root tools, KernelSU modules, streaming drivers, app patches, ports and diagnostics.**
 
-[![community repos](https://img.shields.io/badge/community_repos-71-orange?style=flat-square)](#catalog)
+[![community repos](https://img.shields.io/badge/community_repos-72-orange?style=flat-square)](#catalog)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-2ea44f?style=flat-square)](#suggest-a-repo)
 [![GitHub stars](https://img.shields.io/github/stars/AngelDark92/GalaxyXR-Forge?style=flat-square&label=star)](https://github.com/AngelDark92/GalaxyXR-Forge)
 [![last commit](https://img.shields.io/github/last-commit/AngelDark92/GalaxyXR-Forge?style=flat-square)](https://github.com/AngelDark92/GalaxyXR-Forge/commits/main)
@@ -19,7 +19,7 @@
 
 ---
 
-Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-15` — 71 repos in 9 groups.
+Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-I610`, Android XR): root and kernel tooling, KernelSU modules, PC VR streaming drivers, patched and ported apps, emulation, and diagnostics. Curated `2026-11-21` — 72 repos in 9 groups.
 
 <a id="catalog"></a>
 
@@ -130,6 +130,7 @@ Community-maintained index of projects built for the **Samsung Galaxy XR** (`SM-
 | Repository | What it does |
 | --- | --- |
 | **[aali195/gxr-profiler](https://github.com/aali195/gxr-profiler)**<br>![stars](https://img.shields.io/github/stars/aali195/gxr-profiler?style=flat-square) ![release](https://img.shields.io/github/v/release/aali195/gxr-profiler?include_prereleases&style=flat-square&label=release) | Read-only thermal / performance profiler for a Samsung Galaxy XR (SM-I610) over wireless ADB. |
+| **[aali195/gxr-tools](https://github.com/aali195/gxr-tools)**<br>![stars](https://img.shields.io/github/stars/aali195/gxr-tools?style=flat-square) ![release](https://img.shields.io/github/v/release/aali195/gxr-tools?include_prereleases&style=flat-square&label=release) | GXR Profiler & GXR Manager for collecting diagnostics and telemetry via adb. |
 | **[aali195/steamvr-addon-manager](https://github.com/aali195/steamvr-addon-manager)**<br>![stars](https://img.shields.io/github/stars/aali195/steamvr-addon-manager?style=flat-square) ![release](https://img.shields.io/github/v/release/aali195/steamvr-addon-manager?include_prereleases&style=flat-square&label=release) | A lightweight Windows tool for managing SteamVR drivers and startup overlays by editing SteamVR's config files (before SteamVR is run). |
 | **[AmeChanRain/MicDotDisabler](https://github.com/AmeChanRain/MicDotDisabler)**<br>![stars](https://img.shields.io/github/stars/AmeChanRain/MicDotDisabler?style=flat-square) | Hides the Android privacy indicator dot, built for Android XR devices. |
 | **[AngelDark92/SteamVRColourLab](https://github.com/AngelDark92/SteamVRColourLab)**<br>![stars](https://img.shields.io/github/stars/AngelDark92/SteamVRColourLab?style=flat-square) ![release](https://img.shields.io/github/v/release/AngelDark92/SteamVRColourLab?include_prereleases&style=flat-square&label=release) | In-headset colour test suite: gradients, dark scenes, 8-bit vs 10-bit comparison. |
@@ -199,12 +200,12 @@ This repo is agent-ready. Start with [`AGENTS.md`](AGENTS.md); [`catalog.json`](
 
 ## Changelog
 
+- `2026-11-21` — gxr-tools added
 - `2026-11-15` — Owner-reported AZF3 coverage for the 32 untargeted module records
 - `2026-11-15` — booinspace AZJ2 modules refreshed to the 2026.11.15 release
 - `2026-11-13` — Five more AZJ2 modules and a module-tab audit
 - `2026-11-12` — GXR-Distortion-Profile added
 - `2026-11-12` — galaxyxr-root added
-- `2026-11-12` — galaxyxr-modules added
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://angeldark92.github.io/GalaxyXR-Forge/#changelog).
 
@@ -214,4 +215,4 @@ Full history: [`CHANGELOG.md`](CHANGELOG.md) · [site Changelog tab](https://ang
 - Rooting and module installation carry risk; read the owning project's docs first.
 - No game files, firmware dumps or proprietary binaries are distributed here.
 
-<div align="center"><sub>Curated 2026-11-15 · 71 repos</sub></div>
+<div align="center"><sub>Curated 2026-11-21 · 72 repos</sub></div>

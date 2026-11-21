@@ -1,0 +1,9 @@
+{
+  "repo": "aali195/gxr-tools",
+  "url": "https://github.com/aali195/gxr-tools",
+  "about": "GXR Profiler & GXR Manager for collecting diagnostics and telemetry via adb.",
+  "license": null,
+  "release": "v2.1.0",
+  "added": "2026-11-21",
+  "tags": ["adb", "galaxy-xr", "virtual-reality"]
+}

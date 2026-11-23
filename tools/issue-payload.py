@@ -6,7 +6,8 @@ Reads ISSUE_BODY (and ISSUE_NUMBER) from the environment. Prints JSON:
      "about": null, "issue": 12}
 
 Accepted body shapes, in order of preference:
-    1. the site form / issue template headings:
+    1. the site form / issue template headings (template HTML comments are
+       ignored):
            ### Repo URL
            https://github.com/owner/name
            ### Group
@@ -71,8 +72,10 @@ def first_url(text):
 
 
 def main():
-    body = os.environ.get("ISSUE_BODY", "")
     number = os.environ.get("ISSUE_NUMBER", "0")
+    # Template HTML comments survive in a markdown issue body; they are not
+    # content (same rule as news mode).
+    body = COMMENT_RE.sub("", os.environ.get("ISSUE_BODY", ""))
     sec = sections(body)
 
     repo = first_url(sec.get("repo url") or body)
@@ -104,7 +107,12 @@ def main():
         )
         return 1
 
-    about = (sec.get("about") or sec.get("notes") or "").strip()
+    about = (
+        sec.get("about")
+        or sec.get("about (optional)")
+        or sec.get("notes")
+        or ""
+    ).strip()
     if len(about) > 160:
         about = about[:157].rstrip() + "…"
     if about.lower() in ("(optional)", "optional", "-"):

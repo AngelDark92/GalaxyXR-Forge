@@ -309,7 +309,6 @@ class TestRenderAgainstCatalog(unittest.TestCase):
         self.assertIn("Compare mode needs JavaScript", self.html)
 
     def test_firmware_group_counts(self):
-        # <details class="fw-group" open><summary>...AZJ2...12 modules...
         groups = re.findall(
             r'<details class="fw-group"( open)?><summary>.*?(AZJ2|AZF3|Other).*?(\d+) module',
             self.html,
@@ -318,7 +317,7 @@ class TestRenderAgainstCatalog(unittest.TestCase):
         counts = {}
         for _, label, count in groups:
             counts[label] = int(count)
-        self.assertEqual(counts.get("AZJ2"), 12)
+        self.assertEqual(counts.get("AZJ2"), 13)
         self.assertEqual(counts.get("AZF3"), 33)
         # Every record now carries a target, so no empty "Firmware not documented" group.
         self.assertNotIn("Other", counts)

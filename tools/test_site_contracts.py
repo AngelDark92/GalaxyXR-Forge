@@ -1003,5 +1003,519 @@ class NewsArchive(unittest.TestCase):
         self.assertIn("<strong>bold</strong>", item)
 
 
+# ---------------------------------------------------------------------------
+# theme: dark by default, light on request
+#
+# Static contracts only: palette values, selector shape and source order. The
+# runtime behaviour (unset -> dark, an invalid stored value reported instead of
+# silently coerced, storage errors shown in the status note) needs a browser.
+# ---------------------------------------------------------------------------
+
+# Light palette pinned from 38ffb39:tools/build.py, the last light-only build.
+LIGHT_ROOT = {
+    "paper": "#faf8f4",
+    "surface": "#fffefc",
+    "surface-2": "#f4f0e8",
+    "ink": "#1b1a17",
+    "ink-2": "#37332d",
+    "muted": "#55514a",
+    "dim": "#6a6459",
+    "line": "#e3ddd2",
+    "line-2": "#d8d1c4",
+    "edge": "#8c8477",
+    "accent": "#b4440c",
+    "accent-ink": "#8f350a",
+    "accent-tint": "#fbeade",
+    "fav": "#8a5a00",
+    "fav-tint": "#fdf7ea",
+    "done": "#1b6b45",
+    "done-tint": "#eef5f0",
+}
+
+# Colours that build hard-coded outside :root before the theme work. They must
+# survive as light-mode token values: #fff is not allowed to drift to #fffefc.
+LIGHT_LITERALS = (
+    "#ffffff",  # filled action text, chip count, NEW tag, filter badge
+    "#d9b877", "#fdf3da",   # experimental / news community
+    "#a3231f", "#e0a9a5", "#fbe9e7",  # deprecated module tag
+    "#4f5560", "#c3c7ce", "#eef0f3",  # internal module tag
+    "#196b47", "#8ec7ab", "#e7f4ec",  # AZJ2 firmware / news release
+    "#14557f", "#8fbdd8", "#e6f1f8",  # AZF3 firmware / news site
+    "#5b3a9e", "#b8a8e0", "#efeaf9",  # news guide
+)
+
+# Scrims, shadows and tinted borders, compared by colour and alpha.
+LIGHT_RGBA = (
+    "rgba(28,26,23,.45)",
+    "rgba(27,26,23,.45)",
+    "rgba(27,26,23,.18)",
+    "rgba(180,68,12,.4)",
+    "rgba(138,90,0,.45)",
+    "rgba(27,107,69,.45)",
+)
+
+COLOR_LITERAL = re.compile(
+    r"#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(|\boklch\(|\bcolor\("
+)
+PLAIN_COLOR = re.compile(r"#(?:[0-9a-fA-F]{3,8})|rgba?\([^)]*\)")
+VAR_ONLY = re.compile(r"var\(\s*(--[\w-]+)\s*\)")
+
+
+def style_css(page):
+    return "\n".join(re.findall(r"<style>(.*?)</style>", page, re.S))
+
+
+def script_blocks(page):
+    """(start offset, body) for every inline script, in document order."""
+    return [
+        (m.start(), m.group(1))
+        for m in re.finditer(r"<script\b[^>]*>(.*?)</script>", page, re.S)
+    ]
+
+
+def css_rules(css):
+    """Flat (selector, declarations) pairs; at-rule wrappers are skipped."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    return [
+        (" ".join(selector.split()), block)
+        for selector, block in re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+    ]
+
+
+def declarations(block):
+    decls = {}
+    for part in block.split(";"):
+        if ":" in part:
+            name, value = part.split(":", 1)
+            decls[name.strip()] = value.strip()
+    return decls
+
+
+def color_tokens(decls):
+    return {
+        name for name, value in decls.items()
+        if name.startswith("--") and COLOR_LITERAL.search(value)
+    }
+
+
+def palette_blocks(page):
+    """(dark, light) token maps, from :root and the [data-theme=light] block."""
+    dark = light = None
+    for selector, block in css_rules(style_css(page)):
+        decls = declarations(block)
+        if not color_tokens(decls):
+            continue
+        if re.search(r"""\[data-theme\s*=\s*["']?light""", selector):
+            light = decls
+        elif re.fullmatch(r":root|html", selector):
+            dark = decls
+    return dark, light
+
+
+def token_color(palette, name):
+    """Token value with `var()` references resolved inside the same palette."""
+    value = palette.get(name, "")
+    for _ in range(4):
+        m = VAR_ONLY.fullmatch(value)
+        if not m:
+            break
+        value = palette.get(m.group(1), "")
+    return value
+
+
+def parse_rgb(value):
+    v = value.strip().lower()
+    m = re.fullmatch(r"#([0-9a-f]{6})(?:[0-9a-f]{2})?", v)
+    if m:
+        h = m.group(1)
+    else:
+        m = re.fullmatch(r"#([0-9a-f]{3})(?:[0-9a-f])?", v)
+        if m:
+            h = "".join(c * 2 for c in m.group(1))
+        else:
+            h = None
+    if h:
+        return tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+    m = re.fullmatch(r"rgba?\(([^)]*)\)", v)
+    if m:
+        parts = [p for p in re.split(r"[ ,/]+", m.group(1).strip()) if p]
+        return tuple(float(p) / 255 for p in parts[:3])
+    raise AssertionError(f"not a plain colour: {value!r}")
+
+
+def relative_luminance(rgb):
+    def channel(c):
+        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+    r, g, b = (channel(c) for c in rgb)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast(value_a, value_b):
+    la, lb = relative_luminance(parse_rgb(value_a)), relative_luminance(parse_rgb(value_b))
+    hi, lo = max(la, lb), min(la, lb)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def contrast_rgb(rgb_a, rgb_b):
+    la, lb = relative_luminance(rgb_a), relative_luminance(rgb_b)
+    hi, lo = max(la, lb), min(la, lb)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def blend(fg_value, bg_value, alpha):
+    """Colour as painted over the background at `alpha`; opacity is not free."""
+    fg, bg = parse_rgb(fg_value), parse_rgb(bg_value)
+    return tuple(alpha * f + (1 - alpha) * b for f, b in zip(fg, bg))
+
+
+def themes_for_selector(selector):
+    """Which palettes a rule applies to, from its own theme marker."""
+    if re.search(r""":not\(\[data-theme\s*=\s*["']?light""", selector):
+        return ("dark",)
+    if re.search(r"""\[data-theme\s*=\s*["']?light""", selector):
+        return ("light",)
+    if re.search(r"""\[data-theme\s*=\s*["']?dark""", selector):
+        return ("dark",)
+    return ("dark", "light")
+
+
+def normalize_colors(values):
+    """Compare colours regardless of `#fff` / `#ffffff` or alpha spelling."""
+    out = set()
+    for raw in values:
+        v = raw.strip().lower()
+        m = re.fullmatch(r"#([0-9a-f]{3})", v)
+        if m:
+            v = "#" + "".join(c * 2 for c in m.group(1))
+        m = re.fullmatch(
+            r"rgba?\(\s*([\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)(?:[ ,/]+([\d.]+))?\s*\)", v
+        )
+        if m:
+            hexed = "".join(f"{int(round(float(x))):02x}" for x in m.groups()[:3])
+            alpha = float(m.group(4)) if m.group(4) else 1.0
+            out.add((hexed, round(alpha, 2)))
+        else:
+            out.add(v)
+    return out
+
+
+def rendered_page():
+    cat = build.load_catalog()
+    return build.render_site(
+        cat, build.load_changelog(), build.load_modules(cat), build.load_news()
+    )
+
+
+class ThemeContracts(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.page = rendered_page()
+        cls.doc = Doc()
+        cls.doc.feed(cls.page)
+        cls.dark, cls.light = palette_blocks(cls.page)
+
+    def test_dark_theme_is_the_default_without_os_media_queries(self):
+        self.assertIsNotNone(self.dark, "no :root colour palette")
+        self.assertEqual(
+            " ".join(self.dark.get("color-scheme", "").split()).lower(), "dark"
+        )
+        self.assertNotIn(
+            "prefers-color-scheme", self.page,
+            "the default must not follow the operating system",
+        )
+        self.assertNotRegex(self.page, r"""<html[^>]*data-theme=["']?light""")
+
+    def test_light_palette_keeps_the_baseline_colors(self):
+        self.assertIsNotNone(self.light, "no [data-theme=light] colour palette")
+        for name, value in LIGHT_ROOT.items():
+            self.assertEqual(
+                normalize_colors([token_color(self.light, "--" + name)]),
+                normalize_colors([value]),
+                f"--{name}",
+            )
+        on_accent = normalize_colors([token_color(self.light, "--on-accent")])
+        self.assertEqual(on_accent, normalize_colors(["#ffffff"]),
+                         "filled action text stays white")
+        self.assertNotEqual(
+            on_accent, normalize_colors([LIGHT_ROOT["surface"]]),
+            "white text must not become the off-white surface",
+        )
+        self.assertEqual(
+            normalize_colors([token_color(self.light, "--count-bg")]),
+            normalize_colors(["#ffffff"]),
+            "the chip count keeps its white plate",
+        )
+        values = normalize_colors(self.light.values())
+        self.assertEqual(normalize_colors(LIGHT_LITERALS) - values, set(), "literals")
+        self.assertEqual(normalize_colors(LIGHT_RGBA) - values, set(), "scrims")
+
+    def test_both_palettes_define_the_same_color_tokens(self):
+        self.assertEqual(
+            color_tokens(self.dark), color_tokens(self.light),
+            "dark and light palettes must define the same colour tokens",
+        )
+        self.assertGreaterEqual(len(color_tokens(self.dark)), 12)
+
+    def test_no_raw_colors_outside_the_palette_blocks(self):
+        offenders = []
+        for selector, block in css_rules(style_css(self.page)):
+            if ":root" in selector or "data-theme" in selector:
+                continue
+            if COLOR_LITERAL.search(block):
+                offenders.append(f"{selector} -> {block.strip()[:80]}")
+        self.assertEqual(offenders, [], "hard-coded colours left in the stylesheet")
+
+    def test_color_scheme_and_theme_color_agree_with_the_default(self):
+        meta = {
+            n.attrs.get("name"): n.attrs.get("content", "")
+            for n in walk(self.doc.root)
+            if n.tag == "meta"
+        }
+        self.assertEqual(meta.get("color-scheme", "").split(), ["dark", "light"])
+        self.assertEqual(
+            normalize_colors([meta.get("theme-color", "")]),
+            normalize_colors([token_color(self.dark, "--paper")]),
+            "theme-color must be the default background",
+        )
+
+    def test_theme_prepaint_runs_in_the_head_before_form_logic(self):
+        body_at = self.page.index("<body")
+        key_at = self.page.index("gxrforge.theme")
+        self.assertLess(key_at, body_at, "theme is read before <body>")
+        for other in ("gxrforge.marks", "gxrforge.sidebar", "gxrforge.live.v1"):
+            self.assertLess(key_at, self.page.index(other), other)
+
+        head_script = self.page[self.page.rindex("<script", 0, key_at):
+                                self.page.index("</script>", key_at)]
+        self.assertIn("data-theme", head_script, "prepaint applies the theme")
+        self.assertNotIn("add-repo", head_script)
+        self.assertNotIn("post-news", head_script)
+
+        for name, marker in (("issueHref", "urlInput.value"),
+                             ("issueHref", "titleIn.value")):
+            self.assertNotIn(
+                "gxrforge.theme", js_function_body(self.page, name, marker),
+                f"{name} must not carry theme logic",
+            )
+
+    def test_theme_storage_policy_is_explicit(self):
+        body_at = self.page.index("<body")
+        blocks = [b for b in script_blocks(self.page) if "gxrforge.theme" in b[1]]
+        self.assertEqual(len(blocks), 2, "one prepaint block and one switch handler")
+        (head_at, head), (handler_at, handler) = blocks
+        self.assertLess(head_at, body_at, "the theme is read before <body>")
+        self.assertGreater(handler_at, body_at, "the switch is wired after <body>")
+        for later in ("gxrforge.marks", "gxrforge.sidebar", "gxrforge.live.v1"):
+            self.assertLess(head_at, self.page.index(later), f"theme before {later}")
+        self.assertIn("'gxrforge.theme'", head)
+        self.assertNotRegex(self.page, r"gxrforge\.theme\.[a-z]")
+
+        # Prepaint: read only, validated, never defaulted with || or ??.
+        self.assertIn("getItem(KEY)", head)
+        self.assertNotIn("setItem", head, "prepaint must not write storage")
+        self.assertIsNone(
+            re.search(r"getItem\([^)]*\)\s*(?:\|\||\?\?)", head),
+            "the stored theme is validated, not defaulted with ||",
+        )
+        self.assertRegex(head, r"value\s*===\s*'light'")
+        self.assertRegex(head, r"!\s*==\s*'dark'")
+
+        # Handler: guarded write, named cause, visible status note.
+        self.assertIn("getElementById('theme-note')", handler)
+        self.assertIn("theme-note", self.page[body_at:], "status note after <body>")
+        self.assertIn("setItem(KEY, name)", handler)
+        self.assertRegex(handler, r"if \(name !== 'dark' && name !== 'light'\)")
+        self.assertRegex(handler, r"try\s*\{[^}]*setItem", "the write is guarded")
+        for name in ("SecurityError", "QuotaExceededError",
+                     "NotSupportedError", "InvalidStateError"):
+            self.assertIn(name, handler, f"{name} is reported specifically")
+        self.assertGreaterEqual(
+            len(re.findall(r"err\.name", handler)), 2,
+            "read and write failures both name the cause",
+        )
+        for attr in ("data-theme-error", "data-theme-invalid"):
+            self.assertIn(attr, handler, f"{attr} is surfaced to the visitor")
+        self.assertTrue(
+            re.search(r"textContent\s*=", handler),
+            "the status note carries the message",
+        )
+
+    def test_theme_switch_is_a_native_labelled_44px_group(self):
+        groups = [n for n in walk(self.doc.root) if "data-theme-switch" in n.attrs]
+        self.assertEqual(len(groups), 1, "one theme switch group")
+        group = groups[0]
+        if group.tag == "fieldset":
+            legends = [n for n in group.children if n.tag == "legend"]
+            self.assertTrue(legends and text_of(legends[0]), "fieldset needs a legend")
+        else:
+            self.assertEqual(group.attrs.get("role"), "group")
+            self.assertTrue(
+                group.attrs.get("aria-label") or group.attrs.get("aria-labelledby"),
+                "a non-native group needs an accessible name",
+            )
+
+        buttons = [
+            n for n in walk(group)
+            if n.tag == "button" and "data-theme-set" in n.attrs
+        ]
+        self.assertEqual(
+            sorted(b.attrs["data-theme-set"] for b in buttons), ["dark", "light"]
+        )
+        for button in buttons:
+            self.assertEqual(button.attrs.get("type"), "button")
+            self.assertTrue(
+                text_of(button) or button.attrs.get("aria-label"),
+                f"{button.attrs['data-theme-set']} button needs a label",
+            )
+        pressed = [
+            b.attrs["data-theme-set"] for b in buttons
+            if b.attrs.get("aria-pressed") == "true"
+        ]
+        self.assertEqual(pressed, ["dark"], "dark is pressed by default")
+
+        note = [n for n in walk(self.doc.root) if n.attrs.get("id") == "theme-note"]
+        self.assertTrue(note, "missing #theme-note")
+        self.assertEqual(note[0].attrs.get("role"), "status")
+
+        sized = []
+        widths = set()
+        for button in buttons:
+            widths.update((button.attrs.get("class") or "").split())
+        for selector, block in css_rules(style_css(self.page)):
+            if not any("." + name in selector for name in widths):
+                continue
+            decls = declarations(block)
+            for prop in ("min-height", "height"):
+                value = decls.get(prop, "")
+                if value.endswith("px") and float(value[:-2]) >= 44:
+                    sized.append(selector)
+        self.assertTrue(sized, "theme buttons need a 44px touch target")
+
+    def test_theme_switch_is_hidden_without_js(self):
+        groups = [n for n in walk(self.doc.root) if "data-theme-switch" in n.attrs]
+        self.assertEqual(len(groups), 1, "one theme switch group")
+        classes = (groups[0].attrs.get("class") or "").split()
+        self.assertTrue(classes, "the switch group needs a class to hide")
+        hidden = []
+        for noscript in re.findall(r"<noscript>(.*?)</noscript>", self.page, re.S):
+            for selector, block in css_rules(noscript):
+                decls = declarations(block)
+                if not any("." + name in selector for name in classes):
+                    continue
+                if decls.get("display") == "none" or decls.get("visibility") == "hidden":
+                    hidden.append(selector)
+        self.assertTrue(hidden, "the switch is hidden when scripting is off")
+
+    def test_form_placeholders_use_palette_colours_and_stay_readable(self):
+        """Form fields need their own placeholder treatment in dark mode.
+
+        The browser's native dark placeholder sits at roughly 3.8:1 on the dark
+        field, below the 4.5:1 normal-text floor. The fields therefore need an
+        explicit palette colour and an explicit opacity, so the rendered text
+        does not fall back to the user agent default. Static contract only: the
+        computed style in a real browser belongs to QA.
+        """
+        form_rules = [
+            (selector, declarations(block))
+            for selector, block in css_rules(style_css(self.page))
+            if "::placeholder" in selector
+            and re.search(r"\b(?:input|textarea)\b", selector)
+            and not re.search(r"#q\b|\.search-wrap\b", selector)
+        ]
+        self.assertTrue(
+            form_rules, "no ::placeholder styling for the form input/textarea fields"
+        )
+
+        field_bg = None
+        for selector, block in css_rules(style_css(self.page)):
+            if "::placeholder" in selector or not re.search(r"\b(?:input|textarea)\b", selector):
+                continue
+            if re.search(r"#q\b|\.search-wrap\b", selector):
+                continue
+            ref = VAR_ONLY.fullmatch(declarations(block).get("background", ""))
+            if ref:
+                field_bg = ref.group(1)
+        self.assertIsNotNone(field_bg, "form fields must use a palette background")
+
+        covered = set()
+        for selector, decls in form_rules:
+            themes = themes_for_selector(selector)
+            covered.update(themes)
+            colour = VAR_ONLY.fullmatch(decls.get("color", ""))
+            self.assertIsNotNone(
+                colour, f"{selector}: placeholder colour must be a palette token"
+            )
+            opacity = decls.get("opacity", "")
+            self.assertRegex(
+                opacity, r"^(?:0?\.\d+|1(?:\.0+)?)$",
+                f"{selector}: placeholder opacity must be explicit and numeric",
+            )
+            alpha = float(opacity)
+            self.assertGreater(alpha, 0.0, f"{selector}: placeholder must be visible")
+            bg_ref = VAR_ONLY.fullmatch(
+                decls.get("background-color") or decls.get("background") or ""
+            )
+            for theme in themes:
+                palette = {"dark": self.dark, "light": self.light}[theme]
+                bg_token = bg_ref.group(1) if bg_ref else field_bg
+                fg_value = token_color(palette, colour.group(1))
+                bg_value = token_color(palette, bg_token)
+                with self.subTest(selector=selector, theme=theme):
+                    self.assertGreaterEqual(
+                        contrast_rgb(blend(fg_value, bg_value, alpha),
+                                     parse_rgb(bg_value)),
+                        4.5,
+                        f"{selector}: {colour.group(1)} at opacity {opacity} "
+                        f"on {bg_token} ({theme})",
+                    )
+        self.assertIn("dark", covered, "dark form placeholders need explicit styling")
+
+    def test_contrast_meets_wcag_in_both_themes(self):
+        for label, palette in (("dark", self.dark), ("light", self.light)):
+            for fg in ("--ink", "--ink-2", "--muted", "--dim"):
+                for bg in ("--paper", "--surface", "--surface-2"):
+                    with self.subTest(theme=label, pair=f"{fg}/{bg}"):
+                        self.assertGreaterEqual(
+                            contrast(token_color(palette, fg),
+                                     token_color(palette, bg)),
+                            4.5,
+                        )
+            for bg in ("--accent", "--accent-ink"):
+                with self.subTest(theme=label, pair=f"--on-accent/{bg}"):
+                    self.assertGreaterEqual(
+                        contrast(token_color(palette, "--on-accent"),
+                                 token_color(palette, bg)),
+                        4.5,
+                    )
+            for surface in ("--paper", "--surface"):
+                with self.subTest(theme=label, pair=f"--edge/{surface}"):
+                    self.assertGreaterEqual(
+                        contrast(token_color(palette, "--edge"),
+                                 token_color(palette, surface)),
+                        3.0,
+                    )
+
+        # Badges and filled actions: every token foreground on token background.
+        for selector, block in css_rules(style_css(self.page)):
+            decls = declarations(block)
+            fg = VAR_ONLY.fullmatch(decls.get("color", ""))
+            bg = VAR_ONLY.fullmatch(
+                decls.get("background-color") or decls.get("background") or ""
+            )
+            if not (fg and bg):
+                continue
+            for label, palette in (("dark", self.dark), ("light", self.light)):
+                fg_value = token_color(palette, fg.group(1))
+                bg_value = token_color(palette, bg.group(1))
+                if not (PLAIN_COLOR.fullmatch(fg_value) and PLAIN_COLOR.fullmatch(bg_value)):
+                    continue
+                with self.subTest(theme=label, selector=selector):
+                    self.assertGreaterEqual(
+                        contrast(fg_value, bg_value), 4.5,
+                        f"{selector}: {fg.group(1)} on {bg.group(1)}",
+                    )
+
+
 if __name__ == "__main__":
     unittest.main()

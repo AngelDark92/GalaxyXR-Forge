@@ -5,8 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Galaxy XR Forge: community repos for the Samsung Galaxy XR (SM-I610)</title>
 <meta name="description" content="Community projects for the Samsung Galaxy XR: root and kernel tools, KernelSU modules, PC VR streaming, app ports and diagnostics.">
-<meta name="color-scheme" content="light">
-<meta name="theme-color" content="#faf8f4">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#14130f">
+<script>
+/* Apply a valid saved light choice before paint; absent preferences use dark.
+   Report invalid values and storage errors without rewriting preferences. */
+(function () {
+  var KEY = 'gxrforge.theme';
+  var known = { SecurityError: 1, QuotaExceededError: 1, NotSupportedError: 1, InvalidStateError: 1 };
+  var root = document.documentElement;
+  var value;
+  try {
+    value = window.localStorage.getItem(KEY);
+  } catch (err) {
+    if (!err || !known[err.name]) { throw err; }
+    root.setAttribute('data-theme-error', err.name);
+    return;
+  }
+  if (value === 'light') {
+    root.setAttribute('data-theme', 'light');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) { meta.setAttribute('content', '#faf8f4'); }
+  } else if (value !== null && value !== 'dark') {
+    root.setAttribute('data-theme-invalid', '');
+  }
+})();
+</script>
 <meta property="og:title" content="Galaxy XR Forge">
 <meta property="og:description" content="Community projects for the Samsung Galaxy XR: root and kernel tools, KernelSU modules, PC VR streaming, app ports and diagnostics.">
 <meta property="og:type" content="website">
@@ -15,17 +39,48 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Type and metrics, shared by both palettes. */
 :root{
+  --font-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono',monospace;
+  --font-disp:'Space Grotesk',var(--font-sans);
+  --tab-h:48px;
+}
+/* Dark is the default; the explicit light override keeps the original colors.
+   Native controls follow the active palette's color-scheme. */
+:root{
+  color-scheme:dark;
+  --paper:#14130f; --surface:#1c1a16; --surface-2:#26221c;
+  --ink:#f3efe6; --ink-2:#ded7c9; --muted:#b6afa1; --dim:#9b9384;
+  --line:#322e27; --line-2:#3f3a31; --edge:#6f675a;
+  --accent:#ff9a5c; --accent-ink:#ffb98a; --accent-tint:#37231a;
+  --accent-edge:rgba(255,154,92,.45); --on-accent:#14130f; --count-bg:#26221c;
+  --fav:#f0b64a; --fav-tint:#2e2413; --fav-edge:rgba(240,182,74,.5);
+  --done:#6fd39b; --done-tint:#12291d; --done-edge:rgba(111,211,155,.45);
+  --ok:#6fd39b; --ok-tint:#12291d; --ok-edge:#2f6b4c;
+  --warn:#f0b64a; --warn-tint:#2e2413; --warn-edge:#6d5322;
+  --danger:#ff9b93; --danger-tint:#2f1512; --danger-edge:#70332c;
+  --info:#7fc4ef; --info-tint:#10222e; --info-edge:#2c5872;
+  --neutral:#c3c8d0; --neutral-tint:#1e2126; --neutral-edge:#454b55;
+  --guide:#c3b0f0; --guide-tint:#221b3a; --guide-edge:#4c3d7d;
+  --dot-ring:rgba(255,255,255,.22); --shadow:rgba(0,0,0,.6); --scrim:rgba(0,0,0,.62);
+}
+html[data-theme="light"]{
   color-scheme:light;
   --paper:#faf8f4; --surface:#fffefc; --surface-2:#f4f0e8;
   --ink:#1b1a17; --ink-2:#37332d; --muted:#55514a; --dim:#6a6459;
   --line:#e3ddd2; --line-2:#d8d1c4; --edge:#8c8477;
   --accent:#b4440c; --accent-ink:#8f350a; --accent-tint:#fbeade;
-  --fav:#8a5a00; --fav-tint:#fdf7ea; --done:#1b6b45; --done-tint:#eef5f0;
-  --font-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
-  --font-mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono',monospace;
-  --font-disp:'Space Grotesk',var(--font-sans);
-  --tab-h:48px;
+  --accent-edge:rgba(180,68,12,.4); --on-accent:#fff; --count-bg:#fff;
+  --fav:#8a5a00; --fav-tint:#fdf7ea; --fav-edge:rgba(138,90,0,.45);
+  --done:#1b6b45; --done-tint:#eef5f0; --done-edge:rgba(27,107,69,.45);
+  --ok:#196b47; --ok-tint:#e7f4ec; --ok-edge:#8ec7ab;
+  --warn:#8a5a00; --warn-tint:#fdf3da; --warn-edge:#d9b877;
+  --danger:#a3231f; --danger-tint:#fbe9e7; --danger-edge:#e0a9a5;
+  --info:#14557f; --info-tint:#e6f1f8; --info-edge:#8fbdd8;
+  --neutral:#4f5560; --neutral-tint:#eef0f3; --neutral-edge:#c3c7ce;
+  --guide:#5b3a9e; --guide-tint:#efeaf9; --guide-edge:#b8a8e0;
+  --dot-ring:rgba(27,26,23,.18); --shadow:rgba(27,26,23,.45); --scrim:rgba(28,26,23,.45);
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -36,7 +91,7 @@ a{color:inherit;text-decoration:none}
 :where(a[href],button,summary,label[for],select){cursor:pointer}
 :where(button:disabled),[aria-disabled="true"]{cursor:not-allowed}
 :where(a,button,input,select,textarea,summary):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:#fff;padding:10px 14px;border-radius:0 0 8px 0;z-index:60}
+.skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:var(--on-accent);padding:10px 14px;border-radius:0 0 8px 0;z-index:60}
 .skip:focus{left:0}
 .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
 /* Masthead: one compact block, device line, name, what the index is, live counts */
@@ -48,7 +103,7 @@ a{color:inherit;text-decoration:none}
 h1{font:700 clamp(1.85rem,3.4vw,2.4rem)/1.1 var(--font-disp);letter-spacing:-.015em;margin:0 0 6px}
 h1 .accent{color:var(--accent)}
 .tagline{max-width:64ch;color:var(--muted);font-size:14.5px;line-height:1.55;margin:0}
-.masthead-actions{display:flex;flex:none;padding-top:2px}
+.masthead-actions{display:flex;flex:none;flex-wrap:wrap;justify-content:flex-end;gap:8px;padding-top:2px}
 .stats{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:4px 0;padding-top:11px;border-top:1px solid var(--line)}
 .stat{display:flex;align-items:baseline;gap:6px;padding:0 16px;border-left:1px solid var(--line)}
 .stat:first-child{padding-left:0;border-left:0}
@@ -56,11 +111,24 @@ h1 .accent{color:var(--accent)}
 .stat span{font:500 11.5px var(--font-mono);color:var(--dim)}
 /* Actions */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;padding:0 14px;font:500 12.5px var(--font-mono);cursor:pointer;text-decoration:none;border:1px solid var(--edge);background:var(--surface);color:var(--ink);min-height:44px;white-space:nowrap}
-.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .btn-primary:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
 .btn-ghost{background:transparent;color:var(--ink-2)}
 .btn-ghost:hover{color:var(--accent);border-color:var(--accent)}
 .btn-sm{padding:0 12px;font-size:12px;min-height:44px}
+/* The handler updates these buttons to match the restored theme. */
+.theme-switch{display:inline-flex;align-items:center;gap:8px;flex:none}
+.theme-switch-label{font:500 11.5px var(--font-mono);color:var(--dim)}
+.theme-opts{display:inline-flex;flex:none}
+.theme-opt{min-width:44px;min-height:44px;padding:0 13px;border:1px solid var(--edge);background:var(--surface);color:var(--muted);font:500 12px var(--font-mono);cursor:pointer}
+.theme-opt:first-child{border-radius:8px 0 0 8px}
+.theme-opt:last-child{border-radius:0 8px 8px 0;margin-left:-1px}
+.theme-opt:hover{color:var(--ink);border-color:var(--ink-2)}
+.theme-opt[aria-pressed="true"]{position:relative;z-index:1;background:var(--accent-tint);border-color:var(--accent);color:var(--accent)}
+.theme-opt:focus-visible{position:relative;z-index:2;outline:2px solid var(--accent);outline-offset:1px}
+.theme-note{margin:0;flex:1 1 100%;font:500 12.5px/1.5 var(--font-mono);color:var(--warn)}
+.theme-note:empty{display:none}
+@media (max-width:480px){.theme-switch-label{display:none}}
 @media (max-width:640px){
   .masthead .wrap{padding-top:18px;padding-bottom:14px}
   .stat{padding:0 10px}
@@ -108,15 +176,15 @@ h1 .accent{color:var(--accent)}
 #q::placeholder{color:var(--dim)}
 .chips{display:flex;flex-direction:column;gap:2px;min-width:0}
 .chip{display:flex;align-items:center;gap:8px;width:100%;border:1px solid transparent;background:transparent;color:var(--ink-2);border-radius:8px;padding:0 8px;font:500 13px var(--font-sans);cursor:pointer;min-height:44px;text-align:left}
-.chip .dot{width:8px;height:8px;border-radius:2px;background:var(--hue,var(--line-2));box-shadow:0 0 0 1px rgba(27,26,23,.18);flex:none}
+.chip .dot{width:8px;height:8px;border-radius:2px;background:var(--hue,var(--line-2));box-shadow:0 0 0 1px var(--dot-ring);flex:none}
 .chip .lbl{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chip b{margin-left:auto;flex:none;font:500 11px var(--font-mono);color:var(--dim);background:var(--surface-2);border-radius:99px;padding:1px 6px}
 .chip:hover{background:var(--surface-2);color:var(--ink)}
-.chip.is-active{color:var(--ink);background:var(--accent-tint);border-color:rgba(180,68,12,.4)}
-.chip.is-active b{color:var(--accent);background:#fff}
-.chip[data-status="fav"].is-active{background:var(--fav-tint);border-color:rgba(138,90,0,.45)}
-.chip[data-status="done"].is-active{background:var(--done-tint);border-color:rgba(27,107,69,.45)}
-.side-done{display:none;align-items:center;justify-content:center;gap:8px;width:100%;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:8px;padding:0 14px;font:500 13px var(--font-sans);cursor:pointer;min-height:44px}
+.chip.is-active{color:var(--ink);background:var(--accent-tint);border-color:var(--accent-edge)}
+.chip.is-active b{color:var(--accent);background:var(--count-bg)}
+.chip[data-status="fav"].is-active{background:var(--fav-tint);border-color:var(--fav-edge)}
+.chip[data-status="done"].is-active{background:var(--done-tint);border-color:var(--done-edge)}
+.side-done{display:none;align-items:center;justify-content:center;gap:8px;width:100%;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);border-radius:8px;padding:0 14px;font:500 13px var(--font-sans);cursor:pointer;min-height:44px}
 .side-done:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
 .side-done b{font-weight:600;font-family:var(--font-mono)}
 .backdrop{display:none}
@@ -130,11 +198,11 @@ body.view-noncatalog .shell{grid-template-columns:minmax(0,1fr)}
 @media (max-width:1000px){
   .shell{grid-template-columns:minmax(0,1fr);padding-top:16px}
   .side{position:fixed;top:0;bottom:0;left:0;z-index:60;width:min(320px,86vw);max-height:none;border-radius:0 12px 12px 0;border-left:0;opacity:0;transform:translateX(-104%);visibility:hidden;transition:transform .16s ease,opacity .16s ease,visibility 0s linear .16s;overflow:auto}
-  body.side-open .side{opacity:1;transform:none;visibility:visible;box-shadow:0 24px 60px -30px rgba(27,26,23,.45);transition:transform .16s ease,opacity .16s ease,visibility 0s linear 0s}
+  body.side-open .side{opacity:1;transform:none;visibility:visible;box-shadow:0 24px 60px -30px var(--shadow);transition:transform .16s ease,opacity .16s ease,visibility 0s linear 0s}
   .side-head{display:flex}
   .side-done{display:flex}
   .side-done-wrap{padding:12px;border-top:1px solid var(--line)}
-  .backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:50;background:rgba(28,26,23,.45)}
+  .backdrop:not([hidden]){display:block;position:fixed;inset:0;z-index:50;background:var(--scrim)}
 }
 @media (prefers-reduced-motion:reduce){.side{transition:none}}
 /* View headers */
@@ -158,7 +226,7 @@ body.view-noncatalog .shell{grid-template-columns:minmax(0,1fr)}
 .mod-repo{margin:0 0 26px}
 .mod-head{display:flex;align-items:baseline;gap:8px 12px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px solid var(--line)}
 .mod-head h3{display:flex;align-items:center;gap:8px;font:600 16px/1.3 var(--font-disp);margin:0;min-width:0;overflow-wrap:anywhere}
-.mod-head h3 .dot{width:8px;height:8px;border-radius:2px;background:var(--hue);box-shadow:0 0 0 1px rgba(27,26,23,.18);flex:none}
+.mod-head h3 .dot{width:8px;height:8px;border-radius:2px;background:var(--hue);box-shadow:0 0 0 1px var(--dot-ring);flex:none}
 .mod-head h3 .owner{font:400 12.5px var(--font-mono);color:var(--dim)}
 .mod-head h3 a{min-width:0;overflow-wrap:anywhere}
 .mod-head h3 a:hover{color:var(--accent)}
@@ -176,13 +244,13 @@ body.view-noncatalog .shell{grid-template-columns:minmax(0,1fr)}
 .mod-row h4 code{font:400 11px/1.5 var(--font-mono);color:var(--dim);background:transparent;border:0;padding:0;overflow-wrap:anywhere}
 .mod-row p{grid-column:1/-1;margin:0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
 .mod-tag{justify-self:end;padding:1px 7px;border:1px solid var(--line);border-radius:4px;font:600 9.5px/1.8 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);white-space:nowrap}
-.mod-tag.experimental{color:#8a5a00;border-color:#d9b877;background:#fdf3da}
-.mod-tag.deprecated{color:#a3231f;border-color:#e0a9a5;background:#fbe9e7}
-.mod-tag.internal{color:#4f5560;border-color:#c3c7ce;background:#eef0f3}
+.mod-tag.experimental{color:var(--warn);border-color:var(--warn-edge);background:var(--warn-tint)}
+.mod-tag.deprecated{color:var(--danger);border-color:var(--danger-edge);background:var(--danger-tint)}
+.mod-tag.internal{color:var(--neutral);border-color:var(--neutral-edge);background:var(--neutral-tint)}
 .mod-view-switch{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
 .mod-view-switch .btn{border-color:var(--edge);background:var(--surface);color:var(--ink-2)}
 .mod-view-switch .btn:hover{border-color:var(--accent);color:var(--accent)}
-.mod-view-switch .btn.is-active{background:var(--accent);border-color:var(--accent);color:#fff}
+.mod-view-switch .btn.is-active{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .mod-view-switch .btn.is-active:hover{background:var(--accent-ink)}
 .fw-group{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:0 0 10px}
 .fw-group summary{display:flex;align-items:center;gap:10px;padding:0 13px;min-height:52px;cursor:pointer;list-style:none;font:500 12.5px var(--font-sans);color:var(--ink)}
@@ -190,8 +258,8 @@ body.view-noncatalog .shell{grid-template-columns:minmax(0,1fr)}
 .fw-group summary::before{content:"";width:6px;height:6px;border-radius:1px;background:var(--edge);flex:none;transition:transform .15s ease,background-color .15s ease}
 .fw-group[open]>summary::before{transform:rotate(45deg);background:var(--accent)}
 .fw-badge{display:inline-flex;align-items:center;padding:1px 7px;border-radius:4px;font:600 10px/1.8 var(--font-mono);letter-spacing:.04em;text-transform:uppercase;flex:none;border:1px solid}
-.fw-badge.azj2{background:#e7f4ec;color:#196b47;border-color:#8ec7ab}
-.fw-badge.azf3{background:#e6f1f8;color:#14557f;border-color:#8fbdd8}
+.fw-badge.azj2{background:var(--ok-tint);color:var(--ok);border-color:var(--ok-edge)}
+.fw-badge.azf3{background:var(--info-tint);color:var(--info);border-color:var(--info-edge)}
 .fw-badge.unknown{background:var(--surface-2);color:var(--dim);border-color:var(--line-2)}
 .fw-title{flex:1;min-width:0;font:600 13.5px var(--font-disp)}
 .fw-count{flex:none;font:500 11px var(--font-mono);color:var(--dim)}
@@ -229,7 +297,7 @@ main{padding:0 0 6px}
 .group{margin:0 0 28px}
 .group-head{padding-bottom:7px;border-bottom:2px solid var(--ink)}
 .group-head h2{display:flex;align-items:center;gap:8px;font:600 1.05rem var(--font-disp);margin:0}
-.group-head .dot{width:8px;height:8px;border-radius:2px;background:var(--hue);box-shadow:0 0 0 1px rgba(27,26,23,.18);flex:none}
+.group-head .dot{width:8px;height:8px;border-radius:2px;background:var(--hue);box-shadow:0 0 0 1px var(--dot-ring);flex:none}
 .blurb{color:var(--dim);margin:4px 0 0;font-size:13px;line-height:1.5;max-width:76ch}
 .cards{display:flex;flex-direction:column}
 .card{display:flex;flex-direction:column;gap:4px;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:11px 12px;margin:0 -12px;transition:background-color .12s ease}
@@ -238,7 +306,7 @@ main{padding:0 0 6px}
 .card.is-fav{background:var(--fav-tint)}
 .card.is-done{background:var(--done-tint)}
 .card.is-new{box-shadow:inset 2px 0 0 var(--accent)}
-.tag-new{display:none;align-items:center;padding:1px 6px;border-radius:4px;font:600 9.5px/1.8 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--accent);vertical-align:middle;white-space:nowrap}
+.tag-new{display:none;align-items:center;padding:1px 6px;border-radius:4px;font:600 9.5px/1.8 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--on-accent);background:var(--accent);vertical-align:middle;white-space:nowrap}
 .card.is-new .tag-new{display:inline-flex}
 .card-top{display:flex;align-items:flex-start;gap:24px 12px;justify-content:space-between;flex-wrap:wrap}
 .card h3{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font:600 15px/1.35 var(--font-disp);margin:0;flex:1 1 260px;min-width:0;overflow-wrap:anywhere}
@@ -281,7 +349,7 @@ main{padding:0 0 6px}
 .filter-btn:hover{border-color:var(--accent);color:var(--accent)}
 .filter-btn[aria-expanded="true"]{border-color:var(--ink-2);color:var(--ink)}
 .filter-btn svg{width:14px;height:14px;flex:none}
-.filter-badge{display:none;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--accent);color:#fff;font:600 11px var(--font-mono)}
+.filter-badge{display:none;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--accent);color:var(--on-accent);font:600 11px var(--font-mono)}
 .filter-badge.has-count{display:inline-flex}
 .toolbar-clear{border:0;background:transparent;color:var(--muted);font:500 13px var(--font-sans);cursor:pointer;padding:0 8px;min-height:44px;border-radius:8px}
 .toolbar-clear:hover{color:var(--accent);background:var(--surface-2)}
@@ -298,10 +366,10 @@ main{padding:0 0 6px}
 .news-meta{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font:11.5px var(--font-mono);color:var(--dim);margin-bottom:6px}
 .news-meta time{color:var(--muted)}
 .news-kind{display:inline-flex;padding:1px 7px;border-radius:4px;font:600 10px/1.8 var(--font-mono);letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);background:var(--surface-2)}
-.news-kind[data-kind="site"]{color:#14557f;border-color:#8fbdd8;background:#e6f1f8}
-.news-kind[data-kind="release"]{color:#196b47;border-color:#8ec7ab;background:#e7f4ec}
-.news-kind[data-kind="community"]{color:#8a5a00;border-color:#d9b877;background:#fdf3da}
-.news-kind[data-kind="guide"]{color:#5b3a9e;border-color:#b8a8e0;background:#efeaf9}
+.news-kind[data-kind="site"]{color:var(--info);border-color:var(--info-edge);background:var(--info-tint)}
+.news-kind[data-kind="release"]{color:var(--ok);border-color:var(--ok-edge);background:var(--ok-tint)}
+.news-kind[data-kind="community"]{color:var(--warn);border-color:var(--warn-edge);background:var(--warn-tint)}
+.news-kind[data-kind="guide"]{color:var(--guide);border-color:var(--guide-edge);background:var(--guide-tint)}
 .news-author{color:var(--muted)}
 .news-author:hover{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
 .news-title{font:600 17px/1.35 var(--font-disp);margin:0 0 6px;display:flex;align-items:baseline;gap:8px}
@@ -339,8 +407,8 @@ footer a{color:var(--muted);text-decoration:underline;text-decoration-color:var(
 footer a:hover{color:var(--accent);text-decoration-color:currentColor}
 code{font-family:var(--font-mono);background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);border-radius:5px;padding:1px 5px;font-size:.9em}
 /* Dialogs: the one elevated surface, because they sit above the page */
-.add-dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0;width:min(540px,calc(100vw - 28px));max-height:min(88vh,720px);overflow:auto;box-shadow:0 24px 60px -28px rgba(27,26,23,.45)}
-.add-dialog::backdrop{background:rgba(28,26,23,.45)}
+.add-dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0;width:min(540px,calc(100vw - 28px));max-height:min(88vh,720px);overflow:auto;box-shadow:0 24px 60px -28px var(--shadow)}
+.add-dialog::backdrop{background:var(--scrim)}
 .add-form{display:flex;flex-direction:column;gap:6px;padding:20px}
 .add-form h2{font:600 1.2rem var(--font-disp);margin:0}
 .add-form .dlg-lede{margin:0 0 4px;color:var(--muted);font-size:13.5px;line-height:1.55}
@@ -349,24 +417,27 @@ code{font-family:var(--font-mono);background:var(--surface-2);border:1px solid v
 .add-form input,.add-form select,.add-form textarea{background:var(--surface);border:1px solid var(--edge);color:var(--ink);border-radius:8px;padding:0 12px;font:14px var(--font-sans);width:100%;min-height:44px}
 .add-form textarea{resize:vertical;min-height:96px;padding:10px 12px;line-height:1.5}
 .add-form input:focus,.add-form select:focus,.add-form textarea:focus{border-color:var(--accent)}
+/* Same --dim the search field uses, so hint text reads in both palettes. */
+.add-form input::placeholder,.add-form textarea::placeholder{color:var(--dim);opacity:1}
 .dlg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .dlg-close{border:1px solid var(--edge);background:transparent;color:var(--muted);border-radius:8px;width:44px;height:44px;min-height:44px;padding:0;cursor:pointer;font:14px/1 var(--font-mono);flex:none}
 .dlg-close:hover{color:var(--accent);border-color:var(--accent)}
 .dlg-actions{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
-.add-submit{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);border:1px solid var(--accent);color:#fff;font:500 13px var(--font-mono);padding:0 16px;min-height:44px;border-radius:8px;text-decoration:none}
+.add-submit{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);border:1px solid var(--accent);color:var(--on-accent);font:500 13px var(--font-mono);padding:0 16px;min-height:44px;border-radius:8px;text-decoration:none}
 .add-submit:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
 .add-submit.is-disabled{background:var(--surface-2);color:var(--dim);border:1px solid var(--line-2);pointer-events:none}
 .dlg-alt{color:var(--dim);font-size:12px}
 .dlg-note{margin:2px 0 6px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--ink-2);font-size:12.5px;line-height:1.5}
 .dlg-status{margin:2px 0 0;min-height:16px;font:12px var(--font-mono);color:var(--dim)}
-.dlg-status.ok{color:#1b6b45}
-.dlg-status.warn{color:#8a5a00}
+.dlg-status.ok{color:var(--done)}
+.dlg-status.warn{color:var(--warn)}
 @media (prefers-reduced-motion:reduce){
   .side,.fw-group summary::before,.flag>span,.card,.tab,.chip,.btn,.news-link,.mod-view-switch .btn{transition:none}
 }
 </style>
 <noscript><style>
 .tabbar{display:none}
+.theme-switch{display:none}
 #catalog,#modules,#changelog,#news{display:block !important}
 #catalog[hidden],#modules[hidden],#changelog[hidden],#news[hidden]{display:block !important}
 @media (max-width:1000px){
@@ -385,8 +456,16 @@ code{font-family:var(--font-mono);background:var(--surface-2);border:1px solid v
       <p class="tagline">Community projects for the Samsung Galaxy XR: root and kernel tools, KernelSU modules, PC VR streaming, app ports and diagnostics.</p>
     </div>
     <div class="masthead-actions">
+      <div class="theme-switch" role="group" aria-label="Colour theme" data-theme-switch>
+        <span class="theme-switch-label" aria-hidden="true">Theme</span>
+        <div class="theme-opts">
+          <button type="button" class="theme-opt" data-theme-set="dark" aria-pressed="true">Dark</button>
+          <button type="button" class="theme-opt" data-theme-set="light" aria-pressed="false">Light</button>
+        </div>
+      </div>
       <a class="btn btn-ghost" href="https://github.com/AngelDark92/GalaxyXR-Forge" target="_blank" rel="noopener">Star on GitHub</a>
     </div>
+    <p class="theme-note" id="theme-note" role="status"></p>
     <div class="stats">
       <div class="stat"><b id="count">71</b><span>repos shown</span></div>
       <div class="stat"><b>9</b><span>groups</span></div>
@@ -414,7 +493,7 @@ code{font-family:var(--font-mono);background:var(--surface-2);border:1px solid v
     <div class="side-section">
       <span class="side-label" id="lbl-groups">Group</span>
       <div class="chips" role="group" aria-labelledby="lbl-groups">
-        <button type="button" class="chip is-active" data-group="all" aria-pressed="true" style="--hue:#b4440c" title="Show every group"><span class="dot"></span><span class="lbl">All groups</span><b>71</b></button>
+        <button type="button" class="chip is-active" data-group="all" aria-pressed="true" style="--hue:var(--accent)" title="Show every group"><span class="dot"></span><span class="lbl">All groups</span><b>71</b></button>
         <button type="button" class="chip" data-group="root-kernel" aria-pressed="false" style="--hue:#f59e0b" title="Root the headset and keep it: managers, loaders and kernel research."><span class="dot"></span><span class="lbl">Root &amp; Kernel</span><b>5</b></button>
         <button type="button" class="chip" data-group="kernelsu-modules" aria-pressed="false" style="--hue:#34d399" title="Runtime device patches for tracking, haptics and thermals; every package installs disabled."><span class="dot"></span><span class="lbl">KernelSU Modules</span><b>6</b></button>
         <button type="button" class="chip" data-group="face-eye" aria-pressed="false" style="--hue:#c084fc" title="Face and eye tracking for PC VR: relays, bridges and fixes."><span class="dot"></span><span class="lbl">Face &amp; Eye Tracking</span><b>6</b></button>
@@ -559,6 +638,61 @@ code{font-family:var(--font-mono);background:var(--surface-2);border:1px solid v
     <span>Suggest a repo: <a href="https://github.com/AngelDark92/GalaxyXR-Forge/issues/new?template=add-repo.md&labels=add-repo">file it from the site</a>, or run <code>python tools/add-repo.py</code> · <a href="https://github.com/AngelDark92/GalaxyXR-Forge" target="_blank" rel="noopener">Star on GitHub</a> · <a href="#changelog">Changelog</a> · <a href="#news">News</a> · Agents: <a href="https://github.com/AngelDark92/GalaxyXR-Forge/blob/main/AGENTS.md">AGENTS.md</a></span>
   </div>
 </footer>
+<script>
+/* A separate script keeps theme failures from interrupting catalog controls. */
+(function () {
+  var KEY = 'gxrforge.theme';
+  var known = { SecurityError: 1, QuotaExceededError: 1, NotSupportedError: 1, InvalidStateError: 1 };
+  var root = document.documentElement;
+  var sw = document.querySelector('[data-theme-switch]');
+  var note = document.getElementById('theme-note');
+  if (!sw || !note) { return; }
+  var buttons = [].slice.call(sw.querySelectorAll('[data-theme-set]'));
+  var meta = document.querySelector('meta[name="theme-color"]');
+
+  function say(text) { note.textContent = text; }
+  function current() { return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'; }
+  function paint() {
+    var now = current();
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-theme-set') === now ? 'true' : 'false');
+    });
+  }
+  function apply(name) {
+    if (name === 'light') { root.setAttribute('data-theme', 'light'); }
+    else { root.removeAttribute('data-theme'); }
+    if (meta) { meta.setAttribute('content', name === 'light' ? '#faf8f4' : '#14130f'); }
+    paint();
+  }
+
+  /* The prepaint pass reports what it found; the message names the cause. */
+  var readError = root.getAttribute('data-theme-error');
+  if (readError) {
+    say('Could not read saved theme (' + readError + '). Choose a theme for this page.');
+  } else if (root.hasAttribute('data-theme-invalid')) {
+    say('Saved theme is invalid. Choose Dark or Light.');
+  }
+  paint();
+
+  sw.addEventListener('click', function (ev) {
+    var btn = ev.target && ev.target.closest ? ev.target.closest('[data-theme-set]') : null;
+    if (!btn) { return; }
+    var name = btn.getAttribute('data-theme-set');
+    if (name !== 'dark' && name !== 'light') { return; }
+    apply(name);
+    try {
+      window.localStorage.setItem(KEY, name);
+    } catch (err) {
+      if (!err || !known[err.name]) { throw err; }
+      say('Theme changed, but could not save it (' + err.name + ').');
+      return;
+    }
+    root.removeAttribute('data-theme-invalid');
+    root.removeAttribute('data-theme-error');
+    say('');
+  });
+})();
+</script>
 <script>
 (function () {
   var STORE_KEY = 'gxrforge.marks';
